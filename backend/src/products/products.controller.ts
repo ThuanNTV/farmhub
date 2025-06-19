@@ -1,0 +1,42 @@
+// src/tenant/product/tenant-products.controller.ts
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+
+@Controller('tenant/:storeId/products')
+export class ProductsController {
+  constructor(private readonly service: ProductsService) {}
+
+  @Post()
+  create(@Param('storeId') storeId: string, @Body() dto: CreateProductDto) {
+    return this.service.create(storeId, dto);
+  }
+
+  @Get()
+  findAll(@Param('storeId') storeId: string) {
+    return this.service.findAll(storeId);
+  }
+
+  @Put(':id')
+  update(
+    @Param('storeId') storeId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateProductDto,
+  ) {
+    return this.service.update(storeId, id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('storeId') storeId: string, @Param('id') id: string) {
+    return this.service.remove(storeId, id);
+  }
+}
