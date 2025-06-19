@@ -47,9 +47,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
     try {
       // 1. Validate và lấy thông tin store từ Global Database
       const store = await this.getValidatedStore(storeId);
-      console.log(
-        `Fetching DataSource for store: ${storeId} (db: ${store.databaseName})`,
-      );
+
       const dbName = store.databaseName;
 
       // 2. Kiểm tra cache
@@ -180,7 +178,8 @@ export class TenantDataSourceService implements OnModuleDestroy {
       await newDataSource.initialize();
 
       // Test connection
-      if (process.env.NODE_ENV !== 'production') {
+      const shouldSync = await this.shouldSynchronize(newDataSource);
+      if (shouldSync) {
         this.logger.warn(`Synchronizing schema for db: ${dbName}`);
         await newDataSource.synchronize();
       }
@@ -205,6 +204,37 @@ export class TenantDataSourceService implements OnModuleDestroy {
       }
 
       throw error;
+    }
+  }
+
+  /**
+   * Kiểm tra xem có cần đồng bộ hóa schema không
+   * Nếu bảng 'products' không tồn tại, sẽ đồng bộ hóa schema
+   */
+  private async shouldSynchronize(dataSource: DataSource): Promise<boolean> {
+    try {
+      // Check TypeORM migrations table
+      const result = await dataSource.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'migrations'
+      )
+    `);
+
+      if (!result[0].exists) {
+        return true; // Chưa có migration table → DB mới
+      }
+
+      // Optional: Check migration status
+      const migrationCount = await dataSource.query(`
+      SELECT COUNT(*) as count FROM migrations
+    `);
+
+      return migrationCount[0].count === 0; // Chưa có migration nào
+    } catch (err) {
+      this.logger.warn('Migration check failed. Defaulting to sync.', err);
+      return true;
     }
   }
 
