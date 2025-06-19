@@ -1,0 +1,253 @@
+I. Database Quản lý Chung (Global/Admin Database)
+Database này chứa các thông tin tổng quan, ít thay đổi, và được quản lý tập trung.
+
+1. Bảng Store (Cửa hàng)
+Lưu trữ thông tin cơ bản về mỗi chi nhánh FarmHub.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của cửa hàng (ví dụ: STORE001, STORE002).	Khóa chính
+name	NVARCHAR(255)	Tên hiển thị của cửa hàng (ví dụ: "FarmHub - Phước Sơn", "FarmHub - Thanh Dũng").	
+address	NVARCHAR(500)	Địa chỉ đầy đủ của cửa hàng.	
+phone	VARCHAR(20)	Số điện thoại liên hệ của cửa hàng.	
+email	VARCHAR(255)	Email liên hệ của cửa hàng.	
+database_name	VARCHAR(255)	Tên của database riêng dành cho cửa hàng này.	Quan trọng để ứng dụng kết nối đúng DB.
+manager_id	VARCHAR(255)	ID của người quản lý chính của cửa hàng (khóa ngoại tới User.id).	Tùy chọn, nếu có quản lý riêng từng cửa hàng.
+opening_hours	NVARCHAR(255)	Giờ mở cửa của cửa hàng (ví dụ: "Thứ 2 - CN: 8:00 - 18:00").	
+is_active	BOOLEAN	TRUE nếu cửa hàng đang hoạt động, FALSE nếu không.	
+created_at	DATETIME	Thời gian bản ghi được tạo.	Mặc định: thời gian hiện tại
+updated_at	DATETIME	Thời gian bản ghi được cập nhật lần cuối.	Tự động cập nhật khi chỉnh sửa
+
+
+2. Bảng User (Người dùng/Nhân viên)
+Lưu trữ thông tin tài khoản người dùng có quyền truy cập vào hệ thống.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của người dùng.	Khóa chính
+username	VARCHAR(255)	Tên đăng nhập duy nhất.	Duy nhất
+password_hash	VARCHAR(255)	Mã băm (hash) của mật khẩu người dùng.	Bảo mật
+full_name	NVARCHAR(255)	Tên đầy đủ của người dùng.	
+email	VARCHAR(255)	Địa chỉ email của người dùng.	Có thể dùng cho khôi phục mật khẩu.
+phone	VARCHAR(20)	Số điện thoại của người dùng.	
+role	VARCHAR(50)	Vai trò của người dùng (ví dụ: "admin_global", "store_manager", "store_staff", "viewer").	Xác định quyền truy cập và chức năng.
+associated_store_ids	JSON/TEXT	Mảng các ID cửa hàng mà người dùng này có quyền truy cập (nếu một user có thể truy cập nhiều cửa hàng).	
+is_active	BOOLEAN	TRUE nếu tài khoản đang hoạt động, FALSE nếu bị vô hiệu hóa.	
+is_superadmin	BOOLEAN	TRUE nếu là quản trị viên tối cao toàn hệ thống.	Cấp quyền cao nhất, không giới hạn bởi store_id.
+last_login_at	DATETIME	Thời gian đăng nhập gần nhất.	
+password_reset_token	VARCHAR(255)	Token tạm thời dùng cho chức năng đặt lại mật khẩu.	Tùy chọn
+token_expiry_at	DATETIME	Thời gian hết hạn của password_reset_token.	Tùy chọn
+created_at	DATETIME	Thời gian tài khoản được tạo.	
+updated_at	DATETIME	Thời gian bản ghi được cập nhật lần cuối.	
+
+
+II. Database Riêng cho Từng Cửa Hàng (Tenant-Specific Database)
+Mỗi cửa hàng sẽ có một database riêng (tên database được lưu trong Store.database_name) với cấu trúc bảng giống hệt nhau như mô tả dưới đây.
+
+1. Bảng Product (Sản phẩm)
+Lưu trữ thông tin chi tiết về các sản phẩm được bán tại cửa hàng cụ thể này.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của sản phẩm trong cửa hàng này (ví dụ: PRD001).	Khóa chính
+product_code	VARCHAR(255)	Mã SKU của sản phẩm (ví dụ: ST180).	Duy nhất trong phạm vi cửa hàng.
+name	NVARCHAR(255)	Tên đầy đủ của sản phẩm.	
+slug	VARCHAR(255)	Chuỗi tối ưu cho URL (ví dụ: may-cua-xang-stihl-ms180).	Dễ đọc, SEO.
+description	NVARCHAR(MAX)	Mô tả chi tiết về sản phẩm.	
+category_id	VARCHAR(255)	ID của danh mục sản phẩm (khóa ngoại tới Category.id trong database này).	
+brand	NVARCHAR(100)	Tên thương hiệu của sản phẩm.	
+unit	NVARCHAR(50)	Đơn vị tính của sản phẩm (ví dụ: "cái", "chai", "kg", "bao", "lít").	
+price	DECIMAL(18,2)	Giá bán lẻ của sản phẩm.	
+credit_price	DECIMAL(18,2)	Giá bán khi trả góp/công nợ (nếu khác giá bán lẻ).	
+stock	INT	Số lượng tồn kho hiện có của sản phẩm tại cửa hàng này.	Mặc định: 0
+min_stock_level	INT	Ngưỡng tồn kho tối thiểu để cảnh báo.	Mặc định: 0
+images	TEXT/JSON	Mảng các URL hình ảnh của sản phẩm.	Lưu dưới dạng chuỗi JSON hoặc mảng text.
+specs	TEXT/JSON	Mảng các thông số kỹ thuật của sản phẩm.	Lưu dưới dạng chuỗi JSON hoặc mảng text.
+warranty_info	NVARCHAR(255)	Thông tin bảo hành (ví dụ: "12 tháng", "Không bảo hành").	
+supplier_id	VARCHAR(255)	ID nhà cung cấp cho sản phẩm này (khóa ngoại tới Supplier.id).	Tùy chọn, nếu mỗi cửa hàng có nhà cung cấp riêng.
+created_at	DATETIME	Thời gian sản phẩm được thêm vào hệ thống của cửa hàng.	
+updated_at	DATETIME	Thời gian thông tin sản phẩm được cập nhật lần cuối.	
+is_active	BOOLEAN	TRUE nếu sản phẩm đang được bán và hiển thị, FALSE nếu không.	
+is_deleted	BOOLEAN	TRUE nếu sản phẩm được đánh dấu là đã xóa mềm, FALSE nếu không.	Giữ lại lịch sử nhưng không hiển thị/bán.
+
+
+2. Bảng Category (Danh mục)
+Lưu trữ các danh mục sản phẩm của cửa hàng cụ thể này.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của danh mục.	Khóa chính
+name	NVARCHAR(255)	Tên hiển thị của danh mục (ví dụ: "Máy cưa", "Thuốc trừ sâu").	
+slug	VARCHAR(255)	Chuỗi tối ưu cho URL.	Dễ đọc, SEO.
+description	NVARCHAR(MAX)	Mô tả ngắn về danh mục.	
+parent_id	VARCHAR(255)	ID của danh mục cha (khóa ngoại tới Category.id trong database này). NULL nếu là danh mục gốc.	Hỗ trợ danh mục đa cấp.
+image	VARCHAR(500)	URL hình ảnh đại diện hoặc biểu tượng của danh mục.	Tùy chọn
+order	INT	Thứ tự hiển thị của danh mục.	
+is_active	BOOLEAN	TRUE nếu danh mục đang hoạt động/hiển thị.	
+created_at	DATETIME	Thời gian tạo.	
+updated_at	DATETIME	Thời gian cập nhật.	
+is_deleted	BOOLEAN	TRUE nếu đã xóa mềm.	
+
+
+3. Bảng Customer (Khách hàng)
+Lưu trữ thông tin khách hàng của cửa hàng cụ thể này.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của khách hàng trong cửa hàng này.	Khóa chính
+name	NVARCHAR(255)	Tên khách hàng.	
+phone	VARCHAR(20)	Số điện thoại liên hệ.	
+email	VARCHAR(255)	Địa chỉ email của khách hàng.	
+address	NVARCHAR(500)	Địa chỉ đầy đủ của khách hàng.	
+tax_code	VARCHAR(50)	Mã số thuế (đối với khách hàng doanh nghiệp/trang trại).	
+customer_type	VARCHAR(50)	Loại khách hàng (ví dụ: "Cá nhân", "Trang trại", "Đại lý").	
+note	NVARCHAR(MAX)	Ghi chú về khách hàng.	
+credit_limit	DECIMAL(18,2)	Hạn mức tín dụng tối đa cho phép khách hàng được nợ.	Mặc định: 0
+total_debt	DECIMAL(18,2)	Tổng số tiền khách hàng đang nợ cửa hàng này.	Cập nhật tự động.
+debt_due_date	DATETIME	Ngày đến hạn thanh toán công nợ gần nhất.	
+last_purchase_date	DATETIME	Ngày mua hàng gần nhất của khách hàng.	
+status	VARCHAR(50)	Trạng thái của khách hàng (ví dụ: "Active", "Inactive", "Suspended" do nợ xấu).	
+created_at	DATETIME	Thời gian bản ghi khách hàng được tạo.	
+updated_at	DATETIME	Thời gian bản ghi khách hàng được cập nhật lần cuối.	
+is_deleted	BOOLEAN	TRUE nếu khách hàng đã bị xóa mềm.	
+
+
+4. Bảng Order (Đơn hàng)
+Lưu trữ thông tin các đơn hàng đã được tạo tại cửa hàng cụ thể này.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của đơn hàng trong cửa hàng này.	Khóa chính
+order_code	VARCHAR(255)	Mã đơn hàng thân thiện với người dùng (ví dụ: DH20250619-0001).	Duy nhất trong phạm vi cửa hàng.
+customer_id	VARCHAR(255)	ID của khách hàng đặt đơn hàng (khóa ngoại tới Customer.id trong database này).	
+total_amount	DECIMAL(18,2)	Tổng giá trị của đơn hàng (bao gồm sản phẩm, giảm giá, phí vận chuyển).	
+discount_amount	DECIMAL(18,2)	Tổng số tiền giảm giá áp dụng cho đơn hàng.	Mặc định: 0
+shipping_fee	DECIMAL(18,2)	Phí vận chuyển của đơn hàng.	Mặc định: 0
+total_paid	DECIMAL(18,2)	Tổng số tiền khách hàng đã thanh toán cho đơn hàng này.	
+payment_type	VARCHAR(50)	Phương thức thanh toán chính ("cash", "installment", "bank_transfer", "card").	
+payment_details	NVARCHAR(MAX)	Chi tiết về phương thức thanh toán (ví dụ: "Chuyển khoản Vietcombank 12345").	
+status	VARCHAR(50)	Trạng thái của đơn hàng ("pending", "paid", "partially_paid", "cancelled", "returned").	
+expected_delivery_date	DATETIME	Ngày dự kiến giao hàng.	
+delivery_address	NVARCHAR(500)	Địa chỉ giao hàng cụ thể cho đơn hàng này (có thể khác địa chỉ mặc định của khách hàng).	
+delivery_status	VARCHAR(50)	Trạng thái giao hàng ("processing", "shipping", "delivered", "canceled").	
+note	NVARCHAR(MAX)	Ghi chú đặc biệt cho đơn hàng.	
+processed_by_user_id	VARCHAR(255)	ID của người dùng (nhân viên) đã xử lý đơn hàng (từ bảng User trong Global DB).	Để theo dõi nhân viên xử lý.
+created_at	DATETIME	Thời gian đơn hàng được tạo.	
+updated_at	DATETIME	Thời gian trạng thái đơn hàng được cập nhật lần cuối.	
+
+
+5. Bảng OrderItem (Chi tiết đơn hàng)
+Lưu trữ thông tin chi tiết về từng sản phẩm trong một đơn hàng.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của chi tiết đơn hàng.	Khóa chính
+order_id	VARCHAR(255)	ID của đơn hàng mà mục này thuộc về (khóa ngoại tới Order.id trong database này).	
+product_id	VARCHAR(255)	ID của sản phẩm trong chi tiết đơn hàng (khóa ngoại tới Product.id trong database này).	
+product_name	NVARCHAR(255)	Tên sản phẩm tại thời điểm đặt hàng (đảm bảo tính nhất quán dữ liệu).	Sao chép từ Product.name.
+product_unit	NVARCHAR(50)	Đơn vị tính của sản phẩm tại thời điểm đặt hàng.	Sao chép từ Product.unit.
+quantity	INT	Số lượng sản phẩm đã đặt.	
+unit_price	DECIMAL(18,2)	Đơn giá của sản phẩm tại thời điểm đặt hàng (có thể khác giá hiện tại nếu có thay đổi).	
+total_price	DECIMAL(18,2)	Tổng tiền cho số lượng sản phẩm này (quantity * unit_price).	Tính toán tự động.
+
+
+6. Bảng Installment (Trả góp)
+Quản lý các kỳ thanh toán trả góp cho các đơn hàng công nợ.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của kỳ trả góp.	Khóa chính
+order_id	VARCHAR(255)	ID của đơn hàng mà kỳ trả góp này thuộc về (khóa ngoại tới Order.id trong database này).	
+installment_number	INT	Số thứ tự của kỳ trả góp (ví dụ: 1, 2, 3...).	
+due_date	DATETIME	Ngày đến hạn thanh toán của kỳ trả góp này.	
+amount	DECIMAL(18,2)	Số tiền phải trả trong kỳ này.	
+paid_at	DATETIME	Thời gian thực tế khoản trả góp này được thanh toán. NULL nếu chưa thanh toán.	
+payment_method	VARCHAR(50)	Phương thức thanh toán cho kỳ trả góp này (ví dụ: "Tiền mặt", "Chuyển khoản").	
+is_late	BOOLEAN	TRUE nếu kỳ trả góp này bị quá hạn thanh toán.	Tính toán tự động dựa trên due_date.
+note	NVARCHAR(MAX)	Ghi chú về kỳ trả góp.	
+collected_by_user_id	VARCHAR(255)	ID của người dùng (nhân viên) đã thu tiền cho kỳ trả góp này.	Tùy chọn, để theo dõi nhân viên.
+created_at	DATETIME	Thời gian kỳ trả góp được tạo.	
+updated_at	DATETIME	Thời gian bản ghi được cập nhật lần cuối.	
+
+
+7. Bảng Supplier (Nhà cung cấp)
+Quản lý thông tin các nhà cung cấp cho từng cửa hàng.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của nhà cung cấp.	Khóa chính
+name	NVARCHAR(255)	Tên nhà cung cấp.	
+phone	VARCHAR(20)	Số điện thoại liên hệ.	
+email	VARCHAR(255)	Email liên hệ.	
+address	NVARCHAR(500)	Địa chỉ nhà cung cấp.	
+tax_code	VARCHAR(50)	Mã số thuế (nếu có).	
+contact_person	NVARCHAR(255)	Người liên hệ chính.	
+note	NVARCHAR(MAX)	Ghi chú về nhà cung cấp.	
+created_at	DATETIME	Thời gian tạo.	
+updated_at	DATETIME	Thời gian cập nhật.	
+is_deleted	BOOLEAN	TRUE nếu đã xóa mềm.	
+
+
+8. Bảng PurchaseOrder (Đơn đặt hàng nhập)
+Quản lý các đơn hàng nhập hàng từ nhà cung cấp.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của đơn đặt hàng nhập.	Khóa chính
+order_code	VARCHAR(255)	Mã đơn đặt hàng nhập (ví dụ: PO20250620-001).	Duy nhất
+supplier_id	VARCHAR(255)	ID nhà cung cấp (khóa ngoại tới Supplier.id).	
+total_amount	DECIMAL(18, 2)	Tổng giá trị đơn đặt hàng nhập.	
+status	VARCHAR(50)	Trạng thái đơn đặt hàng ("pending", "ordered", "received", "cancelled").	
+expected_delivery_date	DATETIME	Ngày dự kiến nhận hàng.	
+received_date	DATETIME	Ngày thực tế nhận hàng.	NULL nếu chưa nhận.
+note	NVARCHAR(MAX)	Ghi chú cho đơn đặt hàng.	
+created_by_user_id	VARCHAR(255)	ID người dùng đã tạo đơn đặt hàng nhập.	
+created_at	DATETIME	Thời gian tạo.	
+updated_at	DATETIME	Thời gian cập nhật.	
+
+
+9. Bảng PurchaseOrderItem (Chi tiết đơn đặt hàng nhập)
+Chi tiết các sản phẩm trong một đơn đặt hàng nhập.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của chi tiết đơn đặt hàng nhập.	Khóa chính
+purchase_order_id	VARCHAR(255)	ID đơn đặt hàng nhập (khóa ngoại tới PurchaseOrder.id).	
+product_id	VARCHAR(255)	ID của sản phẩm (khóa ngoại tới Product.id).	
+quantity	INT	Số lượng sản phẩm đặt.	
+unit_price	DECIMAL(18, 2)	Đơn giá nhập của sản phẩm.	
+total_price	DECIMAL(18, 2)	Tổng tiền cho dòng sản phẩm này (quantity * unit_price).	Tính toán tự động
+received_quantity	INT	Số lượng thực tế đã nhận (có thể khác quantity nếu nhận thiếu/thừa).	Mặc định: 0
+
+
+10. Bảng StockAdjustment (Điều chỉnh kho)
+Ghi lại các thay đổi tồn kho không liên quan đến mua/bán.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của điều chỉnh kho.	Khóa chính
+product_id	VARCHAR(255)	ID của sản phẩm bị điều chỉnh (khóa ngoại tới Product.id).	
+adjustment_type	VARCHAR(50)	Loại điều chỉnh ("increase", "decrease").	Ví dụ: "Thêm", "Bớt"
+quantity_change	INT	Số lượng thay đổi (có thể âm hoặc dương).	
+reason	NVARCHAR(MAX)	Lý do điều chỉnh (ví dụ: "Kiểm kê", "Hư hỏng", "Mất mát").	
+adjusted_by_user_id	VARCHAR(255)	ID người dùng đã thực hiện điều chỉnh kho.	
+created_at	DATETIME	Thời gian điều chỉnh.	
+
+
+11. Bảng ReturnOrder (Đơn hàng trả lại)
+Quản lý các trường hợp khách hàng trả lại sản phẩm.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của đơn trả hàng.	Khóa chính
+order_id	VARCHAR(255)	ID của đơn hàng gốc (khóa ngoại tới Order.id).	
+customer_id	VARCHAR(255)	ID của khách hàng trả hàng (khóa ngoại tới Customer.id).	
+return_date	DATETIME	Ngày sản phẩm được trả lại.	
+total_refund_amount	DECIMAL(18, 2)	Tổng số tiền hoàn lại cho khách hàng.	
+reason	NVARCHAR(MAX)	Lý do trả hàng (ví dụ: "Lỗi sản phẩm", "Không còn nhu cầu").	
+status	VARCHAR(50)	Trạng thái xử lý trả hàng ("pending", "approved", "rejected", "refunded", "restocked").	
+processed_by_user_id	VARCHAR(255)	ID người dùng đã xử lý yêu cầu trả hàng.	
+created_at	DATETIME	Thời gian tạo bản ghi.	
+updated_at	DATETIME	Thời gian cập nhật.	
+
+
+12. Bảng ReturnOrderItem (Chi tiết đơn hàng trả lại)
+Chi tiết các sản phẩm trong một đơn trả hàng.
+
+Trường	Kiểu dữ liệu	Mô tả	Ghi chú
+id	VARCHAR(255)	Mã định danh duy nhất của chi tiết trả hàng.	Khóa chính
+return_order_id	VARCHAR(255)	ID của đơn trả hàng (khóa ngoại tới ReturnOrder.id).	
+product_id	VARCHAR(255)	ID của sản phẩm (khóa ngoại tới Product.id).	
+quantity	INT	Số lượng sản phẩm trả lại.	
+unit_price	DECIMAL(18, 2)	Đơn giá hoàn trả của sản phẩm này.	
+condition	NVARCHAR(100)	Tình trạng sản phẩm khi trả lại ("new", "used", "damaged").	Tùy chọn, để quyết định có tái nhập kho hay không.
+restocked	BOOLEAN	TRUE nếu sản phẩm đã được nhập lại kho.	
+
+
