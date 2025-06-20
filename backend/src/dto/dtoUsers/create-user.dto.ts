@@ -33,7 +33,7 @@ export class CreateUserDto {
 
   @IsString({ message: 'Full name must be a string' })
   @IsNotEmpty({ message: 'Full name cannot be empty' })
-  full_name!: string;
+  fullName!: string;
 
   @IsOptional()
   @IsEmail({}, { message: 'Email must be a valid email address' })
@@ -49,11 +49,11 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsArray({ message: 'Associated store IDs must be an array' })
-  associated_store_ids?: string[];
+  associatedStoreIds?: string[];
 
   @IsOptional()
   @IsBoolean({ message: 'is_active must be true or false' })
-  is_active?: boolean;
+  isActive?: boolean;
 
   @IsOptional()
   @IsBoolean({ message: 'isDelete must be a boolean' })
@@ -61,23 +61,23 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsBoolean({ message: 'is_superadmin must be true or false' })
-  is_superadmin?: boolean;
+  isSuperadmin?: boolean;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'last_login_at must be a valid ISO date string' },
   )
-  last_login_at?: string;
+  lastLoginAt?: string;
 
   @IsOptional()
   @IsString({ message: 'Password reset token must be a string' })
-  password_reset_token?: string;
+  passwordResetToken?: string;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'token_expiry_at must be a valid ISO date string' },
   )
-  token_expiry_at?: string;
+  tokenExpiryAt?: string;
 }

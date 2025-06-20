@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/global/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/dto/dtoUsers/create-user.dto';
+import { CreateUserDto, UserRole } from 'src/dto/dtoUsers/create-user.dto';
 import { UpdateUserDto } from 'src/dto/dtoUsers/update-user.dto';
 
 @Injectable()
@@ -36,7 +36,8 @@ export class UsersService {
     // Lưu người dùng mới
     const userToSave = {
       ...createUserDto,
-      password_hash: createUserDto.password, // Lưu hash
+      passwordHash: createUserDto.password, // Lưu hash
+      role: UserRole.STORE_MANAGER,
     } as Omit<typeof createUserDto, 'password'> & { password?: string };
     delete userToSave.password;
     const saved = await this.usersRepo.save(userToSave);
@@ -62,13 +63,11 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, dto: UpdateUserDto) {
     const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException(`❌ User với ID "${id}" không tồn tại`);
-    }
+
     // Cập nhật thông tin người dùng
-    const updated = this.usersRepo.merge(user, updateUserDto);
+    const updated = this.usersRepo.merge(user, dto);
     const saved = await this.usersRepo.save(updated);
 
     return {
@@ -79,14 +78,8 @@ export class UsersService {
 
   async remove(id: string) {
     const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException(`❌ Store với ID "${id}" không tồn tại`);
-    }
     user.isDelete = true;
-    const saved = await this.usersRepo.save(user);
-    if (!saved) {
-      throw new NotFoundException(`❌ Không thể xóa user với ID "${id}"`);
-    }
+    await this.usersRepo.save(user);
     return {
       message: `✅ user với ID "${id}" đã được xóa`,
       data: null,

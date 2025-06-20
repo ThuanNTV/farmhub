@@ -90,6 +90,11 @@ export class StoresService {
 
   async update(id: string, updateStoreDto: UpdateStoreDto) {
     const store = await this.findOne(id);
+    if (store.databaseName != updateStoreDto.databaseName) {
+      throw new ConflictException(
+        '❌ Không thể thay đổi databaseName của Store đã tồn tại.',
+      );
+    }
     const updated = this.storesRepo.merge(store, updateStoreDto);
     const saved = await this.storesRepo.save(updated);
 
@@ -111,7 +116,7 @@ export class StoresService {
   }
 
   async createTenantDatabase(dbName: string) {
-    const query = `CREATE DATABASE \"${dbName}\"`;
+    const query = `CREATE DATABASE "${dbName}"`;
     try {
       // Sử dụng manager thay vì DataSource
       await this.storesRepo.manager.query(query);

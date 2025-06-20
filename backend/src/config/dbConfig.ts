@@ -26,12 +26,12 @@ export const globalDbConfig: DataSourceOptions = {
       : false,
 
   extra: {
-    max: parseInt(process.env.GLOBAL_DB_POOL_MAX || '10'),
-    min: parseInt(process.env.GLOBAL_DB_POOL_MIN || '1'),
+    max: parseInt(process.env.GLOBAL_DB_POOL_MAX ?? '10'),
+    min: parseInt(process.env.GLOBAL_DB_POOL_MIN ?? '1'),
     connectionTimeoutMillis: parseInt(
-      process.env.GLOBAL_DB_CONNECTION_TIMEOUT || '60000',
+      process.env.GLOBAL_DB_CONNECTION_TIMEOUT ?? '60000',
     ),
-    idleTimeoutMillis: parseInt(process.env.GLOBAL_DB_IDLE_TIMEOUT || '30000'),
+    idleTimeoutMillis: parseInt(process.env.GLOBAL_DB_IDLE_TIMEOUT ?? '30000'),
   },
   // Nếu bạn không dùng cache hoặc redis ở đây, hãy bỏ thuộc tính `cache` đi.
   // Nếu dùng, hãy đảm bảo cấu hình cache đúng với TypeORM DataSourceOptions

@@ -1,25 +1,22 @@
-// src/config/tenant-db.config.ts (Ví dụ)
-import { DataSourceOptions } from 'typeorm'; // <-- Import DataSourceOptions từ 'typeorm'
-import { config } from 'dotenv';
+// src/config/tenant-db.config.ts
+import { DataSourceOptions } from 'typeorm';
 import { join } from 'path';
 import { Product } from 'src/entities/tenant/product.entity';
-// Import tất cả các entities của Tenant DB
-
-// ... (các import entities khác)
+import { Category } from 'src/entities/tenant/category.entity';
+import { Customer } from 'src/entities/tenant/customer.entity';
 
 // Export mảng entities riêng
-export const tenantEntities = [Product];
+export const tenantEntities = [Product, Category, Customer];
 
 export function getTenantDbConfig(dbName: string): DataSourceOptions {
-  // <-- Khai báo rõ ràng kiểu là DataSourceOptions
   return {
-    type: 'postgres', // Đảm bảo type là 'postgres'
+    type: 'postgres',
     host:
-      process.env.TENANT_DB_HOST ||
-      process.env.GLOBAL_DB_HOST ||
+      process.env.TENANT_DB_HOST ??
+      process.env.GLOBAL_DB_HOST ??
       'tenant-db.neon.tech',
     port: parseInt(
-      process.env.TENANT_DB_PORT || process.env.GLOBAL_DB_PORT || '5432',
+      process.env.TENANT_DB_PORT ?? process.env.GLOBAL_DB_PORT ?? '5432',
     ),
     username: process.env.TENANT_DB_USER,
     password: process.env.TENANT_DB_PASSWORD,
@@ -38,13 +35,13 @@ export function getTenantDbConfig(dbName: string): DataSourceOptions {
         : false,
 
     extra: {
-      max: parseInt(process.env.TENANT_DB_POOL_MAX || '5'),
-      min: parseInt(process.env.TENANT_DB_POOL_MIN || '0'),
+      max: parseInt(process.env.TENANT_DB_POOL_MAX ?? '5'),
+      min: parseInt(process.env.TENANT_DB_POOL_MIN ?? '0'),
       connectionTimeoutMillis: parseInt(
-        process.env.TENANT_DB_CONNECTION_TIMEOUT || '60000',
+        process.env.TENANT_DB_CONNECTION_TIMEOUT ?? '60000',
       ),
       idleTimeoutMillis: parseInt(
-        process.env.TENANT_DB_IDLE_TIMEOUT || '30000',
+        process.env.TENANT_DB_IDLE_TIMEOUT ?? '30000',
       ),
     },
     // Nếu không dùng cache ở đây, hãy bỏ thuộc tính `cache` đi.

@@ -62,9 +62,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const exceptionResponse = exception.getResponse();
 
       // 🎯 Handle validation pipe errors
-      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        const responseObj = exceptionResponse as any;
-
+      {
+        const responseObj = exceptionResponse as {
+          message: string | string[];
+          [key: string]: unknown;
+        };
         if (Array.isArray(responseObj.message)) {
           return {
             message: 'Dữ liệu không hợp lệ',
@@ -81,7 +83,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
 
       return {
-        message: exception.message || 'Yêu cầu không hợp lệ',
+        message: exception.message,
         validationErrors: [],
       };
     }
@@ -100,6 +102,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   private logError(exception: unknown, request: Request, status: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { method, url, body, query, params, headers } = request;
 
     // 🚨 ERROR CONTEXT LOGGING
@@ -120,8 +123,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof BadRequestException) {
       this.logger.error(`🔍 Validation Error Details:`);
       const response = exception.getResponse();
-      if (typeof response === 'object' && response !== null) {
-        const responseObj = response as any;
+      if (typeof response === 'object') {
+        const responseObj = response as {
+          message: string | string[];
+          [key: string]: unknown;
+        };
         if (Array.isArray(responseObj.message)) {
           this.logger.error(`  Validation Errors:`);
           responseObj.message.forEach((msg: string, index: number) => {
@@ -152,7 +158,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
     this.logger.error('='.repeat(80));
   }
 
-  private getErrorDetails(exception: unknown): any {
+  private getErrorDetails(exception: unknown): {
+    type: string;
+    name?: string;
+    message?: string;
+    status?: number;
+    response?: unknown;
+    stack?: string;
+    value?: unknown;
+  } {
     if (exception instanceof HttpException) {
       return {
         type: 'HttpException',
@@ -187,14 +201,14 @@ export class DatabaseExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const _request = ctx.getRequest<Request>();
 
     // 🔍 Database-specific error handling
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Lỗi cơ sở dữ liệu';
 
-    if (exception.code) {
-      switch (exception.code) {
+    if (exception && typeof exception === 'object' && 'code' in exception) {
+      switch ((exception as { code: string }).code) {
         case '23505': // Unique violation
           status = HttpStatus.CONFLICT;
           message = 'Dữ liệu đã tồn tại';
@@ -212,20 +226,32 @@ export class DatabaseExceptionFilter implements ExceptionFilter {
           message = 'Không thể kết nối cơ sở dữ liệu';
           break;
         default:
-          message = exception.message || 'Lỗi thao tác cơ sở dữ liệu';
+          message =
+            (exception as { message?: string }).message ??
+            'Lỗi thao tác cơ sở dữ liệu';
       }
     }
 
     // 🚨 DETAILED DATABASE ERROR LOGGING
     this.logger.error('🗄️ DATABASE EXCEPTION');
-    this.logger.error(`Code: ${exception.code}`);
-    this.logger.error(`Detail: ${exception.detail}`);
-    this.logger.error(`Query: ${exception.query}`);
-    this.logger.error(`Parameters: ${JSON.stringify(exception.parameters)}`);
-    this.logger.error(`Schema: ${exception.schema}`);
-    this.logger.error(`Table: ${exception.table}`);
-    this.logger.error(`Column: ${exception.column}`);
-    this.logger.error(`Constraint: ${exception.constraint}`);
+    if (exception && typeof exception === 'object') {
+      this.logger.error(`Code: ${(exception as { code?: string }).code}`);
+      this.logger.error(`Detail: ${(exception as { detail?: string }).detail}`);
+      this.logger.error(`Query: ${(exception as { query?: string }).query}`);
+      this.logger.error(
+        `Parameters: ${JSON.stringify((exception as { parameters?: unknown }).parameters)}`,
+      );
+      this.logger.error(`Schema: ${(exception as { schema?: string }).schema}`);
+      this.logger.error(`Table: ${(exception as { table?: string }).table}`);
+      this.logger.error(`Column: ${(exception as { column?: string }).column}`);
+      this.logger.error(
+        `Constraint: ${(exception as { constraint?: string }).constraint}`,
+      );
+    } else {
+      this.logger.error(
+        `Exception is not an object: ${JSON.stringify(exception)}`,
+      );
+    }
 
     response.status(status).json({
       status: 'error',
@@ -234,10 +260,30 @@ export class DatabaseExceptionFilter implements ExceptionFilter {
       code: status,
       ...(process.env.NODE_ENV === 'development' && {
         debug: {
-          dbCode: exception.code,
-          dbDetail: exception.detail,
-          query: exception.query,
-          parameters: exception.parameters,
+          dbCode:
+            typeof exception === 'object' &&
+            exception !== null &&
+            'code' in exception
+              ? (exception as { code?: string }).code
+              : undefined,
+          dbDetail:
+            typeof exception === 'object' &&
+            exception !== null &&
+            'detail' in exception
+              ? (exception as { detail?: string }).detail
+              : undefined,
+          query:
+            typeof exception === 'object' &&
+            exception !== null &&
+            'query' in exception
+              ? (exception as { query?: string }).query
+              : undefined,
+          parameters:
+            typeof exception === 'object' &&
+            exception !== null &&
+            'parameters' in exception
+              ? (exception as { parameters?: unknown }).parameters
+              : undefined,
         },
       }),
     });

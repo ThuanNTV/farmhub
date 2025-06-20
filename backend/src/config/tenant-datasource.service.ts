@@ -40,7 +40,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
    * Lấy hoặc tạo DataSource cho một cửa hàng cụ thể với caching và validation
    */
   async getTenantDataSource(storeId: string): Promise<DataSource> {
-    if (!storeId?.trim()) {
+    if (!storeId.trim()) {
       throw new Error('Store ID cannot be empty');
     }
 
@@ -99,7 +99,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
       );
     }
 
-    if (!store.databaseName?.trim()) {
+    if (!store.databaseName.trim()) {
       this.logger.error(`Store ${storeId} has no database name configured`);
       throw new Error(`Store ${storeId} has invalid database configuration`);
     }
@@ -112,7 +112,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
    */
   private hasCachedDataSource(dbName: string): boolean {
     const cached = this.tenantDataSources.get(dbName);
-    return cached?.dataSource?.isInitialized === true;
+    return cached?.dataSource.isInitialized === true;
   }
 
   /**
@@ -211,27 +211,63 @@ export class TenantDataSourceService implements OnModuleDestroy {
    * Kiểm tra xem có cần đồng bộ hóa schema không
    * Nếu bảng 'products' không tồn tại, sẽ đồng bộ hóa schema
    */
+  /**
+   * Kiểm tra xem có cần đồng bộ hóa schema không
+   * Nếu bảng 'products' không tồn tại, sẽ đồng bộ hóa schema
+   */
   private async shouldSynchronize(dataSource: DataSource): Promise<boolean> {
     try {
       // Check TypeORM migrations table
-      const result = await dataSource.query(`
+      const result: unknown = await dataSource.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
         WHERE table_schema = 'public' 
         AND table_name = 'migrations'
-      )
+      ) as "exists"
     `);
 
-      if (!result[0].exists) {
+      // Type guard for result validation
+      const isValidExistsResult = (
+        data: unknown,
+      ): data is Array<{ exists: boolean }> => {
+        return (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          typeof data[0] === 'object' &&
+          data[0] !== null &&
+          'exists' in data[0] &&
+          typeof (data[0] as Record<string, unknown>).exists === 'boolean'
+        );
+      };
+
+      if (!isValidExistsResult(result) || !result[0].exists) {
         return true; // Chưa có migration table → DB mới
       }
 
       // Optional: Check migration status
-      const migrationCount = await dataSource.query(`
+      const migrationCountResult: unknown = await dataSource.query(`
       SELECT COUNT(*) as count FROM migrations
     `);
 
-      return migrationCount[0].count === 0; // Chưa có migration nào
+      // Type guard for count result validation
+      const isValidCountResult = (
+        data: unknown,
+      ): data is Array<{ count: string }> => {
+        return (
+          Array.isArray(data) &&
+          data.length > 0 &&
+          typeof data[0] === 'object' &&
+          data[0] !== null &&
+          'count' in data[0] &&
+          typeof (data[0] as Record<string, unknown>).count === 'string'
+        );
+      };
+
+      if (!isValidCountResult(migrationCountResult)) {
+        return true; // Default to sync if can't determine migration count
+      }
+
+      return parseInt(migrationCountResult[0].count, 10) === 0; // Chưa có migration nào
     } catch (err) {
       this.logger.warn('Migration check failed. Defaulting to sync.', err);
       return true;
@@ -279,8 +315,10 @@ export class TenantDataSourceService implements OnModuleDestroy {
    * Bắt đầu cleanup job để dọn dẹp các connection idle
    */
   private startCleanupJob(): void {
-    this.cleanupInterval = setInterval(async () => {
-      await this.cleanupIdleConnections();
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupIdleConnections().catch((err) => {
+        this.logger.error('Cleanup job failed:', err);
+      });
     }, this.CLEANUP_INTERVAL);
   }
 
@@ -344,9 +382,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
     );
 
     // Dừng cleanup job
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-    }
+    clearInterval(this.cleanupInterval);
 
     // Đóng tất cả DataSources
     const closePromises: Promise<void>[] = [];

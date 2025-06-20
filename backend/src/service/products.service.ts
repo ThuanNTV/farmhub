@@ -61,16 +61,14 @@ export class ProductsService extends TenantBaseService<Product> {
 
   async findOne(storeId: string, id: string) {
     const repo = await this.getRepo(storeId);
-
     const product = await repo.findOneBy({
       id,
       isDeleted: false,
       isActive: true,
     });
     if (!product) {
-      throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
+      throw new NotFoundException(`Product with id ${id} not found`);
     }
-
     return product;
   }
 
@@ -97,12 +95,7 @@ export class ProductsService extends TenantBaseService<Product> {
   }
 
   async update(storeId: string, id: string, dto: UpdateProductDto) {
-    // const repo = await this.getRepo(storeId);
-
     const { repo, product } = await this.findOneProduc(storeId, id);
-    if (!product) {
-      throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
-    }
     // Kiểm tra sản phẩm có productCode đã tồn tại
     if (dto.productCode) {
       const existingByCode = await this.findByproductCode(
@@ -122,10 +115,6 @@ export class ProductsService extends TenantBaseService<Product> {
 
   async remove(storeId: string, id: string) {
     const { repo, product } = await this.findOneProduc(storeId, id);
-
-    if (!product) {
-      throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
-    }
 
     product.isDeleted = true;
     await repo.save(product);

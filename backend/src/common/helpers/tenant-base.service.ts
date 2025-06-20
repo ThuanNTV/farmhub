@@ -34,7 +34,7 @@ export abstract class TenantBaseService<T extends ObjectLiteral> {
       const dataSource =
         await this.tenantDataSourceService.getTenantDataSource(storeId);
 
-      if (!dataSource || !dataSource.isInitialized) {
+      if (!dataSource.isInitialized) {
         throw new InternalServerErrorException(
           `Kết nối CSDL cho store "${storeId}" chưa được khởi tạo`,
         );

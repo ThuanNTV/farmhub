@@ -15,10 +15,10 @@ export class User {
   username!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  password_hash!: string;
+  passwordHash!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  full_name!: string;
+  fullName!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string;
@@ -30,7 +30,7 @@ export class User {
   role!: 'admin_global' | 'store_manager' | 'store_staff' | 'viewer';
 
   @Column({ type: 'json', nullable: true })
-  associated_store_ids?: string[];
+  associatedStoreIds?: string[];
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;

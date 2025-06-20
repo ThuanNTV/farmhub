@@ -11,35 +11,39 @@ import { CreateCategoryDto } from '../dto/dtoCategories/create-category.dto';
 import { UpdateCategoryDto } from '../dto/dtoCategories/update-category.dto';
 import { CategorysService } from 'src/service/categorys.service';
 
-@Controller('/tenant/:storeId/categorys')
+@Controller('/tenant/:storeId/categories')
 export class CategorysController {
   constructor(private readonly categorysService: CategorysService) {}
 
-  // @Post()
-  // create(@Body() createCategoryDto: CreateCategoryDto) {
-  //   return this.categorysService.create(createCategoryDto);
-  // }
+  @Post()
+  create(
+    @Param('storeId') storeId: string,
+    @Body() createCategoryDto: CreateCategoryDto,
+  ) {
+    return this.categorysService.createCategory(storeId, createCategoryDto);
+  }
 
-  // @Get()
-  // findAll() {
-  //   return this.categorysService.findAll();
-  // }
+  @Get()
+  findAll(@Param('storeId') storeId: string) {
+    return this.categorysService.findAll(storeId);
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.categorysService.findOne(+id);
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: string, @Param('storeId') storeId: string) {
+    return this.categorysService.findOne(storeId, id);
+  }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateCategoryDto: UpdateCategoryDto,
-  // ) {
-  //   return this.categorysService.update(+id, updateCategoryDto);
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Param('storeId') storeId: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categorysService.update(storeId, id, updateCategoryDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.categorysService.remove(+id);
-  // }
+  @Delete(':id')
+  remove(@Param('storeId') storeId: string, @Param('id') id: string) {
+    return this.categorysService.remove(storeId, id);
+  }
 }

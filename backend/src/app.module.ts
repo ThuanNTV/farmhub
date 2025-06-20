@@ -5,6 +5,7 @@ import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
 import { GlobalDatabaseModule } from 'src/config/global-database.module';
 import { CategorysModule } from './module/categorys.module';
 import { ProductsModule } from 'src/module/products.module';
+import { CustomersModule } from './module/customers.module';
 
 @Module({
   imports: [
@@ -13,8 +14,8 @@ import { ProductsModule } from 'src/module/products.module';
     UsersModule,
     ProductsModule,
     CategorysModule,
+    CustomersModule,
   ],
-  controllers: [],
   providers: [TenantDataSourceService],
 })
 export class AppModule {}
