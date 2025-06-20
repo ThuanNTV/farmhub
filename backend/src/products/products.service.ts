@@ -43,13 +43,74 @@ export class ProductsService {
   async create(storeId: string, dto: CreateProductDto) {
     const repo = await this.getRepo(storeId);
 
-    const existing = await repo.findOneBy({ id: dto.id });
+    // Kiểm tra sản phẩm có ID đã tồn tại
+    const existing = await this.findById(storeId, dto.id);
     if (existing) {
-      throw new Error(`⚠️ Sản phẩm với ID "${dto.id}" đã tồn tại.`);
+      throw new InternalServerErrorException(
+        `❌ Sản phẩm với ID "${dto.id}" đã tồn tại`,
+      );
+    }
+    // Kiểm tra sản phẩm có productCode đã tồn tại
+    const existingByCode = await this.findByproductCode(
+      storeId,
+      dto.productCode,
+    );
+    if (existingByCode) {
+      throw new InternalServerErrorException(
+        `❌ Sản phẩm với productCode "${dto.productCode}" đã tồn tại`,
+      );
     }
 
     const product = repo.create(dto);
     return await repo.save(product);
+  }
+
+  async findById(storeId: string, id: string) {
+    const repo = await this.getRepo(storeId);
+    return await repo.findOneBy({
+      id,
+      isDeleted: false,
+      isActive: true,
+    });
+  }
+
+  async findByproductCode(storeId: string, productCode?: string) {
+    const repo = await this.getRepo(storeId);
+    return await repo.findOneBy({
+      productCode,
+      isDeleted: false,
+      isActive: true,
+    });
+  }
+
+  async findOne(storeId: string, id: string) {
+    const repo = await this.getRepo(storeId);
+
+    const product = await repo.findOneBy({
+      id,
+      isDeleted: false,
+      isActive: true,
+    });
+    if (!product) {
+      throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
+    }
+
+    return product;
+  }
+
+  async findOneProduc(storeId: string, id: string) {
+    const repo = await this.getRepo(storeId);
+
+    const product = await repo.findOneBy({
+      id,
+      isDeleted: false,
+      isActive: true,
+    });
+    if (!product) {
+      throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
+    }
+
+    return { repo, product };
   }
 
   async findAll(storeId: string) {
@@ -60,26 +121,41 @@ export class ProductsService {
   }
 
   async update(storeId: string, id: string, dto: UpdateProductDto) {
-    const repo = await this.getRepo(storeId);
+    // const repo = await this.getRepo(storeId);
 
-    const existing = await repo.findOneBy({ id });
-    if (!existing) {
+    const { repo, product } = await this.findOneProduc(storeId, id);
+    if (!product) {
       throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
     }
+    // Kiểm tra sản phẩm có productCode đã tồn tại
+    if (dto.productCode) {
+      const existingByCode = await this.findByproductCode(
+        storeId,
+        dto.productCode,
+      );
+      if (existingByCode && existingByCode.id !== id) {
+        throw new InternalServerErrorException(
+          `❌ Sản phẩm với productCode "${dto.productCode}" đã tồn tại`,
+        );
+      }
+    }
 
-    const updated = repo.merge(existing, dto);
+    const updated = repo.merge(product, dto);
     return await repo.save(updated);
   }
 
   async remove(storeId: string, id: string) {
-    const repo = await this.getRepo(storeId);
+    const { repo, product } = await this.findOneProduc(storeId, id);
 
-    const existing = await repo.findOneBy({ id });
-    if (!existing) {
+    if (!product) {
       throw new NotFoundException(`❌ Không tìm thấy sản phẩm với ID "${id}"`);
     }
 
-    existing.isDeleted = true;
-    return await repo.save(existing);
+    product.isDeleted = true;
+    await repo.save(product);
+    return {
+      message: `✅ Sản phẩm với ID "${id}" đã được xóa`,
+      data: null,
+    };
   }
 }

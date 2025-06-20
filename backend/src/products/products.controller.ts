@@ -5,8 +5,8 @@ import {
   Post,
   Body,
   Param,
-  Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -26,7 +26,12 @@ export class ProductsController {
     return this.service.findAll(storeId);
   }
 
-  @Put(':id')
+  @Get(':id')
+  findById(@Param('storeId') storeId: string, @Param('id') id: string) {
+    return this.service.findOne(storeId, id);
+  }
+
+  @Patch(':id')
   update(
     @Param('storeId') storeId: string,
     @Param('id') id: string,

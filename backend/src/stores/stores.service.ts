@@ -103,7 +103,7 @@ export class StoresService {
     const store = await this.findOne(id);
     store.isDelete = true;
 
-    const saved = await this.storesRepo.save(store);
+    await this.storesRepo.save(store);
     return {
       message: `✅ Store với ID "${id}" đã được xóa mềm`,
       data: null,
