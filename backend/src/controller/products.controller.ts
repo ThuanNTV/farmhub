@@ -8,9 +8,9 @@ import {
   Delete,
   Patch,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from 'src/dto/dtoProducts/create-product.dto';
+import { UpdateProductDto } from 'src/dto/dtoProducts/update-product.dto';
+import { ProductsService } from 'src/service/products.service';
 
 @Controller('tenant/:storeId/products')
 export class ProductsController {

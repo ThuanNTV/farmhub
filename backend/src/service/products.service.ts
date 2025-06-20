@@ -6,38 +6,14 @@ import {
 } from '@nestjs/common';
 import { TenantDataSourceService } from '../config/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
-import { Repository } from 'typeorm';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from 'src/dto/dtoProducts/create-product.dto';
+import { UpdateProductDto } from 'src/dto/dtoProducts/update-product.dto';
+import { TenantBaseService } from 'src/common/helpers/tenant-base.service';
 
 @Injectable()
-export class ProductsService {
-  constructor(
-    private readonly tenantDataSourceService: TenantDataSourceService,
-  ) {}
-
-  private async getRepo(storeId: string): Promise<Repository<Product>> {
-    try {
-      const dataSource =
-        await this.tenantDataSourceService.getTenantDataSource(storeId);
-      const stats = this.tenantDataSourceService.getConnectionStats();
-
-      console.log(`[ProductsService] ✅ Connected to ${storeId}`);
-      console.log(
-        `[ProductsService] 🔌 Active connections: ${stats.totalConnections}`,
-      );
-
-      return dataSource.getRepository(Product);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(`❌ Store "${storeId}" chưa tồn tại`);
-      }
-
-      console.error(`[ProductsService] ❗ getRepo error:`, error);
-      throw new InternalServerErrorException(
-        'Lỗi khi kết nối tới CSDL chi nhánh',
-      );
-    }
+export class ProductsService extends TenantBaseService<Product> {
+  constructor(tenantDS: TenantDataSourceService) {
+    super(tenantDS, Product);
   }
 
   async create(storeId: string, dto: CreateProductDto) {

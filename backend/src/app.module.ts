@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
-import { StoresModule } from './stores/stores.module';
-import { UsersModule } from './users/users.module';
+import { StoresModule } from './module/stores.module';
+import { UsersModule } from './module/users.module';
 import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
 import { GlobalDatabaseModule } from 'src/config/global-database.module';
-import { ProductsModule } from './products/products.module';
-import { CategorysModule } from './categorys/categorys.module';
+import { CategorysModule } from './module/categorys.module';
+import { ProductsModule } from 'src/module/products.module';
 
 @Module({
-  imports: [GlobalDatabaseModule, StoresModule, UsersModule, ProductsModule, CategorysModule],
+  imports: [
+    GlobalDatabaseModule,
+    StoresModule,
+    UsersModule,
+    ProductsModule,
+    CategorysModule,
+  ],
   controllers: [],
   providers: [TenantDataSourceService],
 })

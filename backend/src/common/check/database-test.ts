@@ -1,6 +1,6 @@
 // src/config/database-test.ts
 import { DataSource } from 'typeorm';
-import { globalDbConfig } from '../config/dbConfig';
+import { globalDbConfig } from '../../config/dbConfig';
 
 // npx ts-node src/check/database-test.ts
 
