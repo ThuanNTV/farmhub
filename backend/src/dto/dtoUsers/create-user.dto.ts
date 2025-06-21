@@ -20,7 +20,7 @@ export enum UserRole {
 export class CreateUserDto {
   @IsString({ message: 'ID must be a string' })
   @IsNotEmpty({ message: 'ID cannot be empty' })
-  id!: string;
+  userId!: string;
 
   @IsString({ message: 'Username must be a string' })
   @IsNotEmpty({ message: 'Username cannot be empty' })

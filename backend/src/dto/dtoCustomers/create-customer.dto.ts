@@ -21,7 +21,7 @@ export class CreateCustomerDto {
   @IsString({ message: 'ID must be a string' })
   @IsNotEmpty({ message: 'ID cannot be empty' })
   @Length(1, 50, { message: 'ID must be between 1 and 50 characters' })
-  id!: string;
+  customerId!: string;
 
   @IsString({ message: 'Name must be a string' })
   @IsNotEmpty({ message: 'Name cannot be empty' })

@@ -17,28 +17,26 @@ export class UsersService {
     private usersRepo: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(dto: CreateUserDto) {
     try {
       // Kiểm tra xem người dùng đã tồn tại chưa
-      await this.findOne(createUserDto.id);
+      await this.findOne(dto.userId);
       // Nếu không throw => người dùng đã tồn tại
-      throw new ConflictException(
-        `❌ User ID "${createUserDto.id}" đã tồn tại.`,
-      );
+      throw new ConflictException(`❌ User ID "${dto.userId}" đã tồn tại.`);
     } catch (error) {
       if (!(error instanceof NotFoundException)) throw error;
     }
     // 🔐 Hash password
-    if (createUserDto.password) {
+    if (dto.password) {
       const salt = await bcrypt.genSalt(10);
-      createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
+      dto.password = await bcrypt.hash(dto.password, salt);
     }
     // Lưu người dùng mới
     const userToSave = {
-      ...createUserDto,
-      passwordHash: createUserDto.password, // Lưu hash
+      ...dto,
+      passwordHash: dto.password, // Lưu hash
       role: UserRole.STORE_MANAGER,
-    } as Omit<typeof createUserDto, 'password'> & { password?: string };
+    } as Omit<typeof dto, 'password'> & { password?: string };
     delete userToSave.password;
     const saved = await this.usersRepo.save(userToSave);
     return {
@@ -53,12 +51,12 @@ export class UsersService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(userId: string) {
     const user = await this.usersRepo.findOne({
-      where: { id, isDelete: false },
+      where: { userId, isDelete: false },
     });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException(`User with id ${userId} not found`);
     }
     return user;
   }

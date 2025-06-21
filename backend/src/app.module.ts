@@ -6,6 +6,7 @@ import { GlobalDatabaseModule } from 'src/config/global-database.module';
 import { CategorysModule } from './module/categorys.module';
 import { ProductsModule } from 'src/module/products.module';
 import { CustomersModule } from './module/customers.module';
+import { OrdersModule } from './module/orders.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CustomersModule } from './module/customers.module';
     ProductsModule,
     CategorysModule,
     CustomersModule,
+    OrdersModule,
   ],
   providers: [TenantDataSourceService],
 })

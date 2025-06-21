@@ -1,7 +1,9 @@
+import { Order } from 'src/entities/tenant/order.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -9,7 +11,7 @@ import {
 @Entity('customers')
 export class Customer {
   @PrimaryColumn({ type: 'varchar', length: 50 })
-  id!: string;
+  customerId!: string;
 
   @Column({ type: 'varchar', length: 255 })
   name!: string;
@@ -58,4 +60,7 @@ export class Customer {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt!: Date;
+
+  @OneToMany(() => Order, (order: Order) => order.customer)
+  orders!: Order[];
 }

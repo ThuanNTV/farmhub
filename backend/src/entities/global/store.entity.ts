@@ -9,7 +9,7 @@ import {
 @Entity('stores')
 export class Store {
   @PrimaryColumn({ type: 'varchar', length: 255 })
-  id!: string;
+  storeId!: string;
 
   @Column({ type: 'varchar', length: 255 })
   name!: string;

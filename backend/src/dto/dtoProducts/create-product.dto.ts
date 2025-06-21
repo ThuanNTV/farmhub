@@ -7,12 +7,13 @@ import {
   IsBoolean,
   IsPositive,
   Min,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty({ message: 'ID không được để trống' })
-  id!: string;
+  productId!: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Mã sản phẩm (productCode) không được để trống' })
@@ -20,26 +21,27 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty({ message: 'Tên sản phẩm không được để trống' })
+  @MaxLength(255, { message: 'Tên sản phẩm tối đa 255 ký tự' })
   name!: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Slug không được để trống' })
   slug!: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   description?: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Category ID không được để trống' })
+  @IsNotEmpty({ message: 'Danh mục (categoryId) không được để trống' })
   categoryId!: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   brand?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   unit?: string;
 
   @IsNumber({ maxDecimalPlaces: 2 }, { message: 'Giá phải là số hợp lệ' })
@@ -51,39 +53,40 @@ export class CreateProductDto {
     { maxDecimalPlaces: 2 },
     { message: 'Giá trả góp phải là số hợp lệ' },
   )
+  @Min(0)
   creditPrice?: number;
 
   @IsOptional()
   @IsInt({ message: 'Tồn kho phải là số nguyên' })
   @Min(0, { message: 'Tồn kho không được nhỏ hơn 0' })
-  stock?: number;
+  stock?: number = 0;
 
   @IsOptional()
   @IsInt({ message: 'Ngưỡng tồn kho phải là số nguyên' })
   @Min(0, { message: 'Ngưỡng tồn kho không được nhỏ hơn 0' })
-  min_stock_level?: number;
+  minStockLevel?: number = 0;
 
   @IsOptional()
-  @IsString({ message: 'Hình ảnh phải là chuỗi JSON' }) // Hoặc dùng @IsJSON nếu cần validate kỹ
+  @IsString({ message: 'Hình ảnh phải là chuỗi JSON hoặc text' }) // Nếu dùng TEXT
   images?: string;
 
   @IsOptional()
-  @IsString({ message: 'Thông số kỹ thuật phải là chuỗi JSON' })
+  @IsString({ message: 'Thông số kỹ thuật phải là chuỗi JSON hoặc text' })
   specs?: string;
 
   @IsOptional()
-  @IsString({ message: 'Thông tin bảo hành phải là chuỗi' })
+  @IsString()
   warrantyInfo?: string;
 
   @IsOptional()
-  @IsString({ message: 'Supplier ID phải là chuỗi' })
+  @IsString()
   supplierId?: string;
 
   @IsOptional()
-  @IsBoolean({ message: 'isActive phải là true hoặc false' })
-  isActive?: boolean;
+  @IsBoolean()
+  isActive?: boolean = true;
 
   @IsOptional()
-  @IsBoolean({ message: 'isDeleted phải là true hoặc false' })
-  isDeleted?: boolean;
+  @IsBoolean()
+  isDeleted?: boolean = false;
 }

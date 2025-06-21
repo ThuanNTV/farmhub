@@ -15,10 +15,10 @@ export class CategorysService extends TenantBaseService<Category> {
     const repo = await this.getRepo(storeId);
 
     // Kiểm tra sản phẩm có ID đã tồn tại
-    const existing = await this.findById(storeId, dto.id);
+    const existing = await this.findById(storeId, dto.categoryId);
     if (existing) {
       throw new InternalServerErrorException(
-        `❌ Danh mục với ID "${dto.id}" đã tồn tại`,
+        `❌ Danh mục với ID "${dto.categoryId}" đã tồn tại`,
       );
     }
 
@@ -30,10 +30,10 @@ export class CategorysService extends TenantBaseService<Category> {
     };
   }
 
-  async findById(storeId: string, id: string) {
+  async findById(storeId: string, categoryId: string) {
     const repo = await this.getRepo(storeId);
     return await repo.findOneBy({
-      id,
+      categoryId,
       isDeleted: false,
       isActive: true,
     });
@@ -46,18 +46,18 @@ export class CategorysService extends TenantBaseService<Category> {
     });
   }
 
-  async findOne(storeId: string, id: string) {
+  async findOne(storeId: string, categoryId: string) {
     const repo = await this.getRepo(storeId);
     return await repo.findOneBy({
-      id,
+      categoryId,
       isDeleted: false,
       isActive: true,
     });
   }
 
-  async update(storeId: string, id: string, dto: UpdateCategoryDto) {
+  async update(storeId: string, categoryId: string, dto: UpdateCategoryDto) {
     const repo = await this.getRepo(storeId);
-    const entity = await this.findByIdOrFail(storeId, id);
+    const entity = await this.findByIdOrFail(storeId, categoryId);
 
     // Cập nhật các trường cần thiết
     Object.assign(entity, dto);
@@ -68,9 +68,9 @@ export class CategorysService extends TenantBaseService<Category> {
     };
   }
 
-  async remove(storeId: string, id: string) {
+  async remove(storeId: string, categoryId: string) {
     const repo = await this.getRepo(storeId);
-    const entity = await this.findByIdOrFail(storeId, id);
+    const entity = await this.findByIdOrFail(storeId, categoryId);
 
     // Đánh dấu là đã xóa thay vì xóa thực sự
     entity.isDeleted = true;

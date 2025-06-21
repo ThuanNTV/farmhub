@@ -4,9 +4,11 @@ import { join } from 'path';
 import { Product } from 'src/entities/tenant/product.entity';
 import { Category } from 'src/entities/tenant/category.entity';
 import { Customer } from 'src/entities/tenant/customer.entity';
+import { Order } from 'src/entities/tenant/order.entity';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 
 // Export mảng entities riêng
-export const tenantEntities = [Product, Category, Customer];
+export const tenantEntities = [Product, Category, Customer, Order, OrderItem];
 
 export function getTenantDbConfig(dbName: string): DataSourceOptions {
   return {

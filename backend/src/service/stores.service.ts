@@ -22,16 +22,14 @@ export class StoresService {
     private readonly tenantDataSourceService: TenantDataSourceService,
   ) {}
 
-  async create(createStoreDto: CreateStoreDto) {
-    const existing = await this.storesRepo.findOneBy({ id: createStoreDto.id });
+  async create(dto: CreateStoreDto) {
+    const existing = await this.storesRepo.findOneBy({ storeId: dto.storeId });
     if (existing && !existing.isDelete) {
-      throw new ConflictException(
-        `❌ Store ID "${createStoreDto.id}" đã tồn tại.`,
-      );
+      throw new ConflictException(`❌ Store ID "${dto.storeId}" đã tồn tại.`);
     }
 
     const store = this.storesRepo.create({
-      ...createStoreDto,
+      ...dto,
     });
 
     // Bước 1: Tạo database vật lý trước
@@ -48,9 +46,9 @@ export class StoresService {
 
     // Bước 3: Tạo kết nối và khởi tạo bảng
     try {
-      this.logger.log(`🚀 Khởi tạo DataSource cho Store ID: ${store.id}`);
+      this.logger.log(`🚀 Khởi tạo DataSource cho Store ID: ${store.storeId}`);
       const dataSource = await this.tenantDataSourceService.getTenantDataSource(
-        store.id,
+        store.storeId,
       );
       await dataSource.synchronize(); // Nếu cần tạo bảng
     } catch (error) {
@@ -76,13 +74,15 @@ export class StoresService {
     });
   }
 
-  async findOne(id: string): Promise<Store> {
+  async findOne(storeId: string): Promise<Store> {
     const store = await this.storesRepo.findOne({
-      where: { id, isDelete: false },
+      where: { storeId, isDelete: false },
     });
 
     if (!store) {
-      throw new NotFoundException(`❌ Store với ID "${id}" không tồn tại.`);
+      throw new NotFoundException(
+        `❌ Store với ID "${storeId}" không tồn tại.`,
+      );
     }
 
     return store;

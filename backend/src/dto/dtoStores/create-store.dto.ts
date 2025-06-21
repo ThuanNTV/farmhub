@@ -10,7 +10,7 @@ import {
 export class CreateStoreDto {
   @IsString({ message: 'ID must be a string' })
   @IsNotEmpty({ message: 'ID cannot be empty' })
-  id!: string;
+  storeId!: string;
 
   @IsString({ message: 'Name must be a string' })
   @IsNotEmpty({ message: 'Name cannot be empty' })

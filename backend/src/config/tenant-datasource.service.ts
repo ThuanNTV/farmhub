@@ -85,7 +85,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
     const storeRepo = this.globalDataSource.getRepository(Store);
     const store = await storeRepo.findOne({
       where: {
-        id: storeId,
+        storeId,
         isActive: true, // Chỉ lấy store đang active
         isDelete: false, // Không bị soft delete
       },

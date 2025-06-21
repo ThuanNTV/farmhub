@@ -18,10 +18,10 @@ export class CustomersService extends TenantBaseService<Customer> {
     const repo = await this.getRepo(storeId);
 
     // Kiểm tra sản phẩm có ID đã tồn tại
-    const existing = await this.findById(storeId, dto.id);
+    const existing = await this.findById(storeId, dto.customerId);
     if (existing) {
       throw new InternalServerErrorException(
-        `❌ Khách hàng với ID "${dto.id}" đã tồn tại`,
+        `❌ Khách hàng với ID "${dto.customerId}" đã tồn tại`,
       );
     }
 
@@ -41,22 +41,22 @@ export class CustomersService extends TenantBaseService<Customer> {
     });
   }
 
-  async findOne(storeId: string, id: string) {
+  async findOne(storeId: string, customerId: string) {
     const repo = await this.getRepo(storeId);
     const customer = await repo.findOneBy({
-      id,
+      customerId,
       isDeleted: false,
       isActive: true,
     });
     if (!customer) {
-      throw new NotFoundException(`Customer with id ${id} not found`);
+      throw new NotFoundException(`Customer with id ${customerId} not found`);
     }
     return customer;
   }
 
-  async update(storeId: string, id: string, dto: UpdateCustomerDto) {
+  async update(storeId: string, customerId: string, dto: UpdateCustomerDto) {
     const repo = await this.getRepo(storeId);
-    const entity = await this.findByIdOrFail(storeId, id);
+    const entity = await this.findByIdOrFail(storeId, customerId);
 
     const updated = repo.merge(entity, dto);
     const updatedEntity = await repo.save(updated);
@@ -66,9 +66,9 @@ export class CustomersService extends TenantBaseService<Customer> {
     };
   }
 
-  async remove(storeId: string, id: string) {
+  async remove(storeId: string, customerId: string) {
     const repo = await this.getRepo(storeId);
-    const entity = await this.findByIdOrFail(storeId, id);
+    const entity = await this.findByIdOrFail(storeId, customerId);
 
     entity.isDeleted = true;
     await repo.save(entity);
