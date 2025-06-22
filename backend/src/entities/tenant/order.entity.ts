@@ -40,7 +40,6 @@ export class Order {
   @Column('uuid', { nullable: true })
   customerId?: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   @ManyToOne(() => Customer, (customer: Customer) => customer.orders, {
     onDelete: 'SET NULL',
     nullable: true,

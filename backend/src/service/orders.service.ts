@@ -46,11 +46,7 @@ export class OrdersService extends TenantBaseService<Order> {
     // Create order with items - make sure NOT to set orderId manually
     const order = repo.create({
       ...orderData,
-      // Remove orderId if it exists in orderData - let TypeORM generate it
-      orderId: undefined,
       orderItems: orderItems.map((item) => ({
-        // Don't set orderItemId - let TypeORM generate it
-        orderItemId: undefined,
         productId: item.productId,
         productName: item.productName,
         productUnit: item.productUnit,
@@ -58,7 +54,7 @@ export class OrdersService extends TenantBaseService<Order> {
         unitPrice: item.unitPrice,
         totalPrice: item.totalPrice,
       })),
-    });
+    } as unknown as import('typeorm').DeepPartial<Order>);
 
     try {
       // Save with cascade - this should save order first, then items
