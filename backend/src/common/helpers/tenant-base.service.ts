@@ -5,7 +5,7 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import {
   ObjectLiteral,
   Repository,

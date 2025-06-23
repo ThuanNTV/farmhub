@@ -1,7 +1,7 @@
 // src/config/database-test.ts
 import { DataSource } from 'typeorm';
-import { globalDbConfig } from '../../config/dbConfig';
 import { Logger } from '@nestjs/common';
+import { globalDbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 // npx ts-node src/check/database-test.ts
 

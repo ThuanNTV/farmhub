@@ -48,4 +48,62 @@ export class Store {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  // 🏦 Thông tin ngân hàng
+  @Column({ type: 'varchar', name: 'bank_id', length: 100, nullable: true })
+  bankId?: string;
+
+  @Column({ type: 'varchar', name: 'account_no', length: 100, nullable: true })
+  accountNo?: string;
+
+  @Column({
+    type: 'varchar',
+    name: 'account_name',
+    length: 255,
+    nullable: true,
+  })
+  accountName?: string;
+
+  // 🧾 VAT
+  @Column({ type: 'boolean', name: 'is_vat_enabled', default: false })
+  isVatEnabled!: boolean;
+
+  @Column({ type: 'int', name: 'vat_rate', default: 8 })
+  vatRate!: number;
+
+  // 🧾 In hoá đơn
+  @Column({
+    type: 'varchar',
+    name: 'invoice_footer',
+    length: 500,
+    nullable: true,
+  })
+  invoiceFooter?: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['k58', 'k80', 'a5'],
+    name: 'default_paper_size',
+    default: 'k80',
+  })
+  defaultPaperSize!: 'k80' | 'a5' | 'k58';
+
+  // 💾 Backup
+  @Column({
+    type: 'varchar',
+    name: 'backup_schedule',
+    length: 100,
+    nullable: true,
+  })
+  backupSchedule?: string;
+
+  // ⚙️ Cấu hình mặc định
+  @Column({ type: 'varchar', name: 'default_unit', default: 'cái' })
+  defaultUnit!: string;
+
+  @Column({ type: 'int', name: 'default_discount', default: 0 })
+  defaultDiscount!: number;
+
+  @Column({ type: 'int', name: 'default_shipping_fee', default: 0 })
+  defaultShippingFee!: number;
 }

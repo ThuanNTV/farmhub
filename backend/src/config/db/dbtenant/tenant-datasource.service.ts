@@ -8,7 +8,7 @@ import {
 import { DataSource } from 'typeorm';
 import { getTenantDbConfig } from './getTenantDbConfig';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Store } from '../entities/global/store.entity';
+import { Store } from '../../../entities/global/store.entity';
 
 interface CachedDataSource {
   dataSource: DataSource;

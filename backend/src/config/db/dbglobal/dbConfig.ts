@@ -2,8 +2,8 @@
 import { DataSourceOptions } from 'typeorm'; // <-- Import DataSourceOptions từ 'typeorm'
 import { config } from 'dotenv';
 import { join } from 'path';
-import { Store } from '../entities/global/store.entity';
-import { User } from '../entities/global/user.entity';
+import { Store } from 'src/entities/global/store.entity';
+import { User } from 'src/entities/global/user.entity';
 
 config();
 

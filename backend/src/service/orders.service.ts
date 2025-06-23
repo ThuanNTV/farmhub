@@ -7,7 +7,7 @@ import { CreateOrderDto } from '../dto/dtoOders/create-order.dto';
 import { UpdateOrderDto } from '../dto/dtoOders/update-order.dto';
 import { TenantBaseService } from 'src/common/helpers/tenant-base.service';
 import { Order } from 'src/entities/tenant/order.entity';
-import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class OrdersService extends TenantBaseService<Order> {

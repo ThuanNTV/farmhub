@@ -7,7 +7,7 @@ import { CreateCustomerDto } from '../dto/dtoCustomers/create-customer.dto';
 import { UpdateCustomerDto } from '../dto/dtoCustomers/update-customer.dto';
 import { Customer } from 'src/entities/tenant/customer.entity';
 import { TenantBaseService } from 'src/common/helpers/tenant-base.service';
-import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class CustomersService extends TenantBaseService<Customer> {

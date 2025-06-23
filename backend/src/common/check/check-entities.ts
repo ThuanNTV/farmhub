@@ -1,8 +1,8 @@
 // src/check-entities.ts
 import { DataSource } from 'typeorm';
 import { Store } from '../../entities/global/store.entity'; // Đường dẫn chính xác đến entity
-import { globalDbConfig } from '../../config/dbConfig'; // Đường dẫn chính xác đến cấu hình kết nối
 import { Logger } from '@nestjs/common';
+import { globalDbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 // npx ts-node src/check/check-entities.ts
 

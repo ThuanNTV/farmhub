@@ -1,18 +1,19 @@
+import { UserRole } from 'src/dto/dtoUsers/create-user.dto';
 import {
   Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('users')
 export class User {
-  @PrimaryColumn({ type: 'varchar', length: 255 })
+  @PrimaryGeneratedColumn('uuid')
   userId!: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  username!: string;
+  userName!: string;
 
   @Column({ type: 'varchar', length: 255 })
   passwordHash!: string;
@@ -20,14 +21,14 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   fullName!: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  email?: string;
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email!: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone?: string;
 
   @Column({ type: 'varchar', length: 50 })
-  role!: 'admin_global' | 'store_manager' | 'store_staff' | 'viewer';
+  role!: UserRole.STORE_MANAGER;
 
   @Column({ type: 'json', nullable: true })
   associatedStoreIds?: string[];

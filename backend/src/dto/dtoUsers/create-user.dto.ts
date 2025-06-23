@@ -18,10 +18,6 @@ export enum UserRole {
 }
 
 export class CreateUserDto {
-  @IsString({ message: 'ID must be a string' })
-  @IsNotEmpty({ message: 'ID cannot be empty' })
-  userId!: string;
-
   @IsString({ message: 'Username must be a string' })
   @IsNotEmpty({ message: 'Username cannot be empty' })
   username!: string;
@@ -37,15 +33,15 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsEmail({}, { message: 'Email must be a valid email address' })
-  email?: string;
+  email!: string;
 
   @IsOptional()
   @IsString({ message: 'Phone must be a string' })
   @Length(7, 20, { message: 'Phone must be between 7 and 20 characters' })
   phone?: string;
 
-  @IsEnum(UserRole, { message: 'Role must be a valid user role' })
-  role!: UserRole;
+  @IsEnum(UserRole)
+  role: UserRole = UserRole.STORE_MANAGER;
 
   @IsOptional()
   @IsArray({ message: 'Associated store IDs must be an array' })

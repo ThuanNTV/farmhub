@@ -10,7 +10,7 @@ import { UpdateStoreDto } from '../dto/dtoStores/update-store.dto';
 import { Store } from 'src/entities/global/store.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TenantDataSourceService } from 'src/config/tenant-datasource.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class StoresService {

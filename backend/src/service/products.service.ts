@@ -4,7 +4,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { TenantDataSourceService } from '../config/tenant-datasource.service';
+import { TenantDataSourceService } from '../config/db/dbtenant/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
 import { CreateProductDto } from 'src/dto/dtoProducts/create-product.dto';
 import { UpdateProductDto } from 'src/dto/dtoProducts/update-product.dto';

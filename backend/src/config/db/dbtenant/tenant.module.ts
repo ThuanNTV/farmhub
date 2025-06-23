@@ -1,7 +1,7 @@
 // src/tenant/tenant.module.ts
 import { Module } from '@nestjs/common';
-import { TenantDataSourceService } from './tenant-datasource.service';
-import { GlobalDatabaseModule } from './global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Module({
   imports: [GlobalDatabaseModule],

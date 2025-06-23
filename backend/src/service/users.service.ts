@@ -18,27 +18,30 @@ export class UsersService {
   ) {}
 
   async create(dto: CreateUserDto) {
-    try {
-      // Kiểm tra xem người dùng đã tồn tại chưa
-      await this.findOne(dto.userId);
-      // Nếu không throw => người dùng đã tồn tại
-      throw new ConflictException(`❌ User ID "${dto.userId}" đã tồn tại.`);
-    } catch (error) {
-      if (!(error instanceof NotFoundException)) throw error;
+    const existing = await this.findOneUsername(dto.username).catch(() => null);
+    if (existing) {
+      throw new ConflictException(`❌ Username "${dto.username}" đã tồn tại.`);
     }
-    // 🔐 Hash password
-    if (dto.password) {
-      const salt = await bcrypt.genSalt(10);
-      dto.password = await bcrypt.hash(dto.password, salt);
-    }
-    // Lưu người dùng mới
-    const userToSave = {
-      ...dto,
-      passwordHash: dto.password, // Lưu hash
+
+    const hashedPassword = dto.password
+      ? await bcrypt.hash(dto.password, 10)
+      : undefined;
+
+    const { lastLoginAt, tokenExpiryAt, ...rest } = dto;
+
+    const userToSave: Partial<User> = {
+      ...rest,
+      userName: dto.username,
+      passwordHash: hashedPassword,
       role: UserRole.STORE_MANAGER,
-    } as Omit<typeof dto, 'password'> & { password?: string };
-    delete userToSave.password;
+      isActive: true,
+      isDelete: false,
+      ...(lastLoginAt ? { lastLoginAt: new Date(lastLoginAt) } : {}),
+      ...(tokenExpiryAt ? { tokenExpiryAt: new Date(tokenExpiryAt) } : {}),
+    };
+
     const saved = await this.usersRepo.save(userToSave);
+
     return {
       message: '✅ Tạo người dùng thành công',
       data: saved,
@@ -51,35 +54,89 @@ export class UsersService {
     });
   }
 
-  async findOne(userId: string) {
+  async findByUsernameOrEmail(usernameOrEmail: string) {
+    const isEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(
+      usernameOrEmail,
+    );
+
+    if (isEmail) {
+      return this.usersRepo.findOne({ where: { email: usernameOrEmail } });
+    } else {
+      return this.usersRepo.findOne({ where: { userName: usernameOrEmail } });
+    }
+  }
+
+  async findOneUsername(userName: string) {
     const user = await this.usersRepo.findOne({
-      where: { userId, isDelete: false },
+      where: { userName, isDelete: false, isActive: true },
     });
     if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found`);
+      throw new NotFoundException(`User with ${userName} not found`);
     }
     return user;
   }
 
-  async update(id: string, dto: UpdateUserDto) {
-    const user = await this.findOne(id);
+  async findOneById(userId: string) {
+    const user = await this.usersRepo.findOne({
+      where: { userId, isDelete: false, isActive: true },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with userId ${userId} not found`);
+    }
+    return user;
+  }
+
+  async updateLastLogin(userId: string) {
+    const user = await this.findOneById(userId);
+    user.lastLoginAt = new Date();
+    await this.usersRepo.save(user);
+    return {
+      message: `✅ user "${user.fullName}" đã được cập nhập`,
+      data: null,
+    };
+  }
+
+  async updateResetToken(userId: string, resetToken: string) {
+    const user = await this.findOneById(userId);
+    user.passwordResetToken = resetToken;
+    await this.usersRepo.save(user);
+    return {
+      message: `✅ user "${user.fullName}" đã được cập nhập`,
+      data: null,
+    };
+  }
+
+  async updatePassword(userId: string, passwordHash: string) {
+    const user = await this.findOneById(userId);
+    user.passwordHash = passwordHash;
+    await this.usersRepo.save(user);
+    return {
+      message: `✅ user "${user.fullName}" đã được cập nhập`,
+      data: null,
+    };
+  }
+
+  async update(userId: string, dto: UpdateUserDto) {
+    const user = await this.findOneById(userId);
 
     // Cập nhật thông tin người dùng
-    const updated = this.usersRepo.merge(user, dto);
+    // Omit 'role' from dto to avoid type incompatibility
+    const { role: _role, ...dtoWithoutRole } = dto;
+    const updated = this.usersRepo.merge(user, dtoWithoutRole);
     const saved = await this.usersRepo.save(updated);
 
     return {
-      message: `✅ Store "${saved.username}" đã được cập nhật`,
+      message: `✅ Store "${saved.userName}" đã được cập nhật`,
       data: saved,
     };
   }
 
-  async remove(id: string) {
-    const user = await this.findOne(id);
+  async remove(userId: string) {
+    const user = await this.findOneById(userId);
     user.isDelete = true;
     await this.usersRepo.save(user);
     return {
-      message: `✅ user với ID "${id}" đã được xóa`,
+      message: `✅ user "${user.fullName}" đã được xóa`,
       data: null,
     };
   }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
-import { GlobalDatabaseModule } from 'src/config/global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/global/user.entity';
 import { UsersController } from 'src/controller/users.controller';
@@ -12,5 +12,6 @@ import { UsersController } from 'src/controller/users.controller';
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
