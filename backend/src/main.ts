@@ -21,6 +21,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.enableCors({
+    origin: 'https://farmhub-frontend.onrender.com', // Hoặc chỉ domain frontend như "https://farmhub-frontend.onrender.com"
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
+
   // Listen
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port);
