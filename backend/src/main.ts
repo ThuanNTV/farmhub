@@ -22,7 +22,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   app.enableCors({
-    origin: 'https://farmhub-frontend.onrender.com', // Hoặc chỉ domain frontend như "https://farmhub-frontend.onrender.com"
+    origin: process.env.CORS_ORIGIN?.split(',') ?? true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
