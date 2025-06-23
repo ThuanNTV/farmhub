@@ -8,6 +8,7 @@ import { ProductsModule } from 'src/module/products.module';
 import { CustomersModule } from './module/customers.module';
 import { OrdersModule } from './module/orders.module';
 import { AuthModule } from 'src/module/auth.module';
+import { AppController } from 'src/app.controller';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { AuthModule } from 'src/module/auth.module';
     OrdersModule,
   ],
   providers: [TenantDataSourceService],
+  controllers: [AppController],
 })
 export class AppModule {}

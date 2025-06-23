@@ -1,8 +1,19 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { SafeUser, ResetToken } from 'src/dto/dtoAuth/auth.dto';
 import { CreateUserDto } from 'src/dto/dtoUsers/create-user.dto';
 import { UsersService } from 'src/service/users.service';
+
+export interface UserPayload {
+  userId: string;
+  userName: string;
+  fullName: string;
+  email: string;
+  role: string;
+  associatedStoreIds?: string[];
+  isSuperadmin?: boolean;
+}
 
 @Injectable()
 export class AuthService {
@@ -12,7 +23,10 @@ export class AuthService {
   ) {}
 
   // Validate bằng username hoặc email
-  async validateUser(usernameOrEmail: string, password: string): Promise<any> {
+  async validateUser(
+    usernameOrEmail: string,
+    password: string,
+  ): Promise<UserPayload | null> {
     const user = await this.usersService.findByUsernameOrEmail(usernameOrEmail);
     Logger.log('👤 Đang xác thực:', usernameOrEmail, password);
     if (!user) {
@@ -36,11 +50,28 @@ export class AuthService {
       return null;
     }
 
-    const { ...safeUser } = user;
+    const {
+      userId,
+      userName,
+      fullName,
+      email,
+      role,
+      associatedStoreIds,
+      isSuperadmin,
+    } = user;
 
-    return safeUser;
+    return {
+      userId,
+      userName,
+      fullName,
+      email,
+      role,
+      associatedStoreIds,
+      isSuperadmin,
+    };
   }
-  async login(user: any) {
+
+  async login(user: SafeUser) {
     // Cập nhật last login
     await this.usersService.updateLastLogin(user.userId);
 
@@ -56,13 +87,7 @@ export class AuthService {
       data: {
         access_token: this.jwtService.sign(payload, { expiresIn: '1h' }),
         user: {
-          userId: user.userId,
-          userName: user.username,
-          fullName: user.fullName,
-          email: user.email,
-          role: user.role,
-          associatedStoreIds: user.associatedStoreIds,
-          isSuperadmin: user.isSuperadmin,
+          ...user,
         },
       },
     };
@@ -91,14 +116,14 @@ export class AuthService {
 
   async resetPassword(token: string, newPassword: string) {
     try {
-      const payload = this.jwtService.verify(token);
+      const payload = this.jwtService.verify<ResetToken>(token);
 
       if (payload.type !== 'reset') {
         throw new UnauthorizedException('Invalid token');
       }
 
       const user = await this.usersService.findOneById(payload.userId);
-      if (!user || user.passwordResetToken !== token) {
+      if (user.passwordResetToken !== token) {
         throw new UnauthorizedException('Invalid or expired token');
       }
 
@@ -106,7 +131,7 @@ export class AuthService {
       await this.usersService.updatePassword(payload.userId, hashedPassword);
 
       return { message: 'Password reset successfully' };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

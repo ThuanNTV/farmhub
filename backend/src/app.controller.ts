@@ -8,7 +8,7 @@ import { UserRole } from 'src/dto/dtoUsers/create-user.dto';
 export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: any }): any {
     return req.user;
   }
 
@@ -16,7 +16,9 @@ export class AppController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.STORE_MANAGER)
   @Get('admin-only')
-  getAdminData(@Request() req) {
+  getAdminData(
+    @Request() req: { user: { id: string; username: string; role: UserRole } },
+  ) {
     return { message: 'This is admin-only data', user: req.user };
   }
 
@@ -24,7 +26,9 @@ export class AppController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @Get('manager-data')
-  getManagerData(@Request() req) {
+  getManagerData(
+    @Request() req: { user: { id: string; username: string; role: UserRole } },
+  ) {
     return { message: 'Manager data', user: req.user };
   }
 
@@ -37,7 +41,9 @@ export class AppController {
     UserRole.VIEWER,
   )
   @Get('all-users')
-  getAllUsersData(@Request() req) {
+  getAllUsersData(
+    @Request() req: { user: { id: string; username: string; role: UserRole } },
+  ) {
     return { message: 'Data for all authenticated users', user: req.user };
   }
 }

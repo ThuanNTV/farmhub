@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Param } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/dtoOders/create-order.dto';
-import { UpdateOrderDto } from '../dto/dtoOders/update-order.dto';
+// import { UpdateOrderDto } from '../dto/dtoOders/update-order.dto';
 import { OrdersService } from 'src/service/orders.service';
 
 @Controller('tenant/:storeId/orders')

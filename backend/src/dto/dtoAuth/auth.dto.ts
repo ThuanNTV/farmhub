@@ -26,3 +26,22 @@ export class ResetPasswordDto {
   @Length(8, 20, { message: 'Password must be between 8 and 20 characters' })
   newPassword!: string;
 }
+export class ResetToken {
+  @IsString({ message: 'userId must be a string' })
+  @IsNotEmpty({ message: 'userId cannot be empty' })
+  userId!: string;
+
+  @IsString({ message: 'type must be a string' })
+  @IsNotEmpty({ message: 'type cannot be empty' })
+  type!: string;
+}
+
+export interface SafeUser {
+  userId: string;
+  username: string;
+  fullName: string;
+  email: string;
+  role: string;
+  associatedStoreIds: string[];
+  isSuperadmin: boolean;
+}

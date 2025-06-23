@@ -1,6 +1,10 @@
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { LocalAuthGuard } from 'src/common/auth/local-auth.guard';
-import { ForgotPasswordDto, ResetPasswordDto } from 'src/dto/dtoAuth/auth.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  SafeUser,
+} from 'src/dto/dtoAuth/auth.dto';
 import { CreateUserDto } from 'src/dto/dtoUsers/create-user.dto';
 import { AuthService } from 'src/service/auth.service';
 
@@ -11,7 +15,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req: { user: any }) {
-    return this.authService.login(req.user);
+    return this.authService.login(req.user as SafeUser);
   }
 
   @Post('register')
