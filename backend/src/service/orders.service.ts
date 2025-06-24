@@ -91,9 +91,10 @@ export class OrdersService extends TenantBaseService<Order> {
     }
   }
 
-  // findAll() {
-  //   return `This action returns all orders`;
-  // }
+  async findAllOrder(storeId: string) {
+    const repo = await this.getRepo(storeId);
+    return await repo.find({ where: { isDeleted: false } });
+  }
   // findOne(id: number) {
   //   return `This action returns a #${id} order`;
   // }

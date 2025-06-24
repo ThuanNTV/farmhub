@@ -1,14 +1,14 @@
 import {
   Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('stores')
 export class Store {
-  @PrimaryColumn({ type: 'varchar', length: 255 })
+  @PrimaryGeneratedColumn('uuid')
   storeId!: string;
 
   @Column({ type: 'varchar', length: 255 })

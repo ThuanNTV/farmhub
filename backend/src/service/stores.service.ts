@@ -23,9 +23,13 @@ export class StoresService {
   ) {}
 
   async create(dto: CreateStoreDto) {
-    const existing = await this.storesRepo.findOneBy({ storeId: dto.storeId });
+    const existing = await this.storesRepo.findOneBy({
+      databaseName: dto.databaseName,
+    });
     if (existing && !existing.isDelete) {
-      throw new ConflictException(`❌ Store ID "${dto.storeId}" đã tồn tại.`);
+      throw new ConflictException(
+        `❌ Store ID "${dto.databaseName}" đã tồn tại.`,
+      );
     }
 
     const store = this.storesRepo.create({
