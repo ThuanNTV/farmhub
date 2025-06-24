@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -5,10 +6,43 @@ import {
   IsEmail,
   IsBoolean,
   Length,
-  IsEnum,
   IsInt,
   Min,
+  ValidateNested,
 } from 'class-validator';
+
+export enum PaperSize {
+  k58 = 'k58',
+  k80 = 'k80',
+  a5 = 'a5',
+}
+
+class BankInfoDto {
+  @IsString()
+  bankId!: string;
+
+  @IsString()
+  accountNo!: string;
+
+  @IsString()
+  accountName!: string;
+}
+
+class PrintingPreferencesDto {
+  @IsString()
+  defaultPaperSize!: PaperSize;
+}
+
+class StoreDefaultsDto {
+  @IsString()
+  unit!: string;
+
+  @IsOptional()
+  discount?: number;
+
+  @IsOptional()
+  shippingFee?: number;
+}
 
 export class CreateStoreDto {
   @IsString({ message: 'Name must be a string' })
@@ -45,20 +79,13 @@ export class CreateStoreDto {
 
   @IsOptional()
   @IsBoolean({ message: 'isDelete must be a boolean' })
-  isDelete?: boolean;
+  isDeleted?: boolean;
 
   // 🏦 Bank Info
   @IsOptional()
-  @IsString({ message: 'Bank ID must be a string' })
-  bankId?: string;
-
-  @IsOptional()
-  @IsString({ message: 'Account number must be a string' })
-  accountNo?: string;
-
-  @IsOptional()
-  @IsString({ message: 'Account name must be a string' })
-  accountName?: string;
+  @ValidateNested()
+  @Type(() => BankInfoDto)
+  bankInfo?: BankInfoDto;
 
   // 🧾 VAT
   @IsOptional()
@@ -72,14 +99,13 @@ export class CreateStoreDto {
 
   // 🧾 Invoice
   @IsOptional()
-  @IsString({ message: 'Invoice footer must be a string' })
-  invoiceFooter?: string;
+  @ValidateNested()
+  @Type(() => PrintingPreferencesDto)
+  printingPreferences?: PrintingPreferencesDto;
 
   @IsOptional()
-  @IsEnum(['k58', 'k80', 'a5'], {
-    message: 'Default paper size must be one of: k58, k80, a5',
-  })
-  defaultPaperSize?: 'k58' | 'k80' | 'a5';
+  @IsString({ message: 'Invoice footer must be a string' })
+  invoiceFooter?: string;
 
   // 💾 Backup
   @IsOptional()
@@ -88,16 +114,7 @@ export class CreateStoreDto {
 
   // ⚙️ Configs
   @IsOptional()
-  @IsString({ message: 'Default unit must be a string' })
-  defaultUnit?: string;
-
-  @IsOptional()
-  @IsInt({ message: 'Default discount must be an integer' })
-  @Min(0, { message: 'Default discount cannot be negative' })
-  defaultDiscount?: number;
-
-  @IsOptional()
-  @IsInt({ message: 'Default shipping fee must be an integer' })
-  @Min(0, { message: 'Default shipping fee cannot be negative' })
-  defaultShippingFee?: number;
+  @ValidateNested()
+  @Type(() => StoreDefaultsDto)
+  defaults?: StoreDefaultsDto;
 }

@@ -26,7 +26,7 @@ export class StoresService {
     const existing = await this.storesRepo.findOneBy({
       databaseName: dto.databaseName,
     });
-    if (existing && !existing.isDelete) {
+    if (existing && !existing.isDeleted) {
       throw new ConflictException(
         `❌ Store ID "${dto.databaseName}" đã tồn tại.`,
       );
@@ -74,13 +74,13 @@ export class StoresService {
 
   async findAll() {
     return await this.storesRepo.find({
-      where: { isActive: true, isDelete: false },
+      where: { isActive: true, isDeleted: false },
     });
   }
 
   async findOne(storeId: string): Promise<Store> {
     const store = await this.storesRepo.findOne({
-      where: { storeId, isDelete: false },
+      where: { storeId, isDeleted: false },
     });
 
     if (!store) {
@@ -110,7 +110,7 @@ export class StoresService {
 
   async remove(id: string) {
     const store = await this.findOne(id);
-    store.isDelete = true;
+    store.isDeleted = true;
 
     await this.storesRepo.save(store);
     return {

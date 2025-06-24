@@ -37,7 +37,7 @@ export class User {
   isActive!: boolean;
 
   @Column({ type: 'boolean', default: false })
-  isDelete!: boolean;
+  isDeleted!: boolean;
 
   @Column({ type: 'boolean', default: false })
   isSuperadmin!: boolean;

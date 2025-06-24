@@ -35,7 +35,7 @@ export class UsersService {
       passwordHash: hashedPassword,
       role: UserRole.STORE_MANAGER,
       isActive: true,
-      isDelete: false,
+      isDeleted: false,
       ...(lastLoginAt ? { lastLoginAt: new Date(lastLoginAt) } : {}),
       ...(tokenExpiryAt ? { tokenExpiryAt: new Date(tokenExpiryAt) } : {}),
     };
@@ -50,7 +50,7 @@ export class UsersService {
 
   async findAll() {
     return await this.usersRepo.find({
-      where: { isActive: true, isDelete: false },
+      where: { isActive: true, isDeleted: false },
     });
   }
 
@@ -68,7 +68,7 @@ export class UsersService {
 
   async findOneUsername(userName: string) {
     const user = await this.usersRepo.findOne({
-      where: { userName, isDelete: false, isActive: true },
+      where: { userName, isDeleted: false, isActive: true },
     });
     if (!user) {
       throw new NotFoundException(`User with ${userName} not found`);
@@ -78,7 +78,7 @@ export class UsersService {
 
   async findOneById(userId: string) {
     const user = await this.usersRepo.findOne({
-      where: { userId, isDelete: false, isActive: true },
+      where: { userId, isDeleted: false, isActive: true },
     });
     if (!user) {
       throw new NotFoundException(`User with userId ${userId} not found`);
@@ -133,7 +133,7 @@ export class UsersService {
 
   async remove(userId: string) {
     const user = await this.findOneById(userId);
-    user.isDelete = true;
+    user.isDeleted = true;
     await this.usersRepo.save(user);
     return {
       message: `✅ user "${user.fullName}" đã được xóa`,

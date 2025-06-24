@@ -87,7 +87,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
       where: {
         storeId,
         isActive: true, // Chỉ lấy store đang active
-        isDelete: false, // Không bị soft delete
+        isDeleted: false, // Không bị soft delete
       },
     });
     if (!store) {

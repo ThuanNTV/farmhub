@@ -38,7 +38,7 @@ export class AuthService {
       return null;
     }
 
-    if (!user.isActive || user.isDelete) {
+    if (!user.isActive || user.isDeleted) {
       throw new UnauthorizedException(
         'Tài khoản không hoạt động hoặc đã bị xoá',
       );

@@ -1,3 +1,4 @@
+import { PaperSize } from 'src/dto/dtoStores/create-store.dto';
 import {
   Entity,
   Column,
@@ -41,7 +42,7 @@ export class Store {
   isActive!: boolean;
 
   @Column({ type: 'boolean', default: false, name: 'is_delete' })
-  isDelete!: boolean;
+  isDeleted!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
@@ -82,11 +83,11 @@ export class Store {
 
   @Column({
     type: 'enum',
-    enum: ['k58', 'k80', 'a5'],
+    enum: PaperSize,
     name: 'default_paper_size',
-    default: 'k80',
+    default: PaperSize.k80,
   })
-  defaultPaperSize!: 'k80' | 'a5' | 'k58';
+  defaultPaperSize!: PaperSize;
 
   // 💾 Backup
   @Column({

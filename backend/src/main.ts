@@ -47,7 +47,7 @@ async function bootstrap() {
   logger.log(`🌍 Môi trường: ${environment}`);
 
   if (environment === 'development') {
-    logger.log('🛠️  Development mode - Tất cả tính năng debug đã được bật');
+    logger.log('🛠️ Development mode - Tất cả tính năng debug đã được bật');
     logger.log(`🔒 CORS origins: ${allowedOrigins.join(', ')}`);
   } else {
     logger.log('🔐 Production mode - Bảo mật cao đã được kích hoạt');
