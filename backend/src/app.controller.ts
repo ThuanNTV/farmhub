@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Logger } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
@@ -6,6 +6,12 @@ import { UserRole } from 'src/dto/dtoUsers/create-user.dto';
 
 @Controller()
 export class AppController {
+  @Get()
+  getInit() {
+    Logger.log('Hello!');
+    return 'Hello friend!';
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req: { user: any }): any {
