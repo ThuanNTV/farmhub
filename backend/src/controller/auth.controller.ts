@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from 'src/common/auth/local-auth.guard';
 import {
   ForgotPasswordDto,
@@ -11,6 +19,12 @@ import { AuthService } from 'src/service/auth.service';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  getProfile(@Request() req: { user: SafeUser }): SafeUser {
+    return req.user; // chứa thông tin đã decode từ token
+  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')

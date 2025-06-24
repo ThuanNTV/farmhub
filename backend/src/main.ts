@@ -3,10 +3,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from 'src/common/interceptors/all-exceptions.filter';
+import { Server } from 'http';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+  const server = app.getHttpServer() as Server;
+  const address = server.address();
 
   // Global Validation
   app.useGlobalPipes(
@@ -29,9 +32,26 @@ async function bootstrap() {
 
   // Listen
   const port = Number(process.env.PORT) || 3000;
+  const environment = process.env.NODE_ENV ?? 'production';
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') ?? ['*'];
+  const host =
+    address == null
+      ? 'localhost'
+      : typeof address === 'string'
+        ? address
+        : address.address;
+
   await app.listen(port);
 
-  logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  logger.log(`🚀 Application is running on: http://${host}:${port}`);
+  logger.log(`🌍 Môi trường: ${environment}`);
+
+  if (environment === 'development') {
+    logger.log('🛠️  Development mode - Tất cả tính năng debug đã được bật');
+    logger.log(`🔒 CORS origins: ${allowedOrigins.join(', ')}`);
+  } else {
+    logger.log('🔐 Production mode - Bảo mật cao đã được kích hoạt');
+  }
 }
 
 bootstrap().catch((error) => {

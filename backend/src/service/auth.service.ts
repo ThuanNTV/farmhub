@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { SafeUser, ResetToken } from 'src/dto/dtoAuth/auth.dto';
@@ -28,7 +28,6 @@ export class AuthService {
     password: string,
   ): Promise<UserPayload | null> {
     const user = await this.usersService.findByUsernameOrEmail(usernameOrEmail);
-    Logger.log('👤 Đang xác thực:', usernameOrEmail, password);
     if (!user) {
       // Delay trả về để chống timing attack
       await bcrypt.compare(
