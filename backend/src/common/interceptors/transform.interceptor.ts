@@ -5,6 +5,7 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
+import { classToPlain } from 'class-transformer';
 
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, any> {
@@ -47,10 +48,13 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
           data = response;
         }
 
+        // ⚡️ Chuyển class có @Exclude thành plain object
+        const transformedData = classToPlain(data);
+
         return {
           status: 'success',
           message,
-          data,
+          data: transformedData,
           code: statusCode,
         };
       }),

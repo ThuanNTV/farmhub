@@ -12,8 +12,10 @@ import { TenantBaseService } from 'src/common/helpers/tenant-base.service';
 
 @Injectable()
 export class ProductsService extends TenantBaseService<Product> {
+  protected primaryKey!: string;
   constructor(tenantDS: TenantDataSourceService) {
     super(tenantDS, Product);
+    this.primaryKey = 'productId';
   }
 
   async create(storeId: string, dto: CreateProductDto) {

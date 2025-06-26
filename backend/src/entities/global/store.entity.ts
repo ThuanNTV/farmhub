@@ -41,7 +41,7 @@ export class Store {
   @Column({ type: 'boolean', default: true, name: 'is_active' })
   isActive!: boolean;
 
-  @Column({ type: 'boolean', default: false, name: 'is_delete' })
+  @Column({ type: 'boolean', default: false, name: 'is_deleted' })
   isDeleted!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })

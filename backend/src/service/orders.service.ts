@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/dtoOders/create-order.dto';
 import { TenantBaseService } from 'src/common/helpers/tenant-base.service';
@@ -10,8 +11,10 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 
 @Injectable()
 export class OrdersService extends TenantBaseService<Order> {
+  protected primaryKey!: string;
   constructor(tenantDS: TenantDataSourceService) {
     super(tenantDS, Order);
+    this.primaryKey = 'orderId';
   }
 
   async createOrder(storeId: string, dto: CreateOrderDto) {
@@ -95,9 +98,22 @@ export class OrdersService extends TenantBaseService<Order> {
     const repo = await this.getRepo(storeId);
     return await repo.find({ where: { isDeleted: false } });
   }
-  // findOne(id: number) {
-  //   return `This action returns a #${id} order`;
-  // }
+
+  async findOne(storeId: string, orderId: string) {
+    const repo = await this.getRepo(storeId);
+    const order = await repo.findOneBy({
+      orderId,
+      isDeleted: false,
+    });
+    if (!order) {
+      throw new NotFoundException(
+        `❌ Không tìm thấy Đơn hàng với ID "${orderId}"`,
+      );
+    }
+
+    return order;
+  }
+
   // update(id: number, updateOrderDto: UpdateOrderDto) {
   //   return `This action updates a #${id} order`;
   // }

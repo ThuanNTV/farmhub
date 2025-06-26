@@ -73,14 +73,6 @@ export class CreateStoreDto {
   @IsString({ message: 'Opening hours must be a string' })
   openingHours?: string;
 
-  @IsOptional()
-  @IsBoolean({ message: 'isActive must be a boolean' })
-  isActive?: boolean;
-
-  @IsOptional()
-  @IsBoolean({ message: 'isDelete must be a boolean' })
-  isDeleted?: boolean;
-
   // 🏦 Bank Info
   @IsOptional()
   @ValidateNested()

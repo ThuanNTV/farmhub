@@ -20,10 +20,13 @@ export class OrdersController {
     return this.ordersService.findAllOrder(storeId);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.ordersService.findOne(+id);
-  // }
+  @Get(':orderId')
+  findOne(
+    @Param('storeId') storeId: string,
+    @Param('orderId') orderId: string,
+  ) {
+    return this.ordersService.findOne(storeId, orderId);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {

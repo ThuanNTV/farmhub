@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsEmail,
-  IsBoolean,
   IsArray,
   IsEnum,
   IsDateString,
@@ -46,18 +45,6 @@ export class CreateUserDto {
   @IsOptional()
   @IsArray({ message: 'Associated store IDs must be an array' })
   associatedStoreIds?: string[];
-
-  @IsOptional()
-  @IsBoolean({ message: 'is_active must be true or false' })
-  isActive?: boolean;
-
-  @IsOptional()
-  @IsBoolean({ message: 'isDelete must be a boolean' })
-  isDelete?: boolean;
-
-  @IsOptional()
-  @IsBoolean({ message: 'is_superadmin must be true or false' })
-  isSuperadmin?: boolean;
 
   @IsOptional()
   @IsDateString(

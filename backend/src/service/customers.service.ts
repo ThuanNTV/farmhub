@@ -11,8 +11,10 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 
 @Injectable()
 export class CustomersService extends TenantBaseService<Customer> {
+  protected primaryKey!: string;
   constructor(tenantDS: TenantDataSourceService) {
     super(tenantDS, Customer);
+    this.primaryKey = 'customerId';
   }
   async createCustomer(storeId: string, dto: CreateCustomerDto) {
     const repo = await this.getRepo(storeId);

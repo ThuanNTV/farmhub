@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UserRole } from 'src/dto/dtoUsers/create-user.dto';
 import { UpdateUserDto } from 'src/dto/dtoUsers/update-user.dto';
+import { UserResponseDto } from 'src/dto/dtoUsers/UserResponseDto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -44,7 +46,9 @@ export class UsersService {
 
     return {
       message: '✅ Tạo người dùng thành công',
-      data: saved,
+      data: plainToInstance(UserResponseDto, saved, {
+        excludeExtraneousValues: true,
+      }),
     };
   }
 

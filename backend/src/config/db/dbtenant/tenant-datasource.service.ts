@@ -40,7 +40,8 @@ export class TenantDataSourceService implements OnModuleDestroy {
    * Lấy hoặc tạo DataSource cho một cửa hàng cụ thể với caching và validation
    */
   async getTenantDataSource(storeId: string): Promise<DataSource> {
-    if (!storeId.trim()) {
+    storeId = storeId.trim();
+    if (!storeId) {
       throw new Error('Store ID cannot be empty');
     }
 
@@ -163,35 +164,82 @@ export class TenantDataSourceService implements OnModuleDestroy {
   /**
    * Tạo Promise để khởi tạo DataSource
    */
+  // private async createDataSourceInitPromise(
+  //   storeId: string,
+  //   dbName: string,
+  // ): Promise<DataSource> {
+  //   this.logger.log(
+  //     `Initializing new DataSource for store: ${storeId} (db: ${dbName})`,
+  //   );
+
+  //   const tenantConfig = getTenantDbConfig(dbName);
+  //   const newDataSource = new DataSource(tenantConfig);
+
+  //   try {
+  //     await newDataSource.initialize();
+
+  //     // Test connection
+  //     const shouldSync = await this.shouldSynchronize(newDataSource);
+  //     if (shouldSync) {
+  //       this.logger.warn(`Synchronizing schema for db: ${dbName}`);
+  //       await newDataSource.synchronize();
+  //     }
+
+  //     return newDataSource;
+  //   } catch (error) {
+  //     this.logger.error(
+  //       `Failed to initialize DataSource for store: ${storeId} (db: ${dbName})`,
+  //       error instanceof Error ? error.message : String(error),
+  //     );
+
+  //     // Cleanup nếu initialization thất bại
+  //     if (newDataSource.isInitialized) {
+  //       try {
+  //         await newDataSource.destroy();
+  //       } catch (destroyError) {
+  //         this.logger.error(
+  //           'Failed to cleanup failed DataSource',
+  //           destroyError,
+  //         );
+  //       }
+  //     }
+
+  //     throw error;
+  //   }
+  // }
+
   private async createDataSourceInitPromise(
     storeId: string,
-    dbName: string,
+    schemaName: string,
   ): Promise<DataSource> {
     this.logger.log(
-      `Initializing new DataSource for store: ${storeId} (db: ${dbName})`,
+      `Initializing new DataSource for store: ${storeId} (schema: ${schemaName})`,
     );
 
-    const tenantConfig = getTenantDbConfig(dbName);
+    // 🔧 Bước 1: Ensure schema exists
+    await this.ensureSchemaExists(schemaName);
+
+    // 🔧 Bước 2: Chuẩn bị config
+    const tenantConfig = getTenantDbConfig(schemaName);
     const newDataSource = new DataSource(tenantConfig);
 
     try {
       await newDataSource.initialize();
 
-      // Test connection
+      // 🔍 Bước 3: Kiểm tra có cần sync không
       const shouldSync = await this.shouldSynchronize(newDataSource);
       if (shouldSync) {
-        this.logger.warn(`Synchronizing schema for db: ${dbName}`);
+        this.logger.warn(`Synchronizing schema for: ${schemaName}`);
         await newDataSource.synchronize();
       }
 
       return newDataSource;
     } catch (error) {
       this.logger.error(
-        `Failed to initialize DataSource for store: ${storeId} (db: ${dbName})`,
+        `❌ Failed to initialize DataSource for store: ${storeId} (schema: ${schemaName})`,
         error instanceof Error ? error.message : String(error),
       );
 
-      // Cleanup nếu initialization thất bại
       if (newDataSource.isInitialized) {
         try {
           await newDataSource.destroy();
@@ -204,6 +252,18 @@ export class TenantDataSourceService implements OnModuleDestroy {
       }
 
       throw error;
+    }
+  }
+
+  private async ensureSchemaExists(schemaName: string): Promise<void> {
+    try {
+      await this.globalDataSource.query(
+        `CREATE SCHEMA IF NOT EXISTS "${schemaName}";`,
+      );
+      this.logger.log(`✅ Schema ensured: ${schemaName}`);
+    } catch (err) {
+      this.logger.error(`❌ Failed to ensure schema: ${schemaName}`, err);
+      throw new Error(`Không thể tạo schema cho tenant: ${schemaName}`);
     }
   }
 

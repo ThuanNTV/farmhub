@@ -18,6 +18,12 @@ import {
 export abstract class TenantBaseService<T extends ObjectLiteral> {
   protected readonly logger = new Logger(this.constructor.name);
 
+  /**
+   * The primary key field name for the entity.
+   * Subclasses must set this property.
+   */
+  protected abstract primaryKey: string;
+
   constructor(
     protected readonly tenantDataSourceService: TenantDataSourceService,
     private readonly entity: new () => T, // Entity class
@@ -78,16 +84,26 @@ export abstract class TenantBaseService<T extends ObjectLiteral> {
     storeId: string,
     id: string | number,
   ): Promise<T | null> {
+    if (!this.primaryKey) {
+      throw new Error(
+        `${this.constructor.name} is missing 'primaryKey'. Please define it.`,
+      );
+    }
+
     try {
       const repo = await this.getRepo(storeId);
       return await repo.findOne({
-        where: { id } as unknown as FindOptionsWhere<T>,
+        where: { [this.primaryKey]: id } as FindOptionsWhere<T>,
       });
     } catch (error) {
       this.logger.error(
-        `Failed to find entity by id: ${id} in store: ${storeId}`,
-        error,
+        `❌ [${this.constructor.name}] Failed to find entity by ${this.primaryKey}=${id} in store ${storeId}`,
       );
+      if (error instanceof Error) {
+        this.logger.error(error.stack ?? error.message);
+      } else {
+        this.logger.error(String(error));
+      }
       throw error;
     }
   }

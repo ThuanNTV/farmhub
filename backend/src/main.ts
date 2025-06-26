@@ -4,6 +4,8 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from 'src/common/interceptors/all-exceptions.filter';
 import { Server } from 'http';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

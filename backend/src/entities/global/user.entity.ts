@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { UserRole } from 'src/dto/dtoUsers/create-user.dto';
 import {
   Entity,
@@ -15,6 +16,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   userName!: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 255 })
   passwordHash!: string;
 
