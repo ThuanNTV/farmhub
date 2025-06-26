@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('order_items')
 export class OrderItem {
@@ -23,6 +24,7 @@ export class OrderItem {
     nullable: false,
   })
   @JoinColumn({ name: 'orderId' })
+  @Exclude()
   order!: Order;
 
   @Column('uuid')
@@ -55,6 +57,9 @@ export class OrderItem {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt!: Date;
+
+  @Column({ type: 'boolean', default: false, name: 'is_deleted' })
+  isDeleted!: boolean;
 
   // Method to calculate total price
   calculateTotalPrice(): void {

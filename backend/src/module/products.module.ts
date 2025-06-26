@@ -7,5 +7,6 @@ import { ProductsService } from 'src/service/products.service';
   imports: [TenantModule], // Import the TenantDataSourceService to manage tenant-specific data sources
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

@@ -12,7 +12,7 @@ import {
   IsPositive,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateOrderItemDto } from 'src/dto/dtoOrderItem/create-orderItem.dto';
+import { UpdateOrderItemDto } from 'src/dto/dtoOrderItem/update-orderItem.dto';
 
 export enum OrderStatus {
   Pending = 'pending',
@@ -68,6 +68,7 @@ export class CreateOrderDto {
   @IsString()
   paymentDetails?: string;
 
+  @IsOptional()
   @IsEnum(OrderStatus)
   status: OrderStatus = OrderStatus.Pending;
 
@@ -93,6 +94,6 @@ export class CreateOrderDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateOrderItemDto)
-  orderItems?: CreateOrderItemDto[];
+  @Type(() => UpdateOrderItemDto)
+  orderItems?: UpdateOrderItemDto[];
 }

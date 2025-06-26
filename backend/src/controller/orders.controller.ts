@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, Patch } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/dtoOders/create-order.dto';
 // import { UpdateOrderDto } from '../dto/dtoOders/update-order.dto';
 import { OrdersService } from 'src/service/orders.service';
+import { UpdateOrderDto } from 'src/dto/dtoOders/update-order.dto';
 
 @Controller('tenant/:storeId/orders')
 export class OrdersController {
@@ -28,10 +29,14 @@ export class OrdersController {
     return this.ordersService.findOne(storeId, orderId);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-  //   return this.ordersService.update(+id, updateOrderDto);
-  // }
+  @Patch(':orderId')
+  update(
+    @Param('storeId') storeId: string,
+    @Param('orderId') orderId: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    return this.ordersService.update(storeId, orderId, updateOrderDto);
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
