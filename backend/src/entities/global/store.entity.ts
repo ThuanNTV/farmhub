@@ -1,110 +1,126 @@
-import { PaperSize } from 'src/dto/dtoStores/create-store.dto';
 import {
   Entity,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
+  Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Bank } from './bank.entity';
+import { User } from './user.entity';
+import { PaperSize } from 'src/modules/stores/dto/create-store.dto';
 
-@Entity('stores')
+@Entity('store')
+@Index(['schema_name'], { unique: true })
+@Index('IDX_bank_id', ['bank_id'])
+@Index('IDX_manager_user_id', ['manager_user_id'])
 export class Store {
-  @PrimaryGeneratedColumn('uuid')
-  storeId!: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'storeId' })
+  store_id!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, name: 'name' })
   name!: string;
 
-  @Column({ type: 'varchar', length: 500 })
+  @Column({ type: 'varchar', length: 500, name: 'address' })
   address!: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, name: 'phone' })
   phone!: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, name: 'email', nullable: true })
   email?: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'database_name', unique: true })
-  databaseName!: string;
+  @Column({ type: 'varchar', length: 255, name: 'schemaName', unique: true })
+  schema_name!: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'manager_id', nullable: true })
-  managerId?: string;
+  @Column({ type: 'uuid', name: 'managerUserId', nullable: true })
+  manager_user_id?: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'managerUserId' })
+  manager_user?: User;
 
   @Column({
     type: 'varchar',
     length: 255,
-    name: 'opening_hours',
+    name: 'openingHours',
     nullable: true,
   })
-  openingHours?: string;
+  opening_hours?: string;
 
-  @Column({ type: 'boolean', default: true, name: 'is_active' })
-  isActive!: boolean;
+  @Column({ type: 'boolean', default: true, name: 'isActive' })
+  is_active!: boolean;
 
-  @Column({ type: 'boolean', default: false, name: 'is_deleted' })
-  isDeleted!: boolean;
+  @Column({ type: 'boolean', default: false, name: 'isDeleted' })
+  is_deleted!: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
+  @CreateDateColumn({ name: 'createdAt' })
+  created_at!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
+  @UpdateDateColumn({ name: 'updatedAt' })
+  updated_at!: Date;
 
-  // 🏦 Thông tin ngân hàng
-  @Column({ type: 'varchar', name: 'bank_id', length: 100, nullable: true })
-  bankId?: string;
+  @Column({ type: 'varchar', name: 'bankId', length: 50, nullable: true })
+  bank_id?: string;
 
-  @Column({ type: 'varchar', name: 'account_no', length: 100, nullable: true })
-  accountNo?: string;
+  @ManyToOne(() => Bank, { nullable: true })
+  @JoinColumn({ name: 'bankId' })
+  bank?: Bank;
+
+  @Column({ type: 'varchar', name: 'accountNo', length: 100, nullable: true })
+  account_no?: string;
 
   @Column({
     type: 'varchar',
-    name: 'account_name',
+    name: 'accountName',
     length: 255,
     nullable: true,
   })
-  accountName?: string;
+  account_name?: string;
 
-  // 🧾 VAT
-  @Column({ type: 'boolean', name: 'is_vat_enabled', default: false })
-  isVatEnabled!: boolean;
+  @Column({ type: 'boolean', name: 'isVatEnabled', default: false })
+  is_vat_enabled!: boolean;
 
-  @Column({ type: 'int', name: 'vat_rate', default: 8 })
-  vatRate!: number;
+  @Column({ type: 'int', name: 'vatRate', default: 8 })
+  vat_rate!: number;
 
-  // 🧾 In hoá đơn
   @Column({
     type: 'varchar',
-    name: 'invoice_footer',
+    name: 'invoiceFooter',
     length: 500,
     nullable: true,
   })
-  invoiceFooter?: string;
+  invoice_footer?: string;
 
   @Column({
     type: 'enum',
     enum: PaperSize,
-    name: 'default_paper_size',
+    name: 'defaultPaperSize',
     default: PaperSize.k80,
   })
-  defaultPaperSize!: PaperSize;
+  default_paper_size!: PaperSize;
 
-  // 💾 Backup
   @Column({
     type: 'varchar',
-    name: 'backup_schedule',
+    name: 'backupSchedule',
     length: 100,
     nullable: true,
   })
-  backupSchedule?: string;
+  backup_schedule?: string;
 
-  // ⚙️ Cấu hình mặc định
-  @Column({ type: 'varchar', name: 'default_unit', default: 'cái' })
-  defaultUnit!: string;
+  @Column({
+    type: 'varchar',
+    name: 'defaultUnitId',
+    length: 50,
+    nullable: true,
+  })
+  default_unit_id?: string;
 
-  @Column({ type: 'int', name: 'default_discount', default: 0 })
-  defaultDiscount!: number;
+  @Column({ type: 'int', name: 'defaultDiscount', default: 0 })
+  default_discount!: number;
 
-  @Column({ type: 'int', name: 'default_shipping_fee', default: 0 })
-  defaultShippingFee!: number;
+  @Column({ type: 'int', name: 'defaultShippingFee', default: 0 })
+  default_shipping_fee!: number;
 }

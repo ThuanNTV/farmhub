@@ -7,12 +7,12 @@ import { User } from 'src/entities/global/user.entity';
 
 config();
 
-export const globalDbConfig: DataSourceOptions = {
+export const dbConfig: DataSourceOptions = {
   // <-- Khai báo rõ ràng kiểu là DataSourceOptions
   type: 'postgres', // Đảm bảo type là 'postgres'
   url: process.env.GLOBAL_DATABASE_URL,
 
-  synchronize: true, // Chỉ dùng trong môi trường development
+  synchronize: process.env.NODE_ENV === 'development' ? true : false, // Chỉ dùng trong môi trường development
   logging:
     process.env.NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
 

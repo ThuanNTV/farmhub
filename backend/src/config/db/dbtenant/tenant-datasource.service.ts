@@ -49,7 +49,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
       // 1. Validate và lấy thông tin store từ Global Database
       const store = await this.getValidatedStore(storeId);
 
-      const dbName = store.databaseName;
+      const dbName = store.schema_name;
 
       // 2. Kiểm tra cache
       if (this.hasCachedDataSource(dbName)) {
@@ -86,9 +86,9 @@ export class TenantDataSourceService implements OnModuleDestroy {
     const storeRepo = this.globalDataSource.getRepository(Store);
     const store = await storeRepo.findOne({
       where: {
-        storeId,
-        isActive: true, // Chỉ lấy store đang active
-        isDeleted: false, // Không bị soft delete
+        store_id: storeId,
+        is_active: true, // Chỉ lấy store đang active
+        is_deleted: false, // Không bị soft delete
       },
     });
     if (!store) {
@@ -100,7 +100,7 @@ export class TenantDataSourceService implements OnModuleDestroy {
       );
     }
 
-    if (!store.databaseName.trim()) {
+    if (!store.schema_name.trim()) {
       this.logger.error(`Store ${storeId} has no database name configured`);
       throw new Error(`Store ${storeId} has invalid database configuration`);
     }
@@ -368,6 +368,71 @@ export class TenantDataSourceService implements OnModuleDestroy {
       this.logger.error(`Error destroying DataSource ${dbName}:`, error);
     } finally {
       this.tenantDataSources.delete(dbName);
+    }
+  }
+
+  /**
+   * Xóa các index cũ không còn sử dụng trong schema
+   */
+  async dropObsoleteIndexes(schemaName: string): Promise<void> {
+    // Lấy DataSource cho schema này (nếu đã cache thì lấy, chưa thì khởi tạo mới)
+    let dataSource: DataSource | undefined = undefined;
+    if (this.hasCachedDataSource(schemaName)) {
+      dataSource = this.tenantDataSources.get(schemaName)?.dataSource;
+    } else {
+      // Nếu chưa có, khởi tạo tạm thời (không cache lại)
+      const tenantConfig = getTenantDbConfig(schemaName);
+      dataSource = new DataSource(tenantConfig);
+      if (!dataSource.isInitialized) {
+        await dataSource.initialize();
+      }
+    }
+    if (!dataSource) {
+      throw new Error(`Không tìm thấy DataSource cho schema: ${schemaName}`);
+    }
+    const obsoleteIndexes = [
+      { schema: schemaName, index: 'IDX_product_code' },
+      { schema: schemaName, index: 'IDX_old_column_xyz' },
+    ];
+    for (const { schema, index } of obsoleteIndexes) {
+      await dataSource.query(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM pg_indexes
+            WHERE schemaname = '${schema}'
+              AND indexname = '${index}'
+          ) THEN
+            EXECUTE 'DROP INDEX IF EXISTS ${schema}."${index}"';
+          END IF;
+        END $$;
+      `);
+    }
+  }
+
+  /**
+   * Xóa các index cũ không còn sử dụng trong schema bằng global connection (dùng trước khi khởi tạo DataSource tenant)
+   */
+  async dropObsoleteIndexesWithGlobalConnection(
+    schemaName: string,
+  ): Promise<void> {
+    const obsoleteIndexes = [
+      { schema: schemaName, index: 'IDX_product_code' },
+      { schema: schemaName, index: 'IDX_old_column_xyz' },
+    ];
+    for (const { schema, index } of obsoleteIndexes) {
+      await this.globalDataSource.query(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM pg_indexes
+            WHERE schemaname = '${schema}'
+              AND indexname = '${index}'
+          ) THEN
+            EXECUTE 'DROP INDEX IF EXISTS ${schema}."${index}"';
+          END IF;
+        END $$;
+      `);
     }
   }
 

@@ -1,0 +1,681 @@
+# FarmHub Database Schema - Optimized and Standardized Version (Updated)
+
+This document outlines the updated schema for both the Global Database and the Tenant-Specific Database, incorporating all proposed changes for optimization and standardization, including snake_case naming convention and new suggested tables.
+
+## I. Global Database
+
+### Table: store
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| store_id | UUID | Unique identifier | Primary key |
+| name | VARCHAR(255) | Store display name | |
+| address | VARCHAR(500) | Store address | |
+| phone | VARCHAR(20) | Contact phone | |
+| email | VARCHAR(255) | Email (nullable) | |
+| schema_name | VARCHAR(255) | Tenant DB schema name | Unique, used to route store |
+| manager_user_id | UUID | FK → user.user_id | Nullable |
+| opening_hours | VARCHAR(255) | Operating hours | Nullable |
+| is_active | BOOLEAN | Is store active | Default: true |
+| is_deleted | BOOLEAN | Is store deleted | Soft delete, default: false |
+| created_at | DATETIME | Creation timestamp | Auto |
+| updated_at | DATETIME | Last update | Auto |
+| bank_id | VARCHAR(50) | FK → bank.id | Nullable, now references bank lookup table |
+| account_no | VARCHAR(100) | Bank account number | Nullable |
+| account_name | VARCHAR(255) | Name on the bank account | Nullable |
+| is_vat_enabled | BOOLEAN | VAT enabled or not | Default: false |
+| vat_rate | INT | VAT percentage | Default: 8 (%) |
+| invoice_footer | VARCHAR(500) | Custom footer on invoices | Nullable |
+| default_paper_size | ENUM | Paper size for printing | Enum: PaperSize, default: K80 |
+| backup_schedule | VARCHAR(100) | Schedule string (cron or text) | Nullable |
+| default_unit_id | VARCHAR(50) | FK → unit.id | Default unit of measure, references unit lookup table |
+| default_discount | INT | Default discount (%) | Default: 0 |
+| default_shipping_fee | INT | Default shipping fee | Default: 0 |
+
+### Table: user
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| user_id | UUID | Unique identifier | Primary key |
+| user_name | VARCHAR(255) | Unique login name | Unique |
+| password_hash | VARCHAR(255) | Hashed password (excluded from output) | |
+| full_name | VARCHAR(255) | Full name | |
+| email | VARCHAR(255) | Email address | Unique |
+| phone | VARCHAR(20) | Phone number | Nullable |
+| role | VARCHAR(50) | Role (admin_global, store_manager etc.) | |
+| is_active | BOOLEAN | Is account active | Default: true |
+| is_deleted | BOOLEAN | Soft delete flag | Default: false |
+| is_superadmin | BOOLEAN | System super admin | Default: false |
+| last_login_at | TIMESTAMP | Last login time | Nullable |
+| password_reset_token | VARCHAR(255) | Reset password token | Nullable |
+| token_expiry_at | TIMESTAMP | Expiry for password reset token | Nullable |
+| created_at | TIMESTAMP | Record creation time | Auto |
+| updated_at | TIMESTAMP | Last update | Auto |
+
+### Table: user_store_mapping
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| user_id | UUID | FK → user.user_id | Primary key, composite with store_id |
+| store_id | UUID | FK → store.store_id | Primary key, composite with user_id |
+| role | VARCHAR(50) | Role specific to this store | Optional, e.g., 'staff', 'manager' |
+| created_at | DATETIME | Creation timestamp | |
+| created_by_user_id | UUID | User who created the mapping | FK → user.user_id |
+
+### Table: bank (Lookup Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(50) | Unique identifier for bank | Primary key |
+| name | VARCHAR(255) | Bank display name | |
+| created_at | DATETIME | Creation timestamp | |
+| created_by_user_id | UUID | User who created this record | FK → user.user_id |
+
+### Table: unit (Lookup Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(50) | Unique identifier for unit | Primary key |
+| name | VARCHAR(255) | Unit display name (e.g., 'cái', 'kg') | |
+| created_at | DATETIME | Creation timestamp | |
+| created_by_user_id | UUID | User who created this record | FK → user.user_id |
+
+### Table: payment_method (Lookup Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(50) | Unique identifier for payment method | Primary key |
+| name | VARCHAR(255) | Payment method display name (e.g., 'Tiền mặt', 'Chuyển khoản') | |
+| created_at | DATETIME | Creation timestamp | |
+| created_by_user_id | UUID | User who created this record | FK → user.user_id |
+
+## II. Tenant Database (per Store)
+
+### Table: store_setting (New Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Unique identifier | Primary key |
+| store_id | UUID | FK → store.store_id (Global DB) | Links to the specific store |
+| setting_key | VARCHAR(255) | Key for the setting (e.g., 'enable_loyalty') | Unique with store_id |
+| setting_value | TEXT | Value of the setting | Can store JSON, boolean, string etc. |
+| created_at | TIMESTAMP | Creation timestamp | |
+| updated_at | TIMESTAMP | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: job_schedule (New Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Unique identifier | Primary key |
+| store_id | UUID | FK → store.store_id (Global DB) | Links to the specific store (if job is per-tenant) |
+| job_name | VARCHAR(255) | Name of the scheduled job | |
+| schedule | VARCHAR(255) | Schedule expression (e.g., cron string) | |
+| last_run_at | TIMESTAMP | Timestamp of the last successful run | Nullable |
+| next_run_at | TIMESTAMP | Timestamp of the next scheduled run | Nullable |
+| status | ENUM('scheduled', 'running', 'completed', 'failed') | Current status of the job | |
+| note | TEXT | Any additional notes or error messages | Nullable |
+| created_at | TIMESTAMP | Creation timestamp | |
+| updated_at | TIMESTAMP | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: webhook_log (New Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Unique identifier | Primary key |
+| store_id | UUID | FK → store.store_id (Global DB) | Links to the specific store |
+| type | VARCHAR(50) | Type of webhook ('outgoing', 'incoming') | |
+| event_type | VARCHAR(100) | Type of event (e.g., 'order_created', 'payment_received') | |
+| payload | JSONB | Full payload sent/received | Or TEXT depending on DB |
+| status_code | INT | HTTP status code of the response | Nullable for outgoing, present for incoming |
+| response | TEXT | Full response from the webhook endpoint | Nullable |
+| is_success | BOOLEAN | Whether the webhook operation was successful | |
+| created_at | TIMESTAMP | Timestamp of the log entry | |
+
+### Table: external_system_log (New Table)
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Unique identifier | Primary key |
+| store_id | UUID | FK → store.store_id (Global DB) | Links to the specific store |
+| system_name | VARCHAR(100) | Name of the external system (e.g., 'accounting_erp') | |
+| request_payload | JSONB | Request payload sent | Nullable, or TEXT |
+| response_payload | JSONB | Response payload received | Nullable, or TEXT |
+| http_method | VARCHAR(10) | HTTP method (e.g., 'GET', 'POST') | Nullable |
+| endpoint | TEXT | API endpoint URL | |
+| status_code | INT | HTTP status code of the response | Nullable |
+| is_success | BOOLEAN | Whether the API call was successful | |
+| error_message | TEXT | Any error message | Nullable |
+| created_at | TIMESTAMP | Timestamp of the log entry | |
+
+### Table: category
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| category_id | VARCHAR(255) | Primary key | |
+| name | VARCHAR(255) | Display name | |
+| slug | VARCHAR(255) | SEO-friendly URL slug | |
+| description | VARCHAR | Short description | |
+| parent_id | VARCHAR(255) | FK → category.category_id (nullable) | |
+| image | VARCHAR(500) | Image URL (optional) | |
+| display_order | INT | Display order | Renamed from 'order' to avoid keyword conflict |
+| is_active | BOOLEAN | Display status | |
+| is_deleted | BOOLEAN | Soft delete flag | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: supplier
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| name | VARCHAR(255) | Supplier name | |
+| phone | VARCHAR(20) | Contact phone | |
+| email | VARCHAR(255) | Contact email | |
+| address | VARCHAR(500) | Supplier address | |
+| tax_code | VARCHAR(50) | Tax code (optional) | |
+| contact_person | VARCHAR(255) | Main contact | Retained as requested |
+| note | VARCHAR(MAX) | Additional notes | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+| is_deleted | BOOLEAN | Soft delete | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: product
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| product_id | VARCHAR(255) | Primary key | |
+| product_code | VARCHAR(255) | Unique SKU within store | |
+| name | VARCHAR(255) | Product name | |
+| slug | VARCHAR(255) | SEO-friendly slug | |
+| description | VARCHAR(255) | Product description | |
+| category_id | VARCHAR(255) | FK → category.category_id | |
+| brand | VARCHAR(100) | Brand name | |
+| unit_id | VARCHAR(50) | FK → unit.id | Unit of measure, references unit lookup table |
+| price_retail | DECIMAL(18,2) | Retail price | Renamed from 'price' |
+| price_wholesale | DECIMAL(18,2) | Wholesale price | Added |
+| credit_price | DECIMAL(18,2) | Installment price | |
+| cost_price | DECIMAL(18,2) | Cost price for profit calculation | Added |
+| barcode | VARCHAR(50) | Barcode for scanning | Added |
+| stock | INT | Quantity in stock | |
+| min_stock_level | INT | Minimum stock level | |
+| images | TEXT | JSON string of image URLs | |
+| specs | TEXT | JSON string of technical specs | |
+| warranty_info | VARCHAR(255) | Warranty details | |
+| supplier_id | VARCHAR(255) | FK → supplier.id | |
+| is_active | BOOLEAN | Whether product is for sale | |
+| is_deleted | BOOLEAN | Soft delete flag | |
+| created_at | TIMESTAMP | Creation timestamp | |
+| updated_at | TIMESTAMP | Last update timestamp | |
+| created_by_user_id | UUID | User who created the product | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the product | FK → user.user_id |
+
+### Table: customer
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| customer_id | VARCHAR(50) | Primary key | |
+| name | VARCHAR(255) | Customer name | |
+| phone | VARCHAR(20) | Phone number | |
+| email | VARCHAR(255) | Email address | |
+| address | VARCHAR | Full address | |
+| tax_code | VARCHAR | Tax ID (optional) | |
+| customer_type | VARCHAR(50) | Type (retail, wholesale,...) | |
+| gender | ENUM('male','female','other') | Customer gender | Added |
+| birthday | DATE | Customer birthday | Added |
+| ref_code | VARCHAR(100) | Referral code | Added |
+| note | VARCHAR(255) | Notes | |
+| credit_limit | DECIMAL(18,2) | Credit limit | |
+| total_debt | DECIMAL(18,2) | Current total debt | |
+| debt_due_date | DATE | Nearest debt due | |
+| last_purchase_date | DATE | Last purchase date | |
+| status | VARCHAR(50) | Account status | |
+| is_active | BOOLEAN | Active flag | |
+| is_deleted | BOOLEAN | Soft delete | |
+| created_at | TIMESTAMP | Creation timestamp | |
+| updated_at | TIMESTAMP | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: order
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| order_id | UUID | Primary key | |
+| order_code | VARCHAR(100) | User-facing code (unique) | |
+| customer_id | UUID | FK → customer.customer_id (nullable) | |
+| total_amount | DECIMAL(18,2) | Total amount before payment | |
+| discount_amount | DECIMAL(18,2) | Discount applied | |
+| shipping_fee | DECIMAL(18,2) | Delivery fee | |
+| vat_percent | DECIMAL(5,2) | VAT percentage applied | Added |
+| vat_amount | DECIMAL(18,2) | VAT amount | Added |
+| total_paid | DECIMAL(18,2) | Amount customer has paid | |
+| payment_method_id | VARCHAR(50) | FK → payment_method.id | Payment method, references lookup table |
+| payment_details | TEXT | Additional payment info | |
+| status | ENUM | Order status (pending, confirmed...) | |
+| expected_delivery_date | TIMESTAMP | Estimated delivery | |
+| delivery_address | VARCHAR(500) | Shipping address | |
+| delivery_status | ENUM | Delivery status (processing, shipped...) | |
+| invoice_number | VARCHAR(50) | Invoice number | Added |
+| note | TEXT | Order notes | |
+| processed_by_user_id | UUID | FK → user.user_id (nullable) | |
+| is_deleted | BOOLEAN | Soft delete | |
+| created_at | TIMESTAMP | Record creation time | |
+| updated_at | TIMESTAMP | Record update time | |
+
+### Table: order_item
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| order_item_id | UUID | Primary key | |
+| order_id | UUID | FK → order.order_id | |
+| product_id | UUID | FK → product.product_id | |
+| product_name | VARCHAR(255) | Product name snapshot | |
+| product_unit_id | VARCHAR(50) | FK → unit.id | Unit of product, references unit lookup table |
+| quantity | INT | Quantity ordered | |
+| unit_price | DECIMAL(18,2) | Unit price at time of order | |
+| total_price | DECIMAL(18,2) | quantity x unitPrice | |
+| note | TEXT | Item-specific notes | Added |
+| is_deleted | BOOLEAN | Soft delete flag | |
+| created_at | TIMESTAMP | Record creation time | |
+| updated_at | TIMESTAMP | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: installment
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| order_id | VARCHAR(255) | FK → order.order_id | |
+| installment_number | INT | Installment sequence | |
+| due_date | DATETIME | Payment due date | |
+| amount | DECIMAL(18,2) | Payment amount | |
+| paid_at | DATETIME | Actual payment time (nullable) | |
+| payment_method_id | VARCHAR(50) | FK → payment_method.id | Payment method, references lookup table |
+| status | ENUM('unpaid', 'paid', 'late') | Specific installment status | Replaced 'is_late' |
+| note | VARCHAR(MAX) | Notes | |
+| collected_by_user_id | UUID | FK → user.user_id (nullable) | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+
+### Table: return_order
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| order_id | VARCHAR(255) | FK → order.order_id | |
+| customer_id | VARCHAR(255) | FK → customer.customer_id | |
+| return_date | DATETIME | Return timestamp | |
+| total_refund_amount | DECIMAL(18,2) | Refund total | |
+| reason | VARCHAR(MAX) | Reason for return | |
+| status | ENUM('pending', 'completed', 'cancelled') | Return status | Standardized ENUM |
+| processed_by_user_id | UUID | FK → user.user_id | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+
+### Table: return_order_item
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| return_order_id | VARCHAR(255) | FK → return_order.id | |
+| product_id | VARCHAR(255) | FK → product.product_id | |
+| quantity | INT | Returned quantity | |
+| unit_price | DECIMAL(18,2) | Refund unit price | |
+| condition | VARCHAR(100) | Item condition (new, used, damaged) | |
+| restocked | BOOLEAN | Whether item was restocked | |
+| note | TEXT | Item-specific notes | Added |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: purchase_order
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| order_code | VARCHAR(255) | Unique order code | |
+| supplier_id | VARCHAR(255) | FK → supplier.id | |
+| total_amount | DECIMAL(18,2) | Total purchase amount | |
+| status | ENUM('pending', 'ordered', 'received', 'cancelled') | Purchase order status | Standardized ENUM |
+| expected_delivery_date | DATE | Planned receipt date | |
+| received_date | DATETIME | Actual receipt date (nullable) | |
+| note | VARCHAR(MAX) | Notes | |
+| created_by_user_id | UUID | FK → user.user_id | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+
+### Table: purchase_order_item
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| purchase_order_id | VARCHAR(255) | FK → purchase_order.id | |
+| product_id | VARCHAR(255) | FK → product.product_id | |
+| quantity | INT | Ordered quantity | |
+| unit_price | DECIMAL(18,2) | Purchase unit price | |
+| total_price | DECIMAL(18,2) | Line total | |
+| received_quantity | INT | Actual received quantity | |
+| unit_id | VARCHAR(50) | FK → unit.id | Purchase unit name, references unit lookup table |
+| conversion_rate | INT | Conversion rate to base unit | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: stock_adjustment
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| product_id | VARCHAR(255) | FK → product.product_id | |
+| adjustment_type | VARCHAR(50) | Type (increase, decrease) | |
+| quantity_change | INT | Quantity change | |
+| reason | VARCHAR(MAX) | Reason for adjustment | |
+| status | ENUM('pending', 'completed', 'cancelled') | Status of the stock adjustment | Added |
+| adjusted_by_user_id | UUID | FK → user.user_id | |
+| created_at | DATETIME | Timestamp | |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: dispatch_order
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| dispatch_code | VARCHAR(255) | Code for internal tracking | |
+| purpose | VARCHAR(255) | Dispatch purpose | |
+| status | ENUM('pending', 'completed', 'cancelled') | Dispatch order status | Standardized ENUM |
+| created_by_user_id | UUID | FK → user.user_id | |
+| created_at | DATETIME | Creation timestamp | |
+| updated_at | DATETIME | Last update | |
+
+### Table: dispatch_order_item
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| dispatch_order_id | VARCHAR(255) | FK → dispatch_order.id | |
+| product_id | VARCHAR(255) | FK → product.product_id | |
+| quantity | INT | Quantity dispatched | |
+| unit_price | DECIMAL(18,2) | Unit price (for reference) | |
+| total_price | DECIMAL(18,2) | Line total | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: notification
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| type | VARCHAR(50) | Notification type (order, system...) | |
+| title | VARCHAR(255) | Title | |
+| description | VARCHAR(MAX) | Notification content | |
+| link | VARCHAR(255) | Optional URL | |
+| is_read | BOOLEAN | Read status | |
+| created_at | DATETIME | Timestamp | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: voucher
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| name | VARCHAR(255) | Voucher name | |
+| description | VARCHAR(255) | Short description | |
+| points_cost | INT | Points required to redeem | |
+| value | DECIMAL(18,2) | Discount value | |
+| type | VARCHAR(50) | fixed, percentage, shipping | |
+| created_at | DATETIME | Timestamp | |
+| updated_at | DATETIME | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: inventory_transfer
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| source_store_id | UUID | FK → store.store_id | |
+| target_store_id | UUID | FK → store.store_id | |
+| transfer_code | VARCHAR(100) | Code for tracking | |
+| note | TEXT | Transfer note | |
+| status | ENUM('pending', 'completed', 'cancelled') | Transfer status | Standardized ENUM |
+| created_by_user_id | UUID | FK → user.user_id | |
+| approved_by_user_id | UUID | User who approved the transfer | FK → user.user_id |
+| received_by_user_id | UUID | User who received the transfer | FK → user.user_id |
+| created_at | TIMESTAMP | Creation timestamp | |
+| approved_at | TIMESTAMP | Timestamp of approval | Added |
+| updated_at | TIMESTAMP | Last update | |
+
+### Table: inventory_transfer_item
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| transfer_id | UUID | FK → inventory_transfer.id | |
+| product_id | UUID | FK → product.product_id | |
+| quantity | INT | Quantity to transfer | |
+| unit_price | DECIMAL(18,2) | Unit price (optional) | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: promotion
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| name | VARCHAR(255) | Promotion name | |
+| type | VARCHAR(50) | Type (percentage, fixed, bogo) | |
+| value | DECIMAL(18,2) | Discount value | |
+| applies_to | VARCHAR(50) | all, category, product | |
+| start_date | DATE | Start date | |
+| end_date | DATE | End date | |
+| is_active | BOOLEAN | Whether active | |
+| created_at | TIMESTAMP | Creation timestamp | |
+| updated_at | TIMESTAMP | Last update | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: loyalty_point_log
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| customer_id | UUID | FK → customer.customer_id | |
+| order_id | UUID | FK → order.order_id | Nullable |
+| change | INT | Points added or deducted | |
+| reason | TEXT | Reason for change | |
+| created_at | TIMESTAMP | Timestamp | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: price_history
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| product_id | UUID | FK → product.product_id | |
+| old_price | DECIMAL(18,2) | Previous price | |
+| new_price | DECIMAL(18,2) | New price | |
+| changed_by_user_id | UUID | FK → user.user_id | |
+| changed_at | TIMESTAMP | Timestamp | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: audit_log
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| entity_type | VARCHAR(100) | Table name (e.g., 'order', 'product') | |
+| entity_id | UUID | Target record ID | |
+| action | VARCHAR(50) | 'create', 'update', 'delete' | |
+| performed_by_user_id | UUID | FK → user.user_id | |
+| diff | TEXT | JSON of changed fields | |
+| created_at | TIMESTAMP | Timestamp | |
+| ip_address | VARCHAR(45) | IP address of the user | Added (Optional extension) |
+| user_agent | VARCHAR(255) | User-agent string of the client | Added (Optional extension) |
+
+### Table: file_attachment
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | UUID | Primary key | |
+| entity_type | VARCHAR(100) | Type (e.g., 'order', 'product') | |
+| entity_id | UUID | FK to corresponding record | |
+| file_url | TEXT | URL to the file | |
+| uploaded_by_user_id | UUID | FK → user.user_id | |
+| note | VARCHAR(255) | Optional description | |
+| created_at | TIMESTAMP | Timestamp | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: debt_transaction
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| customer_id | VARCHAR(255) | FK → customer.customer_id | |
+| amount | DECIMAL(18,2) | Payment amount | |
+| payment_method_id | VARCHAR(50) | FK → payment_method.id | Payment method, references lookup table |
+| paid_by_user_id | UUID | FK → user.user_id | |
+| paid_at | DATETIME | Payment time | |
+| status | ENUM('pending', 'paid', 'cancelled', 'overdue') | Status of the debt transaction | Added |
+| note | TEXT | Notes | |
+| created_at | DATETIME | Timestamp | |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: payment
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| order_id | VARCHAR(255) | FK → order.order_id | |
+| amount | DECIMAL(18,2) | Payment amount | |
+| payment_method_id | VARCHAR(50) | FK → payment_method.id | Payment method, references lookup table |
+| paid_at | DATETIME | Payment timestamp | |
+| paid_by_user_id | UUID | FK → user.user_id | |
+| ref_code | VARCHAR(100) | Bank transaction reference code | Added |
+| status | ENUM('pending', 'completed', 'failed', 'refunded') | Status of the payment | Added |
+| note | TEXT | Notes | |
+| created_at | DATETIME | Timestamp | |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: inventory_log
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| product_id | VARCHAR(255) | FK → product.product_id | |
+| source_type | VARCHAR(50) | 'order', 'purchase_order', 'return', 'manual_adjustment' | |
+| source_id | VARCHAR(255) | ID nguồn | |
+| quantity | INT | Có thể âm hoặc dương | |
+| stock_before | INT | Tồn trước khi thay đổi | |
+| stock_after | INT | Tồn sau khi thay đổi | |
+| note | TEXT | | |
+| changed_at | DATETIME | | |
+| changed_by_user_id | UUID | FK → user.user_id | |
+
+### Table: daily_report
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| date | DATE | Date of report | |
+| total_sales | DECIMAL(18,2) | Total paid sales | |
+| total_debt | DECIMAL(18,2) | Total outstanding debt | |
+| total_received | DECIMAL(18,2) | Total debt payments received | |
+| new_customers | INT | New customers that day | |
+| created_at | DATETIME | Timestamp | |
+| created_by_user_id | UUID | User who created the record | FK → user.user_id |
+| updated_by_user_id | UUID | User who last updated the record | FK → user.user_id |
+
+### Table: user_activity_log
+
+| Column | Type | Description | Notes |
+|---|---|---|---|
+| id | VARCHAR(255) | Primary key | |
+| user_id | UUID | FK → user.user_id | |
+| action | VARCHAR(255) | Action performed | |
+| target_table | VARCHAR(100) | Affected table | |
+| target_id | UUID | Affected record ID | |
+| metadata | JSON | Optional structured log (details of change) | |
+| created_at | DATETIME | Timestamp | |
+
+## 🔗 Primary & Foreign Key Relationships (Updated)
+
+### Global ➝ Tenant Links
+* **store.manager_user_id** links to **user.user_id**.
+* **user_store_mapping.store_id** links to **store.store_id**.
+* **user_store_mapping.user_id** links to **user.user_id**.
+* **bank.created_by_user_id** links to **user.user_id**.
+* **unit.created_by_user_id** links to **user.user_id**.
+* **payment_method.created_by_user_id** links to **user.user_id**.
+* Many tenant tables' `created_by_user_id` and `updated_by_user_id` link to **user.user_id**.
+* **order.processed_by_user_id** links to **user.user_id**.
+* **installment.collected_by_user_id** links to **user.user_id**.
+* **return_order.processed_by_user_id** links to **user.user_id**.
+* **purchase_order.created_by_user_id** links to **user.user_id**.
+* **stock_adjustment.adjusted_by_user_id** links to **user.user_id**.
+* **dispatch_order.created_by_user_id** links to **user.user_id**.
+* **inventory_transfer.created_by_user_id**, `approved_by_user_id`, `received_by_user_id` link to **user.user_id**.
+* **price_history.changed_by_user_id** links to **user.user_id**.
+* **audit_log.performed_by_user_id** links to **user.user_id**.
+* **file_attachment.uploaded_by_user_id** links to **user.user_id**.
+* **debt_transaction.paid_by_user_id** links to **user.user_id**.
+* **payment.paid_by_user_id** links to **user.user_id**.
+* **inventory_log.changed_by_user_id** links to **user.user_id**.
+* **user_activity_log.user_id** links to **user.user_id**.
+* **store_setting.store_id** links to **store.store_id**.
+* **store_setting.created_by_user_id**, `updated_by_user_id` link to **user.user_id**.
+* **job_schedule.store_id** links to **store.store_id**.
+* **job_schedule.created_by_user_id**, `updated_by_user_id` link to **user.user_id**.
+* **webhook_log.store_id** links to **store.store_id**.
+* **external_system_log.store_id** links to **store.store_id**.
+
+### Tenant Internal Links
+* **store.bank_id** links to **bank.id**.
+* **store.default_unit_id** links to **unit.id**.
+* **product.category_id** links to **category.category_id**.
+* **product.supplier_id** links to **supplier.id**.
+* **product.unit_id** links to **unit.id**.
+* **customer.customer_id** can be linked to multiple tables:
+    * **order.customer_id**
+    * **debt_transaction.customer_id**
+    * **loyalty_point_log.customer_id**
+* **order.payment_method_id** links to **payment_method.id**.
+* **order_item.order_id** links to **order.order_id**.
+* **order_item.product_id** links to **product.product_id**.
+* **order_item.product_unit_id** links to **unit.id**.
+* **installment.order_id** links to **order.order_id**.
+* **installment.payment_method_id** links to **payment_method.id**.
+* **return_order.order_id** links to **order.order_id**.
+* **return_order.customer_id** links to **customer.customer_id**.
+* **return_order_item.return_order_id** links to **return_order.id**.
+* **return_order_item.product_id** links to **product.product_id**.
+* **purchase_order.supplier_id** links to **supplier.id**.
+* **purchase_order_item.purchase_order_id** links to **purchase_order.id**.
+* **purchase_order_item.product_id** links to **product.product_id**.
+* **purchase_order_item.unit_id** links to **unit.id**.
+* **stock_adjustment.product_id** links to **product.product_id**.
+* **dispatch_order_item.dispatch_order_id** links to **dispatch_order.id**.
+* **dispatch_order_item.product_id** links to **product.product_id**.
+* **inventory_transfer.source_store_id** and **inventory_transfer.target_store_id** both link to **store.store_id**.
+* **inventory_transfer_item.transfer_id** links to **inventory_transfer.id**.
+* **inventory_transfer_item.product_id** links to **product.product_id**.
+* **loyalty_point_log.customer_id** links to **customer.customer_id**.
+* **loyalty_point_log.order_id** links to **order.order_id**.
+* **price_history.product_id** links to **product.product_id**.
+* **audit_log.entity_id** is a dynamic foreign key (depends on entity_type).
+* **file_attachment.entity_id** is a dynamic foreign key (depends on entity_type).
+* **debt_transaction.customer_id** links to **customer.customer_id**.
+* **debt_transaction.payment_method_id** links to **payment_method.id**.
+* **payment.order_id** links to **order.order_id**.
+* **payment.payment_method_id** links to **payment_method.id**.
+* **inventory_log.product_id** links to **product.product_id**.
+```
