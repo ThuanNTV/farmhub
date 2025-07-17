@@ -1,0 +1,10 @@
+import { Module } from '@nestjs/common';
+import { LogLevelModule } from '../utils/log-level.module';
+import { LogLevelController } from './log-level.controller';
+import { AuthModule } from 'src/core/auth/auth.module';
+
+@Module({
+  imports: [LogLevelModule, AuthModule],
+  controllers: [LogLevelController],
+})
+export class LogLevelControllerModule {}

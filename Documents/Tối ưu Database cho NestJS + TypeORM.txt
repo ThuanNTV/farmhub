@@ -1,0 +1,625 @@
+# Tối ưu Database cho NestJS + TypeORM
+
+## 🚨 KHẮC PHỤC NGAY (Tuần 1)
+
+### 1. Cấu hình TypeORM Connection
+```typescript
+// app.module.ts
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: false, // ❌ NEVER true in production
+      logging: ['error', 'warn'], // Only log errors in production
+      maxQueryExecutionTime: 1000, // Log slow queries > 1s
+      cache: {
+        duration: 30000, // 30 seconds cache
+        type: 'redis', // hoặc 'database' nếu không có Redis
+      },
+      // Connection pooling
+      extra: {
+        max: 20, // maximum number of connections
+        min: 5,  // minimum number of connections
+        acquire: 30000, // maximum time to get connection
+        idle: 10000, // maximum time connection can be idle
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+### 2. Tối ưu Entity Definitions
+```typescript
+// user.entity.ts
+import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
+@Entity('user')
+@Index(['email']) // Single index
+@Index(['userName']) // Single index
+@Index(['isActive', 'isDeleted']) // Composite index
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  userId: string;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
+  @Index() // Explicit index for frequent queries
+  userName: string;
+
+  @Column({ type: 'varchar', length: 255, select: false }) // Exclude from default SELECT
+  passwordHash: string;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
+  @Index() // For login queries
+  email: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Index() // For phone lookup
+  phone: string;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  // Soft delete method
+  softDelete(): void {
+    this.isDeleted = true;
+    this.isActive = false;
+  }
+}
+```
+
+```typescript
+// product.entity.ts
+@Entity('product')
+@Index(['categoryId', 'isActive', 'isDeleted']) // Composite for filtering
+@Index(['supplierId', 'isActive']) // For supplier queries
+@Index(['barcode'], { unique: true }) // Unique barcode
+export class Product {
+  @PrimaryGeneratedColumn('uuid')
+  productId: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  @Index() // For search
+  name: string;
+
+  @Column({ type: 'varchar', length: 50, unique: true })
+  barcode: string;
+
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
+  @Check(`price_retail >= 0`) // Database-level constraint
+  priceRetail: number;
+
+  @Column({ type: 'int', default: 0 })
+  @Check(`stock >= 0`) // Prevent negative stock
+  stock: number;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
+
+  @ManyToOne(() => Category, { eager: false })
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
+
+  @ManyToOne(() => Supplier, { eager: false })
+  @JoinColumn({ name: 'supplier_id' })
+  supplier: Supplier;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+### 3. Repository Pattern với Custom Queries
+```typescript
+// product.repository.ts
+import { EntityRepository, Repository } from 'typeorm';
+import { Product } from './product.entity';
+
+@EntityRepository(Product)
+export class ProductRepository extends Repository<Product> {
+  
+  // Optimized query with proper indexing
+  async findActiveProducts(
+    categoryId?: string,
+    supplierId?: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<[Product[], number]> {
+    const query = this.createQueryBuilder('product')
+      .where('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.isDeleted = :isDeleted', { isDeleted: false });
+
+    if (categoryId) {
+      query.andWhere('product.categoryId = :categoryId', { categoryId });
+    }
+
+    if (supplierId) {
+      query.andWhere('product.supplierId = :supplierId', { supplierId });
+    }
+
+    return query
+      .orderBy('product.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+  }
+
+  // Low stock products
+  async findLowStockProducts(): Promise<Product[]> {
+    return this.createQueryBuilder('product')
+      .where('product.stock <= product.minStockLevel')
+      .andWhere('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.isDeleted = :isDeleted', { isDeleted: false })
+      .getMany();
+  }
+
+  // Search products with full-text search
+  async searchProducts(searchTerm: string): Promise<Product[]> {
+    return this.createQueryBuilder('product')
+      .where('product.name ILIKE :searchTerm', { searchTerm: `%${searchTerm}%` })
+      .orWhere('product.barcode ILIKE :searchTerm', { searchTerm: `%${searchTerm}%` })
+      .andWhere('product.isActive = :isActive', { isActive: true })
+      .andWhere('product.isDeleted = :isDeleted', { isDeleted: false })
+      .limit(20)
+      .getMany();
+  }
+}
+```
+
+## ⚡ SERVICES VÀ CACHING (Tuần 2)
+
+### 4. Service Layer với Caching
+```typescript
+// product.service.ts
+import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductRepository } from './product.repository';
+
+@Injectable()
+export class ProductService {
+  constructor(
+    @InjectRepository(ProductRepository)
+    private productRepository: ProductRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
+
+  async findById(id: string): Promise<Product> {
+    // Try cache first
+    const cacheKey = `product:${id}`;
+    const cached = await this.cacheManager.get<Product>(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
+    // Query database
+    const product = await this.productRepository.findOne({
+      where: { productId: id, isDeleted: false },
+      relations: ['category', 'supplier'], // Only load needed relations
+    });
+
+    // Cache for 5 minutes
+    if (product) {
+      await this.cacheManager.set(cacheKey, product, 300);
+    }
+
+    return product;
+  }
+
+  async updateStock(productId: string, quantityChange: number, userId: string): Promise<void> {
+    const queryRunner = this.productRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Lock the product row
+      const product = await queryRunner.manager.findOne(Product, {
+        where: { productId },
+        lock: { mode: 'pessimistic_write' }, // Prevent concurrent updates
+      });
+
+      if (!product) {
+        throw new Error('Product not found');
+      }
+
+      const newStock = product.stock + quantityChange;
+      if (newStock < 0) {
+        throw new Error('Stock cannot be negative');
+      }
+
+      // Update stock
+      await queryRunner.manager.update(Product, productId, {
+        stock: newStock,
+        updatedAt: new Date(),
+      });
+
+      // Log inventory change
+      await queryRunner.manager.insert(InventoryLog, {
+        productId,
+        quantityChange,
+        stockBefore: product.stock,
+        stockAfter: newStock,
+        changedAt: new Date(),
+        changedByUserId: userId,
+      });
+
+      await queryRunner.commitTransaction();
+
+      // Invalidate cache
+      await this.cacheManager.del(`product:${productId}`);
+      
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+}
+```
+
+### 5. DTO và Validation
+```typescript
+// create-product.dto.ts
+import { IsString, IsNumber, IsOptional, IsBoolean, Min, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+export class CreateProductDto {
+  @IsString()
+  @MaxLength(255)
+  name: string;
+
+  @IsString()
+  @MaxLength(50)
+  barcode: string;
+
+  @IsNumber()
+  @Min(0)
+  @Transform(({ value }) => parseFloat(value))
+  priceRetail: number;
+
+  @IsNumber()
+  @Min(0)
+  @Transform(({ value }) => parseInt(value))
+  stock: number;
+
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @IsOptional()
+  @IsString()
+  supplierId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean = true;
+}
+```
+
+## 🔒 AUTHENTICATION & AUTHORIZATION (Tuần 3)
+
+### 6. JWT Authentication Service
+```typescript
+// auth.service.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { email, isActive: true, isDeleted: false },
+      select: ['userId', 'email', 'passwordHash', 'role'], // Include passwordHash
+    });
+
+    if (user && await bcrypt.compare(password, user.passwordHash)) {
+      const { passwordHash, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user: any) {
+    const payload = { email: user.email, sub: user.userId, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: user,
+    };
+  }
+
+  async register(userData: any): Promise<User> {
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+    
+    const user = this.userRepository.create({
+      ...userData,
+      passwordHash: hashedPassword,
+    });
+
+    return this.userRepository.save(user);
+  }
+}
+```
+
+### 7. Guards và Decorators
+```typescript
+// roles.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    
+    if (!requiredRoles) {
+      return true;
+    }
+    
+    const { user } = context.switchToHttp().getRequest();
+    return requiredRoles.some((role) => user.role === role);
+  }
+}
+
+// roles.decorator.ts
+import { SetMetadata } from '@nestjs/common';
+export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+```
+
+## 📊 AUDIT & LOGGING (Tuần 4)
+
+### 8. Audit Interceptor
+```typescript
+// audit.interceptor.ts
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuditLog } from './audit-log.entity';
+
+@Injectable()
+export class AuditInterceptor implements NestInterceptor {
+  constructor(
+    @InjectRepository(AuditLog)
+    private auditRepository: Repository<AuditLog>,
+  ) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
+    const { method, url, user, body } = request;
+
+    // Only audit important operations
+    const auditMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    if (!auditMethods.includes(method)) {
+      return next.handle();
+    }
+
+    const startTime = Date.now();
+
+    return next.handle().pipe(
+      tap({
+        next: (data) => {
+          this.logAudit({
+            userId: user?.userId,
+            action: `${method} ${url}`,
+            details: JSON.stringify({ body, response: data }),
+            success: true,
+            duration: Date.now() - startTime,
+          });
+        },
+        error: (error) => {
+          this.logAudit({
+            userId: user?.userId,
+            action: `${method} ${url}`,
+            details: JSON.stringify({ body, error: error.message }),
+            success: false,
+            duration: Date.now() - startTime,
+          });
+        },
+      }),
+    );
+  }
+
+  private async logAudit(auditData: any): Promise<void> {
+    try {
+      const audit = this.auditRepository.create(auditData);
+      await this.auditRepository.save(audit);
+    } catch (error) {
+      // Don't let audit failure break the main operation
+      console.error('Audit logging failed:', error);
+    }
+  }
+}
+```
+
+### 9. Database Migrations
+```typescript
+// migration/001-add-indexes.ts
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class AddIndexes1234567890 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Add indexes for performance
+    await queryRunner.query(`
+      CREATE INDEX IF NOT EXISTS idx_user_email ON "user"(email);
+      CREATE INDEX IF NOT EXISTS idx_user_username ON "user"(user_name);
+      CREATE INDEX IF NOT EXISTS idx_product_category_active ON product(category_id, is_active, is_deleted);
+      CREATE INDEX IF NOT EXISTS idx_product_barcode ON product(barcode);
+      CREATE INDEX IF NOT EXISTS idx_order_customer_date ON "order"(customer_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_order_status ON "order"(status);
+    `);
+
+    // Add constraints
+    await queryRunner.query(`
+      ALTER TABLE product ADD CONSTRAINT chk_price_positive CHECK (price_retail >= 0);
+      ALTER TABLE product ADD CONSTRAINT chk_stock_positive CHECK (stock >= 0);
+      ALTER TABLE "order" ADD CONSTRAINT chk_total_positive CHECK (total_amount >= 0);
+    `);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Remove indexes and constraints
+    await queryRunner.query(`
+      DROP INDEX IF EXISTS idx_user_email;
+      DROP INDEX IF EXISTS idx_user_username;
+      DROP INDEX IF EXISTS idx_product_category_active;
+      DROP INDEX IF EXISTS idx_product_barcode;
+      DROP INDEX IF EXISTS idx_order_customer_date;
+      DROP INDEX IF EXISTS idx_order_status;
+    `);
+
+    await queryRunner.query(`
+      ALTER TABLE product DROP CONSTRAINT IF EXISTS chk_price_positive;
+      ALTER TABLE product DROP CONSTRAINT IF EXISTS chk_stock_positive;
+      ALTER TABLE "order" DROP CONSTRAINT IF EXISTS chk_total_positive;
+    `);
+  }
+}
+```
+
+## 🚀 DEPLOYMENT & MONITORING (Tuần 5)
+
+### 10. Environment Configuration
+```typescript
+// config/database.config.ts
+export const getDatabaseConfig = () => ({
+  type: 'postgres' as const,
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT) || 5432,
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  cli: {
+    migrationsDir: 'src/migrations',
+  },
+  synchronize: process.env.NODE_ENV !== 'production',
+  logging: process.env.NODE_ENV === 'development' ? 'all' : ['error', 'warn'],
+  maxQueryExecutionTime: 1000,
+  cache: {
+    duration: 30000,
+    type: process.env.REDIS_URL ? 'redis' : 'database',
+    options: process.env.REDIS_URL ? { url: process.env.REDIS_URL } : {},
+  },
+});
+```
+
+### 11. Health Check
+```typescript
+// health.controller.ts
+import { Controller, Get } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
+
+@Controller('health')
+export class HealthController {
+  constructor(@InjectConnection() private connection: Connection) {}
+
+  @Get()
+  async checkHealth() {
+    const dbStatus = this.connection.isConnected ? 'connected' : 'disconnected';
+    
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      database: dbStatus,
+      uptime: process.uptime(),
+    };
+  }
+
+  @Get('db')
+  async checkDatabase() {
+    try {
+      await this.connection.query('SELECT 1');
+      return { status: 'healthy', timestamp: new Date().toISOString() };
+    } catch (error) {
+      return { status: 'unhealthy', error: error.message };
+    }
+  }
+}
+```
+
+## 📋 CHECKLIST TRIỂN KHAI
+
+### Tuần 1: Cơ sở hạ tầng
+- [ ] Cấu hình TypeORM connection
+- [ ] Tối ưu Entity definitions
+- [ ] Thêm indexes và constraints
+- [ ] Setup Repository pattern
+
+### Tuần 2: Performance
+- [ ] Implement caching strategy
+- [ ] Optimize queries với QueryBuilder
+- [ ] Add connection pooling
+- [ ] Create DTOs với validation
+
+### Tuần 3: Security
+- [ ] JWT authentication
+- [ ] Role-based authorization
+- [ ] Password hashing với bcrypt
+- [ ] Input validation
+
+### Tuần 4: Monitoring
+- [ ] Audit logging
+- [ ] Error tracking
+- [ ] Performance monitoring
+- [ ] Database migrations
+
+### Tuần 5: Production
+- [ ] Environment configuration
+- [ ] Health checks
+- [ ] Backup strategy
+- [ ] Deployment scripts
+
+## 🎯 KẾT QUẢ MONG ĐỢI
+
+- ✅ **Performance**: Query time < 100ms cho 90% requests
+- ✅ **Security**: JWT auth + role-based access
+- ✅ **Reliability**: Transaction safety + audit trail
+- ✅ **Scalability**: Connection pooling + caching
+- ✅ **Maintainability**: TypeScript + migrations + health checks
+
+**Thời gian triển khai**: 5 tuần (part-time)
+**Công nghệ**: NestJS + TypeORM + PostgreSQL + Redis (optional)

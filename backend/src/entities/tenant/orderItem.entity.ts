@@ -6,63 +6,71 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
 import { Exclude } from 'class-transformer';
 
-@Entity('order_items')
+@Entity('order_item')
+@Index(['orderId'])
+@Index(['productId'])
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
-  orderItemId!: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'orderItemId' })
+  order_item_id!: string;
 
-  @Column('uuid')
-  orderId!: string;
+  @Column({ type: 'uuid', name: 'orderId' })
+  order_id!: string;
 
-  @ManyToOne(() => Order, (order) => order.orderItems, {
+  @ManyToOne(() => Order, (order) => order.order_items, {
     onDelete: 'CASCADE',
     nullable: false,
   })
   @JoinColumn({ name: 'orderId' })
-  @Exclude()
   order!: Order;
 
-  @Column('uuid')
-  productId!: string;
+  @Column({ type: 'uuid', name: 'productId' })
+  product_id!: string;
 
-  @ManyToOne(() => Product, {
-    nullable: false,
-    eager: false,
-  })
+  @ManyToOne(() => Product, { nullable: false, eager: false })
   @JoinColumn({ name: 'productId' })
   product!: Product;
 
-  @Column({ type: 'varchar', length: 255 })
-  productName!: string;
+  @Column({ type: 'varchar', length: 255, name: 'productName' })
+  product_name!: string;
 
-  @Column({ type: 'varchar', length: 50 })
-  productUnit!: string;
+  @Column({
+    type: 'varchar',
+    length: 50,
+    name: 'productUnitId',
+    nullable: true,
+  })
+  product_unit_id?: string;
 
-  @Column({ type: 'int', unsigned: true })
+  @Column({ type: 'int', name: 'quantity' })
   quantity!: number;
 
-  @Column('decimal', { precision: 18, scale: 2, unsigned: true })
-  unitPrice!: number;
+  @Column({ type: 'decimal', precision: 18, scale: 2, name: 'unitPrice' })
+  unit_price!: number;
 
-  @Column('decimal', { precision: 18, scale: 2, unsigned: true })
-  totalPrice!: number;
+  @Column({ type: 'decimal', precision: 18, scale: 2, name: 'totalPrice' })
+  total_price!: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt!: Date;
+  @Column({ type: 'text', name: 'note', nullable: true })
+  note?: string;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt!: Date;
+  @Column({ type: 'boolean', name: 'isDeleted', default: false })
+  is_deleted!: boolean;
 
-  @Column({ type: 'boolean', default: false, name: 'is_deleted' })
-  isDeleted!: boolean;
+  @CreateDateColumn({ name: 'createdAt' })
+  created_at!: Date;
 
-  // Method to calculate total price
-  calculateTotalPrice(): void {
-    this.totalPrice = this.quantity * this.unitPrice;
-  }
+  @UpdateDateColumn({ name: 'updatedAt' })
+  updated_at!: Date;
+
+  @Column({ type: 'uuid', name: 'createdByUserId', nullable: true })
+  created_by_user_id?: string;
+
+  @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
+  updated_by_user_id?: string;
 }

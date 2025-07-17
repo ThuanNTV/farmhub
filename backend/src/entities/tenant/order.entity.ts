@@ -1,4 +1,4 @@
-// order.entity.ts
+import { Index } from 'typeorm';
 import {
   Entity,
   Column,
@@ -7,11 +7,18 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  BeforeInsert,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Customer } from './customer.entity';
 import { OrderItem } from './orderItem.entity';
+
+export enum DebtStatus {
+  UNPAID = 'unpaid',
+  PARTIAL = 'partial',
+  PAID = 'paid',
+  OVERDUE = 'overdue',
+}
 
 export enum OrderStatus {
   PENDING = 'pending',
@@ -29,16 +36,18 @@ export enum DeliveryStatus {
   DELIVERED = 'delivered',
   FAILE = 'failed',
 }
-@Entity('orders')
+
+@Entity('order')
 export class Order {
-  @PrimaryGeneratedColumn('uuid')
-  orderId!: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'orderId' })
+  order_id!: string;
 
-  @Column({ unique: true, length: 100 })
-  orderCode!: string;
+  @Column({ type: 'varchar', length: 100, name: 'orderCode', unique: true })
+  order_code!: string;
 
-  @Column('uuid', { nullable: true })
-  customerId?: string;
+  @Index('IDX_order_code', ['order_code'], { unique: true })
+  @Column({ type: 'uuid', name: 'customerId', nullable: true })
+  customer_id?: string;
 
   @ManyToOne(() => Customer, (customer: Customer) => customer.orders, {
     onDelete: 'SET NULL',
@@ -47,70 +56,139 @@ export class Order {
   @JoinColumn({ name: 'customerId' })
   customer?: Customer;
 
-  @Column('decimal', { precision: 18, scale: 2 })
-  totalAmount!: number;
+  @Column({ type: 'decimal', precision: 18, scale: 2, name: 'totalAmount' })
+  total_amount!: number;
 
-  @Column('decimal', { precision: 18, scale: 2, default: 0 })
-  discountAmount: number = 0;
+  // --- Tài chính & Kế toán ---
+  @Index()
+  @Column({ type: 'timestamp', name: 'invoiceIssuedAt', nullable: true })
+  invoice_issued_at?: Date;
 
-  @Column('decimal', { precision: 18, scale: 2, default: 0 })
-  shippingFee: number = 0;
+  @Index()
+  @Column({ type: 'timestamp', name: 'accountingExportedAt', nullable: true })
+  accounting_exported_at?: Date;
 
-  @Column('decimal', { precision: 18, scale: 2, default: 0 })
-  totalPaid: number = 0;
+  // --- Bán buôn / Công nợ ---
+  @Column({ type: 'boolean', name: 'isCreditOrder', default: false })
+  is_credit_order!: boolean;
 
-  @Column({ length: 50 })
-  paymentType!: string;
+  @Index()
+  @Column({
+    type: 'enum',
+    enum: DebtStatus,
+    name: 'debtStatus',
+    default: DebtStatus.UNPAID,
+  })
+  debt_status!: DebtStatus;
 
-  @Column('text', { nullable: true })
-  paymentDetails?: string;
+  @Index()
+  @Column({ type: 'timestamp', name: 'dueDate', nullable: true })
+  due_date?: Date;
+
+  @Column({ type: 'varchar', length: 50, name: 'paymentTerms', nullable: true })
+  payment_terms?: string;
+
+  // --- POS hiện đại / trực tiếp ---
+  @Index()
+  @Column({ type: 'uuid', name: 'cashierId', nullable: true })
+  cashier_id?: string;
+
+  @Index()
+  @Column({ type: 'varchar', length: 50, name: 'terminalId', nullable: true })
+  terminal_id?: string;
+
+  @Index()
+  @Column({ type: 'varchar', length: 50, name: 'shiftId', nullable: true })
+  shift_id?: string;
+
+  @Column({ type: 'varchar', length: 100, name: 'posLocation', nullable: true })
+  pos_location?: string;
+  @Column({
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    name: 'vatAmount',
+    default: 0,
+  })
+  vat_amount!: number;
 
   @Column({
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    name: 'totalPaid',
+    default: 0,
+  })
+  total_paid!: number;
+
+  @Column({
+    type: 'varchar',
     length: 50,
-    default: OrderStatus.PENDING,
+    name: 'paymentMethodId',
+    nullable: true,
+  })
+  payment_method_id?: string;
+
+  @Column({ type: 'text', name: 'paymentDetails', nullable: true })
+  payment_details?: string;
+
+  @Column({
+    type: 'enum',
     enum: OrderStatus,
+    name: 'status',
+    default: OrderStatus.PENDING,
   })
   status!: OrderStatus;
 
-  @Column({ type: 'timestamp', nullable: true })
-  expectedDeliveryDate?: Date;
+  @Column({ type: 'timestamp', name: 'expectedDeliveryDate', nullable: true })
+  expected_delivery_date?: Date;
 
-  @Column({ length: 500 })
-  deliveryAddress!: string;
+  @Column({ type: 'varchar', length: 500, name: 'deliveryAddress' })
+  delivery_address!: string;
 
   @Column({
-    length: 50,
-    default: DeliveryStatus.PROCESSING,
+    type: 'enum',
     enum: DeliveryStatus,
+    name: 'deliveryStatus',
+    default: DeliveryStatus.PROCESSING,
   })
-  deliveryStatus!: DeliveryStatus;
+  delivery_status!: DeliveryStatus;
 
-  @Column('text', { nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    name: 'invoiceNumber',
+    nullable: true,
+  })
+  invoice_number?: string;
+
+  @Column({ type: 'text', name: 'note', nullable: true })
   note?: string;
 
-  @Column('uuid', { nullable: true })
-  processedByUserId?: string;
+  @Column({ type: 'uuid', name: 'processedByUserId', nullable: true })
+  processed_by_user_id?: string;
+
+  @Column({ type: 'uuid', name: 'createdByUserId', nullable: true })
+  created_by_user_id?: string;
+
+  @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
+  updated_by_user_id?: string;
+
+  @DeleteDateColumn({ name: 'deletedAt' })
+  deleted_at?: Date;
 
   @OneToMany(() => OrderItem, (item) => item.order, {
     cascade: ['insert', 'update'],
     eager: false,
   })
-  orderItems!: OrderItem[];
+  order_items!: OrderItem[];
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt!: Date;
+  @Column({ type: 'boolean', name: 'isDeleted', default: false })
+  is_deleted!: boolean;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt!: Date;
+  @CreateDateColumn({ name: 'createdAt' })
+  created_at!: Date;
 
-  @Column({ type: 'boolean', default: false })
-  isDeleted: boolean = false;
-
-  @BeforeInsert()
-  generateOrderCode() {
-    if (!this.orderCode) {
-      const timestamp = Date.now().toString();
-      this.orderCode = `ORD-${timestamp}`;
-    }
-  }
+  @UpdateDateColumn({ name: 'updatedAt' })
+  updated_at!: Date;
 }

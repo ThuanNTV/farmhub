@@ -1,12 +1,12 @@
 // src/config/database-test.ts
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
-import { globalDbConfig } from 'src/config/db/dbglobal/dbConfig';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 // npx ts-node src/check/database-test.ts
 
 export async function testDatabaseConnection() {
-  const dataSource = new DataSource(globalDbConfig);
+  const dataSource = new DataSource(dbConfig);
 
   try {
     Logger.log('🔄 Đang kết nối database...');

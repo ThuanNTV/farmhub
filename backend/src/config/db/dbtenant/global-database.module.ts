@@ -3,14 +3,25 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Store } from '../../../entities/global/store.entity';
 import { User } from 'src/entities/global/user.entity';
-import { globalDbConfig } from 'src/config/db/dbglobal/dbConfig';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
+import { Bank } from 'src/entities/global/bank.entity';
+import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
+import { Unit } from 'src/entities/global/unit.entity';
+import { PaymentMethod } from 'src/entities/global/payment_method.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      ...globalDbConfig,
-      name: 'globalConnection', // 👈 Tên connection custom
-      entities: [Store, User],
+      ...dbConfig,
+      name: 'globalConnection',
+      entities: [Store, User, Bank, UserStoreMapping, Unit, PaymentMethod],
+      extra: {
+        max: 20,
+        min: 5,
+        acquireTimeoutMillis: 2000,
+        idleTimeoutMillis: 10000,
+        reapIntervalMillis: 3000,
+      },
     }),
   ],
   exports: [TypeOrmModule],

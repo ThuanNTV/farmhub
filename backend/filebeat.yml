@@ -1,0 +1,40 @@
+# ================== Filebeat Configuration Example ==================
+# Thu thập log file dạng JSON từ ứng dụng NodeJS (Winston)
+# Gửi về Logstash hoặc Elasticsearch
+
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - ./logs/application-*.log
+      - ./logs/error-*.log
+      - ./logs/info-*.log
+    json.keys_under_root: true
+    json.add_error_key: true
+    json.message_key: message
+    # Có thể thêm multiline nếu log có stacktrace
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+
+# Output về Logstash (khuyến nghị)
+output.logstash:
+  hosts: ["localhost:5044"]
+  # Nếu dùng Logstash trên server khác, sửa lại host
+
+# Nếu muốn gửi trực tiếp về Elasticsearch (không qua Logstash)
+#output.elasticsearch:
+#  hosts: ["localhost:9200"]
+#  username: "elastic"
+#  password: "changeme"
+
+# Tùy chọn: Ghi log hoạt động của Filebeat
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: ./filebeat-logs
+  name: filebeat.log
+  keepfiles: 7
+  permissions: 0644
+
+# ================== END ================== 

@@ -1,14 +1,14 @@
 // src/check-entities.ts
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { Store } from '../../entities/global/store.entity'; // Đường dẫn chính xác đến entity
 import { Logger } from '@nestjs/common';
-import { globalDbConfig } from 'src/config/db/dbglobal/dbConfig';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 // npx ts-node src/check/check-entities.ts
 
 // Cách 1: Import trực tiếp entity
-const configWithDirectImport = {
-  ...globalDbConfig,
+const configWithDirectImport: DataSourceOptions = {
+  ...dbConfig,
   entities: [Store], // Import trực tiếp thay vì dùng pattern
 };
 
