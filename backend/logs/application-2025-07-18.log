@@ -1558,3 +1558,393 @@
 {"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"","timestamp":"2025-07-18 04:41:37"}
 {"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m✅ All systems ready - Happy coding!\u001b[39m","timestamp":"2025-07-18 04:41:37"}
 {"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m============================================================\u001b[39m","timestamp":"2025-07-18 04:41:37"}
+{"context":"NestFactory","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStarting Nest application...\u001b[39m","timestamp":"2025-07-18 05:11:39"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBullModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mGlobalDatabaseModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPassportModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mConfigHostModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mWinstonModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mJwtModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mJwtModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDiscoveryModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mConfigModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mConfigModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mSecurityModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBullModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBullModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mLogLevelModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCacheModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRedisCacheModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBullModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mLogLevelControllerModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAuditLogAsyncModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:42"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmCoreModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTypeOrmModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTenantModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUserModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStoreSettingsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAuditLogQueueModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAuditLogsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUsersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:43"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStockTransferModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mNotificationModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTagModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mVoucherUsageLogModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReturnOrderItemsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mInventoryTransfersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPriceHistoriesModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mInstallmentsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mLoyaltyPointLogsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mJobSchedulesModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mFileAttachmentsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDashboardAnalyticsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPaymentsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mVouchersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mSuppliersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReturnOrdersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStockAdjustmentsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPromotionsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDebtTransactionsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mWebhookLogsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mExternalSystemLogsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReportModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPrintingModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCategoriesModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCustomersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDispatchOrdersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBankModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPaymentMethodsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUnitsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUserStoreMappingsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRecreateOrderModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStoresModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mProductsModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAuthModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mOrdersModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDashboardModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"InstanceLoader","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAppModule dependencies initialized\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAppController {/}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/health, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/health/db, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/health/redis, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/profile, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/admin-only, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/manager-data, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/all-users, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mAuthController {/auth}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/me, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/login, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/logout, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/register, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/forgot-password, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/reset-password, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/auth/refresh-token, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUsersController {/users}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/store/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/users/role/:role, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStoresController {/tenant/stores}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/stores/user/:userId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mProductsController {/tenant/:storeId/products}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/:storeId/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/products/store/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCategoriesController {/tenant/:storeId/categories}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/parent/:parentId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/categories/:storeId/tree, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mCustomersController {/tenant/:storeId/customers}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/search/:keyword, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/customers/:storeId/filter, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mOrdersController {/tenant/:storeId/orders}:\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:44"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/atomic, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id/confirm, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id/ship, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id/complete, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/:id/cancel, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/status/:status, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/orders/:storeId/customer/:customerId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mOrderItemsController {/tenant/:storeId/order-items}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items/order/:orderId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/order-items/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPaymentsController {/tenant/:storeId/payments}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments/stats, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/payments/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mVouchersController {/tenant/:storeId/vouchers}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/vouchers/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mSuppliersController {/tenant/:storeId/suppliers}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/suppliers/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDispatchOrdersController {/tenant/:storeId/dispatch-orders}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dispatch-orders, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dispatch-orders, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dispatch-orders/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dispatch-orders/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dispatch-orders/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReturnOrdersController {/tenant/:storeId/return-orders}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-orders/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStockAdjustmentsController {/tenant/:storeId/stock-adjustments}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/stock-adjustments/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mInventoryTransfersController {/tenant/:storeId/inventory-transfers}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/inventory-transfers/:id/restore, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPriceHistoriesController {/tenant/:storeId/price-histories}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/price-histories/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPromotionsController {/tenant/:storeId/promotions}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/promotions/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mInstallmentsController {/tenant/:storeId/installments}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/installments/:id/restore, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDebtTransactionsController {/tenant/:storeId/debt-transactions}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/debt-transactions/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mLoyaltyPointLogsController {/tenant/:storeId/loyalty-point-logs}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/loyalty-point-logs/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mJobSchedulesController {/tenant/:storeId/job-schedules}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/job-schedules, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/job-schedules, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/job-schedules/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/job-schedules/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/job-schedules/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mWebhookLogsController {/tenant/:storeId/webhook-logs}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/stats, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/event-type/:eventType, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/type/:type, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/webhook-logs/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mExternalSystemLogsController {/tenant/:storeId/external-system-logs}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/external-system-logs, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/external-system-logs, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/external-system-logs/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/external-system-logs/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/external-system-logs/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mFileAttachmentsController {/tenant/:storeId/file-attachments}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/file-attachments, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/file-attachments, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/file-attachments/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/file-attachments/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/file-attachments/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDashboardController {/tenant/:storeId/dashboard}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard/overview, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard/revenue, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard/orders, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard/customers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard/best-selling-products, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReportController {/tenant/:storeId/reports}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/export, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/types, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/preview, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/revenue, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/orders, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/customers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/products, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/reports/inventory, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPrintingController {/tenant/:storeId/printing}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/printing/invoice, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/printing/receipt, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/printing/barcode, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/printing/quotation, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mRecreateOrderController {/orders/recreate}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/orders/recreate/:storeId, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mStockTransferController {/stock-transfers}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers/:id, PUT} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers/:id/restore, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/stock-transfers/:id/items, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mNotificationController {/tenant/:storeId/notifications}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications/:id, PUT} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications/:id/mark-as-read, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/notifications/mark-all-as-read, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mDashboardAnalyticsController {/tenant/:storeId/dashboard-analytics}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard-analytics/heatmap, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard-analytics/chart, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard-analytics/industry, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/dashboard-analytics/trend, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mTagController {/tags}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags/:id, PUT} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tags/:id/restore, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mBankController {/banks}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/banks, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/banks, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/banks/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/banks/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/banks/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mVoucherUsageLogController {/voucher-usage-logs}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/:id, PUT} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/:id/restore, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/stats/overview, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/filter/advanced, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/by-voucher/:voucherId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/by-user/:userId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/voucher-usage-logs/by-order/:orderId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mPaymentMethodsController {/payment-methods}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/payment-methods/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUnitsController {/units}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/units/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mUserStoreMappingsController {/user-store-mappings}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings/:userId/:storeId, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings/:userId/:storeId, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings/:userId/:storeId, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/user-store-mappings/:userId/:storeId/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mReturnOrderItemsController {/tenant/:storeId/return-order-items}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items/:id, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items/:id, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items/:id, DELETE} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/tenant/:storeId/return-order-items/:id/restore, PATCH} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RoutesResolver","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mLogLevelController {/system/log-level}:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/system/log-level, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/system/log-level/change, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/system/log-level/reset, POST} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/system/log-level/stats, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RouterExplorer","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mMapped {/system/log-level/test, GET} route\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"NestApplication","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32mNest application successfully started\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RedisCacheService","level":"\u001b[34mdebug\u001b[39m","message":"\u001b[34mCache SET: startup:test (default TTL)\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"RedisCacheService","level":"\u001b[34mdebug\u001b[39m","message":"\u001b[34mCache HIT: startup:test\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m✅ Redis connection successful\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m============================================================\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌾 FarmHub API Server Started Successfully\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m============================================================\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🚀 Server URL: http://localhost:3000\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🌍 Environment: DEVELOPMENT\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📡 Port: 3000\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m🗄️  Cache & Storage:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m   🔴 Redis: Connected\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m📋 Development Features:\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m   📚 Swagger UI: http://localhost:3000/api\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m   📄 OpenAPI JSON: ./openapi.json\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m   🔧 Debug Mode: Enabled\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m   🔒 CORS Origins: https://farmhub-frontend.onrender.com, https://6000-firebase-studio-xxx.cloudworkstations.dev\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m✅ All systems ready - Happy coding!\u001b[39m","timestamp":"2025-07-18 05:11:45"}
+{"context":"Bootstrap","level":"\u001b[32minfo\u001b[39m","message":"\u001b[32m============================================================\u001b[39m","timestamp":"2025-07-18 05:11:45"}
