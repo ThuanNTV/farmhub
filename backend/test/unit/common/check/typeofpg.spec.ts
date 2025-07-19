@@ -14,8 +14,8 @@ describe('typeofpg', () => {
     expect(PostgreSQLTypes.decimal).toBe('decimal');
     expect(PostgreSQLTypes.numeric).toBe('numeric');
     expect(PostgreSQLTypes.real).toBe('real');
-    expect(PostgreSQLTypes['double']).toBeUndefined();
-    expect(PostgreSQLTypes['double precision']).toBe('double precision');
+    expect(PostgreSQLTypes['double']).toBe('double precision');
+    expect(PostgreSQLTypes['double precision']).toBeUndefined();
     expect(PostgreSQLTypes.boolean).toBe('boolean');
     expect(PostgreSQLTypes.date).toBe('date');
     expect(PostgreSQLTypes.time).toBe('time');
