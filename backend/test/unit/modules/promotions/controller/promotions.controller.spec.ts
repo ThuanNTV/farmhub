@@ -61,9 +61,13 @@ describe('PromotionsController', () => {
       name: 'Test Promotion',
       description: 'Test promotion description',
       type: 'percentage',
-      value: 10,
+      value: '10',
+      appliesTo: 'all',
       startDate: new Date(),
       endDate: new Date(),
+      isActive: true,
+      createdByUserId: 'user-123',
+      updatedByUserId: 'user-123',
     };
 
     it('should create promotion successfully', async () => {
@@ -72,7 +76,22 @@ describe('PromotionsController', () => {
 
       const result = await controller.create(storeId, createDto as any);
 
-      expect(promotionsService.create).toHaveBeenCalledWith(storeId, createDto);
+      // The controller transforms the DTO before passing to service
+      const expectedEntityData = {
+        ...createDto,
+        type: 'percentage', // Controller transforms to enum value (PromotionType.PERCENTAGE = 'percentage')
+        applies_to: createDto.appliesTo,
+        start_date: createDto.startDate,
+        end_date: createDto.endDate,
+        is_active: createDto.isActive,
+        created_by_user_id: createDto.createdByUserId,
+        updated_by_user_id: createDto.updatedByUserId,
+      };
+
+      expect(promotionsService.create).toHaveBeenCalledWith(
+        storeId,
+        expectedEntityData,
+      );
       expect(result).toEqual(mockPromotion);
     });
 

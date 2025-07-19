@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DispatchOrdersController } from '@modules/dispatch-orders/controller/dispatch-orders.controller';
+import { SecurityService } from 'src/common/service/global/security.service';
 
 describe('DispatchOrdersController', () => {
   let controller: DispatchOrdersController;
@@ -13,6 +14,7 @@ describe('DispatchOrdersController', () => {
       controllers: [DispatchOrdersController],
       providers: [
         // Add dependency mocks here
+        { provide: SecurityService, useValue: { validate: jest.fn() } },
       ],
     }).compile();
 
