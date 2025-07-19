@@ -339,7 +339,7 @@ describe('CustomersService', () => {
       const result = await service.remove(storeId, customerId);
 
       expect(result).toEqual({
-        message: `✅ Khách hàng với ID "${customerId}" đã được xóa`,
+        message: `Xóa Khách hàng thành công`,
         data: null,
       });
       expect(mockCustomer.is_deleted).toBe(true);

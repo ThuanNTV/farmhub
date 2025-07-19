@@ -244,3 +244,104 @@ export const createTestModuleWithMocks = async (
     providers: [...getCommonMockProviders(), ...additionalProviders],
   });
 };
+
+/**
+ * Mock StockAdjustmentsService for testing
+ */
+export const mockStockAdjustmentsService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock VoucherUsageLogService for testing
+ */
+export const mockVoucherUsageLogService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+  findByVoucher: jest.fn().mockResolvedValue([]),
+  filter: jest.fn().mockResolvedValue([]),
+};
+
+/**
+ * Mock StockTransferService for testing
+ */
+export const mockStockTransferService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock StoreSettingsService for testing
+ */
+export const mockStoreSettingsService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock FileAttachmentsService for testing
+ */
+export const mockFileAttachmentsService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock LoyaltyPointLogsService for testing
+ */
+export const mockLoyaltyPointLogsService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
+  remove: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock DashboardService for testing
+ */
+export const mockDashboardService = {
+  getDashboardData: jest.fn().mockResolvedValue({}),
+  getStats: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock PrintingService for testing
+ */
+export const mockPrintingService = {
+  generateReceipt: jest.fn().mockResolvedValue({}),
+  printDocument: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock UserActivityLogService for testing
+ */
+export const mockUserActivityLogService = {
+  create: jest.fn().mockResolvedValue({}),
+  findAll: jest.fn().mockResolvedValue([]),
+  findOne: jest.fn().mockResolvedValue({}),
+};
+
+/**
+ * Mock ReportService for testing
+ */
+export const mockReportService = {
+  generateReport: jest.fn().mockResolvedValue({}),
+  getReportData: jest.fn().mockResolvedValue({}),
+};

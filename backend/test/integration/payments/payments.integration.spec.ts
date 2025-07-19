@@ -4,13 +4,13 @@ import { Repository } from 'typeorm';
 import { PaymentsService } from '../../../src/modules/payments/service/payments.service';
 import { Payment } from '../../../src/entities/tenant/payment.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { TenantDatabaseModule } from '../../../src/config/db/dbtenant/tenant-database.module';
-import { PaymentsModule } from '../../../src/modules/payments.module';
 import { TenantDataSourceService } from '../../../src/config/db/dbtenant/tenant-datasource.service';
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { PaymentsModule } from 'src/modules/payments/payments.module';
+import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
 
 describe('PaymentsService Integration', () => {
   let app: INestApplication;
@@ -32,7 +32,7 @@ describe('PaymentsService Integration', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TenantDatabaseModule, PaymentsModule],
+      imports: [TenantModule, PaymentsModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -52,7 +52,7 @@ describe('PaymentsService Integration', () => {
   beforeEach(async () => {
     // Clean up database before each test
     await paymentRepository.delete({
-      transaction_id: testPaymentData.transactionId,
+      id: testPaymentData.transactionId,
     });
   });
 
@@ -65,7 +65,7 @@ describe('PaymentsService Integration', () => {
   describe('create', () => {
     it('should create a new payment successfully', async () => {
       // Create new payment
-      const result = await paymentsService.create(testStoreId, testPaymentData);
+      const result = await paymentsService.createPayment(testStoreId, testPaymentData);
 
       // Verify the result
       expect(result).toBeDefined();

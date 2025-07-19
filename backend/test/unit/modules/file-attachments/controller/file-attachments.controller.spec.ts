@@ -1,18 +1,57 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FileAttachmentsController } from '@modules/file-attachments/controller/file-attachments.controller';
+import { FileAttachmentsService } from '@modules/file-attachments/service/file-attachments.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import { Reflector } from '@nestjs/core';
+import { SecurityService } from 'src/service/global/security.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import {
+  mockFileAttachmentsService,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockAuditInterceptor,
+  mockReflector,
+  mockSecurityService,
+  mockAuditLogAsyncService,
+} from '../../../../utils/mock-dependencies';
 
 describe('FileAttachmentsController', () => {
   let controller: FileAttachmentsController;
-
-  const mockDependencies = {
-    // Add mock dependencies here based on constructor
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FileAttachmentsController],
       providers: [
-        // Add dependency mocks here
+        {
+          provide: FileAttachmentsService,
+          useValue: mockFileAttachmentsService,
+        },
+        {
+          provide: EnhancedAuthGuard,
+          useValue: mockEnhancedAuthGuard,
+        },
+        {
+          provide: PermissionGuard,
+          useValue: mockPermissionGuard,
+        },
+        {
+          provide: AuditInterceptor,
+          useValue: mockAuditInterceptor,
+        },
+        {
+          provide: Reflector,
+          useValue: mockReflector,
+        },
+        {
+          provide: SecurityService,
+          useValue: mockSecurityService,
+        },
+        {
+          provide: AuditLogAsyncService,
+          useValue: mockAuditLogAsyncService,
+        },
       ],
     }).compile();
 

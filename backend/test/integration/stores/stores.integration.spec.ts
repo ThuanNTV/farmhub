@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { StoresModule } from '../../../src/modules/stores.module';
+import { StoresModule } from '../../../src/modules/stores/stores.module';
 import { Store } from '../../../src/entities/global/store.entity';
 import { DataSource } from 'typeorm';
 import { TenantDataSourceService } from '../../../src/config/db/dbtenant/tenant-datasource.service';
 import { JwtAuthGuard } from '../../../src/common/auth/jwt-auth.guard';
 import { EnhancedAuthGuard } from '../../../src/common/auth/enhanced-auth.guard';
-import { RolesGuard } from '../../../src/common/guards/roles.guard';
 import { RateLimitAPI } from '../../../src/common/decorator/rate-limit.decorator';
 import { AuditInterceptor } from '../../../src/common/auth/audit.interceptor';
 import { AllExceptionsFilter } from '../../../src/common/interceptors/all-exceptions.filter';
 import { TransformInterceptor } from '../../../src/common/interceptors/transform.interceptor';
+import { RolesGuard } from 'src/core/rbac/role/roles.guard';
 
 describe('Stores Integration Tests', () => {
   let app: INestApplication;
@@ -44,7 +44,7 @@ describe('Stores Integration Tests', () => {
         TypeOrmModule.forRoot({
           type: 'postgres',
           host: process.env.DB_HOST || 'localhost',
-          port: parseInt(process.env.DB_PORT) || 5432,
+          port: parseInt(process.env.DB_PORT || '5432', 10),
           username: process.env.DB_USERNAME || 'postgres',
           password: process.env.DB_PASSWORD || 'password',
           database: process.env.DB_DATABASE || 'farmhub_test',
@@ -89,7 +89,11 @@ describe('Stores Integration Tests', () => {
         `DROP DATABASE IF EXISTS "${testStore.schemaName}"`,
       );
     } catch (error) {
-      console.log('Database cleanup error:', error.message);
+      if (error instanceof Error) {
+        console.log('Database cleanup error:', error.message);
+      } else {
+        console.log('Database cleanup error:', error);
+      }
     }
 
     await dataSource.destroy();
@@ -133,8 +137,8 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(savedStore).toBeDefined();
-      expect(savedStore.schema_name).toBe(testStore.schemaName);
+      expect(savedStore).not.toBeNull();
+      expect(savedStore!.schema_name).toBe(testStore.schemaName);
     });
 
     it('should fail to create store with duplicate schema name', async () => {
@@ -321,9 +325,10 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(updatedStore.name).toBe(updateStoreData.name);
-      expect(updatedStore.phone).toBe(updateStoreData.phone);
-      expect(updatedStore.email).toBe(updateStoreData.email);
+      expect(updatedStore).not.toBeNull();
+      expect(updatedStore!.name).toBe(updateStoreData.name);
+      expect(updatedStore!.phone).toBe(updateStoreData.phone);
+      expect(updatedStore!.email).toBe(updateStoreData.email);
     });
 
     it('should fail to update non-existent store', async () => {
@@ -397,7 +402,8 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(deletedStore.is_deleted).toBe(true);
+      expect(deletedStore).not.toBeNull();
+      expect(deletedStore!.is_deleted).toBe(true);
     });
 
     it('should fail to delete non-existent store', async () => {
@@ -456,7 +462,8 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(restoredStore.is_deleted).toBe(false);
+      expect(restoredStore).not.toBeNull();
+      expect(restoredStore!.is_deleted).toBe(false);
     });
 
     it('should fail to restore non-existent store', async () => {
@@ -538,10 +545,11 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(finalStore.name).toBe(updateStoreData.name);
-      expect(finalStore.phone).toBe(updateStoreData.phone);
-      expect(finalStore.email).toBe(updateStoreData.email);
-      expect(finalStore.is_deleted).toBe(false);
+      expect(finalStore).not.toBeNull();
+      expect(finalStore!.name).toBe(updateStoreData.name);
+      expect(finalStore!.phone).toBe(updateStoreData.phone);
+      expect(finalStore!.email).toBe(updateStoreData.email);
+      expect(finalStore!.is_deleted).toBe(false);
     });
   });
 
@@ -653,8 +661,9 @@ describe('Stores Integration Tests', () => {
         .getRepository(Store)
         .findOne({ where: { schema_name: testStore.schemaName } });
 
-      expect(finalStore.is_deleted).toBe(false);
-      expect(finalStore.name).toBe(updateStoreData.name);
+      expect(finalStore).not.toBeNull();
+      expect(finalStore!.is_deleted).toBe(false);
+      expect(finalStore!.name).toBe(updateStoreData.name);
     });
   });
 });

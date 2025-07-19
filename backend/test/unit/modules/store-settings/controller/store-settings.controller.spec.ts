@@ -1,18 +1,57 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StoreSettingsController } from '@modules/store-settings/controller/store-settings.controller';
+import { StoreSettingsService } from '@modules/store-settings/service/store-settings.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import { Reflector } from '@nestjs/core';
+import { SecurityService } from 'src/service/global/security.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import {
+  mockStoreSettingsService,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockAuditInterceptor,
+  mockReflector,
+  mockSecurityService,
+  mockAuditLogAsyncService,
+} from '../../../../utils/mock-dependencies';
 
 describe('StoreSettingsController', () => {
   let controller: StoreSettingsController;
-
-  const mockDependencies = {
-    // Add mock dependencies here based on constructor
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StoreSettingsController],
       providers: [
-        // Add dependency mocks here
+        {
+          provide: StoreSettingsService,
+          useValue: mockStoreSettingsService,
+        },
+        {
+          provide: EnhancedAuthGuard,
+          useValue: mockEnhancedAuthGuard,
+        },
+        {
+          provide: PermissionGuard,
+          useValue: mockPermissionGuard,
+        },
+        {
+          provide: AuditInterceptor,
+          useValue: mockAuditInterceptor,
+        },
+        {
+          provide: Reflector,
+          useValue: mockReflector,
+        },
+        {
+          provide: SecurityService,
+          useValue: mockSecurityService,
+        },
+        {
+          provide: AuditLogAsyncService,
+          useValue: mockAuditLogAsyncService,
+        },
       ],
     }).compile();
 

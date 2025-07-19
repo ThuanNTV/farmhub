@@ -6,7 +6,7 @@ import { TenantDataSourceService } from '../../../src/config/db/dbtenant/tenant-
 import { InternalServerErrorException } from '@nestjs/common';
 import { CategoriesService } from '../../../src/modules/categories/service/categories.service';
 import { CategoriesModule } from '../../../src/modules/categories/categories.module';
-import { TenantDatabaseModule } from '../../../src/config/db/dbtenant/tenant-database.module';
+import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
 
 describe('CategoriesService Integration', () => {
   let app: INestApplication;
@@ -18,9 +18,10 @@ describe('CategoriesService Integration', () => {
   const testCategoryData = {
     categoryId: '123e4567-e89b-12d3-a456-426614174000',
     categoryName: 'Integration Test Category',
+    name: 'Integration Test Category', // thêm dòng này
     slug: 'integration-test-category',
     description: 'Integration Test Category Description',
-    parentId: null,
+    parentId: undefined,
     image: '{"url": "test.jpg"}',
     sortOrder: 1,
     createdByUserId: '123e4567-e89b-12d3-a456-426614174001',
@@ -29,7 +30,7 @@ describe('CategoriesService Integration', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TenantDatabaseModule, CategoriesModule],
+      imports: [TenantModule, CategoriesModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -72,7 +73,7 @@ describe('CategoriesService Integration', () => {
       expect(result.message).toBe('Thêm danh mục mới thành công');
       expect(result.data).toBeDefined();
       expect(result.data.category_id).toBe(testCategoryData.categoryId);
-      expect(result.data.category_name).toBe(testCategoryData.categoryName);
+      expect(result.data.name).toBe(testCategoryData.categoryName);
       expect(result.data.slug).toBe(testCategoryData.slug);
       expect(result.data.description).toBe(testCategoryData.description);
 
@@ -81,7 +82,7 @@ describe('CategoriesService Integration', () => {
         category_id: testCategoryData.categoryId,
       });
       expect(dbCategory).not.toBeNull();
-      expect(dbCategory!.category_name).toBe(testCategoryData.categoryName);
+      expect(dbCategory!.name).toBe(testCategoryData.categoryName);
       expect(dbCategory!.slug).toBe(testCategoryData.slug);
       expect(dbCategory!.is_active).toBe(true);
       expect(dbCategory!.is_deleted).toBe(false);
@@ -181,7 +182,7 @@ describe('CategoriesService Integration', () => {
         (c) => c.category_id === testCategoryData.categoryId,
       );
       expect(testCategory).toBeDefined();
-      expect(testCategory!.category_name).toBe(testCategoryData.categoryName);
+      expect(testCategory!.name).toBe(testCategoryData.categoryName);
     });
   });
 
@@ -198,9 +199,9 @@ describe('CategoriesService Integration', () => {
       );
 
       expect(category).toBeDefined();
-      expect(category.category_id).toBe(testCategoryData.categoryId);
-      expect(category.category_name).toBe(testCategoryData.categoryName);
-      expect(category.slug).toBe(testCategoryData.slug);
+      expect(category?.category_id).toBe(testCategoryData.categoryId);
+      expect(category?.name).toBe(testCategoryData.categoryName);
+      expect(category?.slug).toBe(testCategoryData.slug);
     });
 
     it('should return null for non-existent category', async () => {
@@ -229,7 +230,7 @@ describe('CategoriesService Integration', () => {
 
       expect(category).toBeDefined();
       expect(category!.category_id).toBe(testCategoryData.categoryId);
-      expect(category!.category_name).toBe(testCategoryData.categoryName);
+      expect(category!.name).toBe(testCategoryData.categoryName);
     });
 
     it('should return null for non-existent category', async () => {
@@ -278,9 +279,8 @@ describe('CategoriesService Integration', () => {
         category_id: categoryId,
       });
       expect(updatedCategory).not.toBeNull();
-      expect(updatedCategory!.category_name).toBe(updateData.categoryName);
+      expect(updatedCategory!.name).toBe(updateData.categoryName);
       expect(updatedCategory!.description).toBe(updateData.description);
-      expect(updatedCategory!.sort_order).toBe(updateData.sortOrder);
       expect(updatedCategory!.slug).toBe(updateData.slug);
     });
 

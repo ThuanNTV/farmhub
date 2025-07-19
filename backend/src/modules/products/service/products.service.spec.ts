@@ -26,12 +26,13 @@ describe('ProductsService', () => {
   let auditLogsService: ReturnType<typeof mockAuditLogsService>;
 
   beforeEach(async () => {
+    repo = mockRepo();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
         {
           provide: TenantDataSourceService,
-          useValue: { getRepo: jest.fn().mockResolvedValue(mockRepo()) },
+          useValue: { getRepo: jest.fn().mockResolvedValue(repo) },
         },
         {
           provide: AuditLogsService,
@@ -41,9 +42,14 @@ describe('ProductsService', () => {
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
-    repo = await service.getRepo('store1');
+    // Mock the protected getRepo method
+    jest
+      .spyOn(service as any, 'getRepo')
+      .mockImplementation(() => Promise.resolve(repo));
     auditLogsService = module.get(AuditLogsService);
   });
+
+  afterEach(() => jest.clearAllMocks());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -91,10 +97,10 @@ describe('ProductsService', () => {
     repo.merge.mockReturnValue({ ...product, ...dto });
     repo.save.mockResolvedValue({ ...product, ...dto });
     auditLogsService.create.mockResolvedValue({});
-    // Mock findOneProduc
-    service.findOneProduc = jest.fn().mockResolvedValue({ repo, product });
+    // Mock findOneProduct
+    service.findOne = jest.fn().mockResolvedValue({ repo, product });
     const result = await service.update('store1', 'p1', dto);
-    expect(result.productCode).toBe('C2');
+    expect(result.product_code).toBe('C2');
     expect(repo.merge).toHaveBeenCalled();
     expect(repo.save).toHaveBeenCalled();
     expect(auditLogsService.create).toHaveBeenCalled();
@@ -104,7 +110,7 @@ describe('ProductsService', () => {
     const product = { product_id: 'p1', updated_by_user_id: 'u2' };
     repo.save.mockResolvedValue({ ...product, is_deleted: true });
     auditLogsService.create.mockResolvedValue({});
-    service.findOneProduc = jest.fn().mockResolvedValue({ repo, product });
+    service.findOne = jest.fn().mockResolvedValue({ repo, product });
     const result = await service.remove('store1', 'p1');
     expect(result.message).toContain('đã được xóa');
     expect(repo.save).toHaveBeenCalled();

@@ -1,18 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserActivityLogService } from '@modules/user-activity-log/service/user-activity-log.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { mockTenantDataSourceService } from '../../../../utils/mock-dependencies';
 
 describe('UserActivityLogService', () => {
   let service: UserActivityLogService;
-
-  const _ = {
-    // Add mock dependencies here based on constructor
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserActivityLogService,
-        // Add dependency mocks here
+        {
+          provide: TenantDataSourceService,
+          useValue: mockTenantDataSourceService,
+        },
       ],
     }).compile();
 

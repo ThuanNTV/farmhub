@@ -10,13 +10,13 @@ import { AuthService } from 'src/core/auth/service/auth.service';
 import { AuthModule } from 'src/core/auth/auth.module';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
 import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
-import { AuditLogQueueService } from 'src/common/audit/audit-log-queue.service';
 import { SecurityService } from 'src/service/global/security.service';
 import {
   mockAuditLogAsyncService,
   mockAuditLogQueueService,
   mockSecurityService,
 } from '../../utils/mock-dependencies';
+import { AuditLogQueueService } from 'src/common/queue/audit-log-queue.service';
 
 describe('AuthService Integration', () => {
   let app: INestApplication;
