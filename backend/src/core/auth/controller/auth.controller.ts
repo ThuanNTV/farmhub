@@ -88,7 +88,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Đăng xuất' })
   @ApiResponse({ status: 200, description: 'Đăng xuất thành công' })
   logout(@Request() req: { user: SafeUser; headers: Record<string, string> }) {
-    const token = req.headers.authorization.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace('Bearer ', '');
     if (token) {
       return this.authService.logout(token);
     }

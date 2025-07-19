@@ -33,39 +33,39 @@ export class PrintingService {
     const customerRepo = ds.getRepository(Customer);
 
     const order = (await orderRepo.findOne({
-      where: { order_id: orderId, is_deleted: false },
+      where: { orderId: orderId, isDeleted: false },
       relations: ['customer', 'payment_method'],
     })) as Order;
 
     // Get order items
     const orderItems: OrderItem[] = await orderItemRepo.find({
-      where: { order_id: orderId, is_deleted: false },
+      where: { orderId: orderId, isDeleted: false },
       relations: ['product'],
     });
 
     // Get customer details
     const customer = await customerRepo.findOne({
-      where: { customer_id: order.customer_id, is_deleted: false },
+      where: { customer_id: order.customerId, is_deleted: false },
     });
 
     // Generate invoice data
     const invoiceData: PrintData = {
       type: 'invoice',
       data: {
-        id: order.order_id,
+        id: order.orderId,
         customerName: customer?.name ?? 'Unknown',
         customerEmail: customer?.email,
         items: orderItems.map((item) => ({
-          id: item.order_item_id,
-          name: item.product_name,
+          id: item.orderItemId,
+          name: item.productName,
           quantity: item.quantity,
-          price: item.unit_price,
-          total: item.total_price,
+          price: item.unitPrice,
+          total: item.totalPrice,
         })),
-        subtotal: order.total_amount,
+        subtotal: order.totalAmount,
         tax: 0,
-        total: order.total_amount,
-        createdAt: order.created_at,
+        total: order.totalAmount,
+        createdAt: order.createdAt,
       },
     };
 

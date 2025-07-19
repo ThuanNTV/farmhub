@@ -412,6 +412,39 @@ describe('AuthController', () => {
     });
   });
 
+  describe('getProfile', () => {
+    it('should return the current user', () => {
+      const req = { user: mockUser };
+      const result = controller.getProfile(req as any);
+      expect(result).toBe(mockUser);
+    });
+  });
+
+  describe('register', () => {
+    const createUserDto = {
+      username: 'newuser',
+      email: 'newuser@example.com',
+      password: 'password123',
+      fullName: 'New User',
+    };
+
+    it('should register a new user successfully', async () => {
+      const expectedResponse = { message: 'Đăng ký thành công', data: null };
+      mockAuthService.register.mockResolvedValue(expectedResponse);
+
+      const result = await controller.register(createUserDto as any);
+      expect(result).toEqual(expectedResponse);
+      expect(mockAuthService.register).toHaveBeenCalledWith(createUserDto);
+    });
+
+    it('should throw BadRequestException if data is invalid', async () => {
+      const error = new BadRequestException('Dữ liệu không hợp lệ');
+      mockAuthService.register.mockRejectedValue(error);
+
+      await expect(controller.register({} as any)).rejects.toThrow(error);
+    });
+  });
+
   describe('Edge Cases', () => {
     it('should handle null/undefined parameters gracefully', async () => {
       const error = new BadRequestException('Invalid parameters');

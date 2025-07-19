@@ -18,7 +18,7 @@ export class DashboardService {
       this.getBestSellingProducts(storeId),
     ]);
     const totalRevenue = orders.reduce(
-      (sum, o) => sum + (o.total_amount || 0),
+      (sum, o) => sum + (o.totalAmount || 0),
       0,
     );
     return {
@@ -33,14 +33,14 @@ export class DashboardService {
     const orders = await this.ordersService.findAllOrder(storeId);
     const byDay = orders.reduce(
       (acc, o) => {
-        const date = o.created_at.toISOString().slice(0, 10) || 'unknown';
-        acc[date] = (acc[date] || 0) + (o.total_amount || 0);
+        const date = o.createdAt.toISOString().slice(0, 10) || 'unknown';
+        acc[date] = (acc[date] || 0) + (o.totalAmount || 0);
         return acc;
       },
       {} as Record<string, number>,
     );
     return {
-      total: orders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+      total: orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0),
       byDay: Object.entries(byDay).map(([date, revenue]) => ({
         date,
         revenue,
@@ -73,9 +73,9 @@ export class DashboardService {
     // Map customer_id to total spending
     const spendingMap: Record<string, number> = {};
     for (const order of orders) {
-      if (order.customer_id && !order.is_deleted) {
-        spendingMap[order.customer_id] =
-          (spendingMap[order.customer_id] || 0) + (order.total_amount || 0);
+      if (order.customerId && !order.isDeleted) {
+        spendingMap[order.customerId] =
+          (spendingMap[order.customerId] || 0) + (order.totalAmount || 0);
       }
     }
     // Attach totalSpent to each customer
@@ -101,9 +101,9 @@ export class DashboardService {
     const orders = await this.ordersService.findAllOrder(storeId);
     const productCount: Record<string, number> = {};
     for (const o of orders) {
-      for (const item of o.order_items) {
-        productCount[item.product_id] =
-          (productCount[item.product_id] || 0) + (item.quantity || 0);
+      for (const item of o.orderItems) {
+        productCount[item.productId] =
+          (productCount[item.productId] || 0) + (item.quantity || 0);
       }
     }
     const products = await this.productsService.findAll(storeId);
