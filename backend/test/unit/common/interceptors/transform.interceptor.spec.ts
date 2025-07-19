@@ -28,6 +28,10 @@ describe('TransformInterceptor', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
     jest.restoreAllMocks();
   });
 

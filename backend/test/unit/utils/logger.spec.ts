@@ -14,6 +14,10 @@ describe('Winston Logger', () => {
     logger = module.get<Logger>(Logger);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterEach(async () => {
     await module.close();
   });

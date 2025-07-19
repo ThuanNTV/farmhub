@@ -26,6 +26,10 @@ describe('SecurityService', () => {
     service = module.get<SecurityService>(SecurityService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('validateToken', () => {
     it('should return true for valid token', async () => {
       const token = 'valid-token';

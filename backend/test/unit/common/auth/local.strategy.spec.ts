@@ -13,6 +13,10 @@ describe('LocalStrategy', () => {
     strategy = new LocalStrategy(authService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('trả về user khi validate thành công', async () => {
     const user = { userId: '1', username: 'test' };
     authService.validateUser.mockResolvedValue(user);

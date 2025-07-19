@@ -27,6 +27,10 @@ describe('AuditLogAsyncService', () => {
     auditLogQueueService = module.get(AuditLogQueueService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

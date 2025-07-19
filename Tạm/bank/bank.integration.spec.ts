@@ -35,6 +35,10 @@ describe('BankService Integration', () => {
     // Clean up database before each test
     await bankRepository.clear();
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
 
   afterAll(async () => {
     if (app) {

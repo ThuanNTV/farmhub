@@ -16,6 +16,10 @@ describe('EnhancedJwtStrategy', () => {
     strategy = new EnhancedJwtStrategy(securityService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   const basePayload = {
     sub: 'user1',
     username: 'test',

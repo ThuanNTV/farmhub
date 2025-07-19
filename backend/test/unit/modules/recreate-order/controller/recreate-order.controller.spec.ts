@@ -53,11 +53,12 @@ describe('RecreateOrderController', () => {
     const storeId = 'test-store-123';
     const orderId = 'test-order-123';
     const mockRecreatedOrder = {
-      order_id: 'new-order-123',
-      order_code: 'ORD002',
-      customer_id: 'customer-123',
-      total_amount: 100,
-      status: 'PENDING',
+      orderId: 'new-order-123',
+      orderCode: 'ORD002',
+      customerId: 'customer-123',
+      totalAmount: 100,
+      status: 'pending',
+      items: [],
     };
 
     it('should recreate order successfully', async () => {
@@ -69,7 +70,7 @@ describe('RecreateOrderController', () => {
         storeId,
         orderId,
       );
-      expect(result).toEqual(mockRecreatedOrder);
+      expect(result).toEqual({ ...mockRecreatedOrder, items: [] });
     });
 
     it('should handle service errors', async () => {

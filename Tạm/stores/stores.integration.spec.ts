@@ -14,8 +14,7 @@ import { AllExceptionsFilter } from '../../../src/common/interceptors/all-except
 import { TransformInterceptor } from '../../../src/common/interceptors/transform.interceptor';
 import { RolesGuard } from 'src/core/rbac/role/roles.guard';
 
-describe('Stores Integration Tests', () => {
-  let app: INestApplication;
+describe('Stores Integration Tests', () => {let app: INestApplication;
   let dataSource: DataSource;
   let tenantDataSourceService: TenantDataSourceService;
 
@@ -105,6 +104,10 @@ describe('Stores Integration Tests', () => {
     await dataSource.query(
       `DELETE FROM store WHERE schema_name = '${testStore.schemaName}'`,
     );
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('POST /stores', () => {

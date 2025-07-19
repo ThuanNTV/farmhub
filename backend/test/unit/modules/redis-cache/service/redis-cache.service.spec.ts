@@ -17,6 +17,7 @@ describe('RedisCacheService', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 

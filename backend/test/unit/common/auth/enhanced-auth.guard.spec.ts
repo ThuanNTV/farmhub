@@ -18,6 +18,10 @@ describe('EnhancedAuthGuard', () => {
     guard = new EnhancedAuthGuard(reflector, securityService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('canActivate trả về true khi super trả về true', async () => {
     const context = {} as ExecutionContext;
     // Mock super.canActivate trả về true

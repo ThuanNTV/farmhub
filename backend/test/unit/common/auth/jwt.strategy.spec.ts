@@ -7,6 +7,9 @@ describe('JwtStrategy', () => {
   beforeEach(() => {
     strategy = new JwtStrategy();
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('validate trả về user info đúng', () => {
     const payload = {

@@ -26,6 +26,7 @@ describe('AuditLogQueueService', () => {
     loggerDebug = jest
       .spyOn(Logger.prototype, 'debug')
       .mockImplementation(() => {});
+
     loggerError = jest
       .spyOn(Logger.prototype, 'error')
       .mockImplementation(() => {});
@@ -35,6 +36,7 @@ describe('AuditLogQueueService', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 

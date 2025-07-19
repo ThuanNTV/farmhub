@@ -38,12 +38,16 @@ describe('NotificationService', () => {
         NotificationService,
         {
           provide: TenantDataSourceService,
-          useValue: mockTenantDataSourceService,
+          useValue: { getTenantDataSource: jest.fn() },
         },
       ],
     }).compile();
 
     service = module.get<NotificationService>(NotificationService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('createNotification', () => {

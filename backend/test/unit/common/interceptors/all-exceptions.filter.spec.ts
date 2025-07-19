@@ -23,6 +23,7 @@ describe('AllExceptionsFilter', () => {
     loggerError = jest
       .spyOn(Logger.prototype, 'error')
       .mockImplementation(() => {});
+
     loggerLog = jest
       .spyOn(Logger.prototype, 'log')
       .mockImplementation(() => {});
@@ -44,6 +45,7 @@ describe('AllExceptionsFilter', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 
@@ -125,6 +127,120 @@ describe('AllExceptionsFilter', () => {
       expect.objectContaining({ debug: expect.any(Object) }),
     );
     process.env.NODE_ENV = '';
+  });
+});
+
+describe('AllExceptionsFilter bổ sung coverage', () => {
+  let filter: AllExceptionsFilter;
+  let mockResponse: any;
+  let mockRequest: any;
+  let mockHost: any;
+
+  beforeEach(() => {
+    filter = new AllExceptionsFilter();
+    mockResponse = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    mockRequest = {
+      url: '/test',
+      method: 'GET',
+      body: {},
+      query: {},
+      params: {},
+      headers: { 'user-agent': 'test' },
+    };
+    mockHost = {
+      switchToHttp: () => ({
+        getResponse: () => mockResponse,
+        getRequest: () => mockRequest,
+      }),
+    };
+  });
+
+  it('exception là null', () => {
+    filter.catch(null, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
+    );
+  });
+
+  it('exception là undefined', () => {
+    filter.catch(undefined, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
+    );
+  });
+
+  it('exception là number', () => {
+    filter.catch(123, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
+    );
+  });
+
+  it('exception là string', () => {
+    filter.catch('error string', mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
+    );
+  });
+
+  it('exception là boolean', () => {
+    filter.catch(true, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
+    );
+  });
+
+  it('BadRequestException với getResponse trả về object không có message', () => {
+    const ex = new BadRequestException();
+    jest.spyOn(ex, 'getResponse').mockReturnValue({ foo: 'bar' });
+    filter.catch(ex, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: ex.message, code: 400 }),
+    );
+  });
+
+  it('logger.error throw error không làm crash filter', () => {
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {
+      throw new Error('logger fail');
+    });
+    const ex = new Error('fail');
+    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+  });
+
+  it('request thiếu trường', () => {
+    mockRequest = { url: '/test', method: 'GET' }; // thiếu body, query, params, headers
+    mockHost = {
+      switchToHttp: () => ({
+        getResponse: () => mockResponse,
+        getRequest: () => mockRequest,
+      }),
+    };
+    const ex = new Error('fail');
+    filter.catch(ex, mockHost as any);
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+  });
+
+  it('response.status throw error không làm crash filter', () => {
+    mockResponse.status = jest.fn(() => {
+      throw new Error('status fail');
+    });
+    const ex = new Error('fail');
+    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
+  });
+
+  it('response.json throw error không làm crash filter', () => {
+    mockResponse.json = jest.fn(() => {
+      throw new Error('json fail');
+    });
+    const ex = new Error('fail');
+    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
   });
 });
 

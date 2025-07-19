@@ -33,6 +33,10 @@ describe('LogLevelController', () => {
     controller = new LogLevelController(service);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('getLogLevelInfo trả về thông tin log level', () => {
     const res = controller.getLogLevelInfo();
     expect(res.data).toEqual(service.getLogLevelInfo());

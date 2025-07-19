@@ -57,6 +57,10 @@ describe('CustomersService Integration', () => {
     await customerRepository.delete({
       customer_id: testCustomerData.customerId,
     });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   });
 
   afterAll(async () => {

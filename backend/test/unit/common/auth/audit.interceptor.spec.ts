@@ -27,6 +27,10 @@ describe('AuditInterceptor', () => {
     };
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('không log nếu không có user', async () => {
     (context.switchToHttp as any).mockReturnValue({
       getRequest: () => ({

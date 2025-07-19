@@ -37,6 +37,10 @@ describe('AuditTransactionService', () => {
     service = module.get<AuditTransactionService>(AuditTransactionService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('createAuditLog', () => {
     it('should create audit log successfully', async () => {
       const mockAuditLog = {

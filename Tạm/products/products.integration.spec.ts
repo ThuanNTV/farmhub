@@ -57,6 +57,10 @@ describe('ProductsService Integration', () => {
   beforeEach(async () => {
     // Clean up database before each test
     await productRepository.delete({ product_id: testProductData.productId });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   });
 
   afterAll(async () => {

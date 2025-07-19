@@ -18,6 +18,10 @@ describe('RolesGuard', () => {
     } as any;
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('trả về true nếu không có roles yêu cầu', () => {
     reflector.getAllAndOverride.mockReturnValue([]);
     expect(guard.canActivate(context)).toBe(true);

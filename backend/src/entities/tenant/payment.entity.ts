@@ -62,6 +62,12 @@ export class Payment {
   @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
   updated_by_user_id?: string;
 
+  @Column({ type: 'varchar', length: 10, name: 'currency', nullable: false })
+  currency!: string;
+
+  @Column({ type: 'varchar', length: 100, name: 'transactionId', unique: true })
+  transaction_id!: string;
+
   @DeleteDateColumn({ name: 'deletedAt' })
   deleted_at?: Date;
 

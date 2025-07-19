@@ -14,6 +14,7 @@ describe('testDatabaseConnection', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 

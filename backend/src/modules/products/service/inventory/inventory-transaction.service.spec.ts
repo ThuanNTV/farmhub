@@ -13,15 +13,16 @@ const mockRepo = () => ({
 
 describe('InventoryTransactionService', () => {
   let service: InventoryTransactionService;
-  let repo: ReturnType<typeof mockRepo>;
+  let mockRepository: ReturnType<typeof mockRepo>;
 
   beforeEach(async () => {
+    mockRepository = mockRepo();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         InventoryTransactionService,
         {
           provide: TenantDataSourceService,
-          useValue: { getRepo: jest.fn().mockResolvedValue(mockRepo()) },
+          useValue: { getRepo: jest.fn().mockResolvedValue(mockRepository) },
         },
       ],
     }).compile();
@@ -29,7 +30,10 @@ describe('InventoryTransactionService', () => {
     service = module.get<InventoryTransactionService>(
       InventoryTransactionService,
     );
-    repo = await service.getRepo('store1');
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -37,16 +41,16 @@ describe('InventoryTransactionService', () => {
   });
 
   it('should call findAll', async () => {
-    repo.find.mockResolvedValue([]);
+    mockRepository.find.mockResolvedValue([]);
     const result = await service.findAll('store1');
     expect(result).toEqual([]);
-    expect(repo.find).toHaveBeenCalled();
+    expect(mockRepository.find).toHaveBeenCalled();
   });
 
   it('should call findOne', async () => {
-    repo.findOne.mockResolvedValue({ id: 1 });
+    mockRepository.findOne.mockResolvedValue({ id: 1 });
     const result = await service.findOne('store1', 1);
     expect(result).toEqual({ id: 1 });
-    expect(repo.findOne).toHaveBeenCalled();
+    expect(mockRepository.findOne).toHaveBeenCalled();
   });
 });

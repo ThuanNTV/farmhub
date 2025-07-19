@@ -16,50 +16,51 @@ import { AuditInterceptor } from '@common/auth/audit.interceptor';
 import { AuditLogsService } from '@modules/audit-logs/service/audit-logs.service';
 import { Order, OrderStatus } from 'src/entities/tenant/order.entity';
 import { OrderItem } from 'src/entities/tenant/orderItem.entity';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
   let mockOrdersService: jest.Mocked<OrdersService>;
 
   const mockOrderItem: OrderItem = {
-    order_item_id: '123e4567-e89b-12d3-a456-426614174000',
-    order_id: '123e4567-e89b-12d3-a456-426614174001',
-    product_id: '123e4567-e89b-12d3-a456-426614174002',
-    product_name: 'Test Product',
-    product_unit_id: '123e4567-e89b-12d3-a456-426614174003',
+    orderItemId: '123e4567-e89b-12d3-a456-426614174000',
+    orderId: '123e4567-e89b-12d3-a456-426614174001',
+    productId: '123e4567-e89b-12d3-a456-426614174002',
+    productName: 'Test Product',
+    productUnitId: '123e4567-e89b-12d3-a456-426614174003',
     quantity: 2,
-    unit_price: 100.0,
-    total_price: 200.0,
-    is_deleted: false,
-    created_at: new Date(),
-    updated_at: new Date(),
+    unitPrice: 100.0,
+    totalPrice: 200.0,
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
     order: undefined as any,
     product: undefined as any,
   };
 
   const mockOrder: Order = {
-    order_id: '123e4567-e89b-12d3-a456-426614174001',
-    order_code: 'ORD001',
-    customer_id: '123e4567-e89b-12d3-a456-426614174004',
-    total_amount: 200.0,
-    total_paid: 200.0,
-    vat_amount: 0,
+    orderId: '123e4567-e89b-12d3-a456-426614174001',
+    orderCode: 'ORD001',
+    customerId: '123e4567-e89b-12d3-a456-426614174004',
+    totalAmount: 200.0,
+    totalPaid: 200.0,
+    vatAmount: 0,
     status: OrderStatus.PENDING,
-    debt_status: undefined as any,
-    delivery_status: undefined as any,
-    delivery_address: 'Test Address',
-    is_credit_order: false,
-    is_deleted: false,
-    created_at: new Date(),
-    updated_at: new Date(),
-    order_items: [mockOrderItem],
+    debtStatus: undefined as any,
+    deliveryStatus: undefined as any,
+    deliveryAddress: 'Test Address',
+    isCreditOrder: false,
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    orderItems: [mockOrderItem],
   };
 
   const storeId = 'store-123';
 
   const mockRequest = {
     user: {
-      userId: '123e4567-e89b-12d3-a456-426614174001',
+      id: '123e4567-e89b-12d3-a456-426614174001',
       storeId: 'store-123',
     },
   };
@@ -97,6 +98,7 @@ describe('OrdersController', () => {
         { provide: SecurityService, useValue: {} },
         { provide: Reflector, useValue: {} },
         { provide: AuditLogsService, useValue: {} },
+        { provide: AuditLogAsyncService, useValue: { log: jest.fn() } },
       ],
     }).compile();
 

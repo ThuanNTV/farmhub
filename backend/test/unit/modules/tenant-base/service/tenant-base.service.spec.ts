@@ -28,6 +28,9 @@ class TestEntity {
 
 // Concrete implementation for testing
 class TestTenantService extends TenantBaseService<TestEntity> {
+  close() {
+    throw new Error('Method not implemented.');
+  }
   protected primaryKey = 'id';
 
   constructor(tenantDataSourceService: TenantDataSourceService) {
@@ -88,7 +91,7 @@ class TestTenantService extends TenantBaseService<TestEntity> {
   }
 }
 
-describe('TenantBaseService', () => {
+describe('TestTenantService', () => {
   let service: TestTenantService;
   let tenantDataSourceService: jest.Mocked<TenantDataSourceService>;
   let mockDataSource: jest.Mocked<DataSource>;
@@ -112,6 +115,7 @@ describe('TenantBaseService', () => {
     mockDataSource = {
       isInitialized: true,
       getRepository: jest.fn().mockReturnValue(mockRepository),
+      close: jest.fn(),
     } as any;
 
     // Create mock tenant data source service
@@ -121,10 +125,7 @@ describe('TenantBaseService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        {
-          provide: TestTenantService,
-          useFactory: () => new TestTenantService(tenantDataSourceService),
-        },
+        TestTenantService,
         {
           provide: TenantDataSourceService,
           useValue: tenantDataSourceService,
@@ -143,8 +144,13 @@ describe('TenantBaseService', () => {
     );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
+    await service.close();
+  });
+
+  beforeEach(() => {
     // Reset mock implementations to default
     tenantDataSourceService.getTenantDataSource.mockResolvedValue(
       mockDataSource,
@@ -208,6 +214,7 @@ describe('TenantBaseService', () => {
       const uninitializedDataSource = {
         isInitialized: false,
         getRepository: jest.fn().mockReturnValue(mockRepository),
+        close: jest.fn(),
       } as any;
 
       tenantDataSourceService.getTenantDataSource.mockResolvedValue(

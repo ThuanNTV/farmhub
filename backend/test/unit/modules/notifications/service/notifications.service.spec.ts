@@ -51,6 +51,10 @@ describe('NotificationService', () => {
     service = module.get<NotificationService>(NotificationService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterEach(async () => {
     resetMocks(setup);
     if (module) {

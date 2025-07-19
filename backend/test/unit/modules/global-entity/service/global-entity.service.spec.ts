@@ -51,6 +51,10 @@ describe('GlobalEntityService', () => {
     service = module.get<GlobalEntityService>(GlobalEntityService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('getUserById', () => {
     it('should return user when found', async () => {
       const mockUser = { user_id: 'u1', name: 'Test User' };

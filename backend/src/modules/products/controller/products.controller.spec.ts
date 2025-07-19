@@ -26,6 +26,10 @@ describe('ProductsController', () => {
     service = module.get(ProductsService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

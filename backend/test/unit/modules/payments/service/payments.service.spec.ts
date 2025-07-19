@@ -80,6 +80,10 @@ describe('PaymentsService', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
     resetMocks(setup);
   });
 

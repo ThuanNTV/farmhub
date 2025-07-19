@@ -12,8 +12,9 @@ describe('StockTransferService', () => {
         StockTransferService,
         {
           provide: TenantDataSourceService,
-          useValue: mockTenantDataSourceService,
+          useValue: { getTenantDataSource: jest.fn() },
         },
+        // Add dependency mocks here
       ],
     }).compile();
 

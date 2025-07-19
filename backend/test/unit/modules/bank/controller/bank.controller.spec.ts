@@ -90,18 +90,10 @@ describe('BankController', () => {
     jest.spyOn(service, 'create').mockImplementation((dto, userId) => {
       return Promise.resolve(mockService.create(dto, userId));
     });
-    jest.spyOn(service, 'findAll').mockImplementation(() => {
-      return Promise.resolve(mockService.findAll());
-    });
-    jest.spyOn(service, 'findOne').mockImplementation((id) => {
-      return Promise.resolve(mockService.findOne(id));
-    });
-    jest.spyOn(service, 'update').mockImplementation((id, dto, userId) => {
-      return Promise.resolve(mockService.update(id, dto, userId));
-    });
-    jest.spyOn(service, 'remove').mockImplementation((id, userId) => {
-      return Promise.resolve(mockService.remove(id, userId));
-    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

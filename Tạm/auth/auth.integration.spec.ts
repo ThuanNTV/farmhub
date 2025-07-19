@@ -64,6 +64,10 @@ describe('AuthService Integration', () => {
   beforeEach(async () => {
     // Clean up database before each test
     await userRepository.delete({ user_name: testUserData.userName });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   });
 
   afterAll(async () => {

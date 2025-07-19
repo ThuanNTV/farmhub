@@ -52,6 +52,10 @@ describe('CategoriesService Integration', () => {
     await categoryRepository.delete({
       category_id: testCategoryData.categoryId,
     });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   });
 
   afterAll(async () => {

@@ -23,6 +23,7 @@ describe('TenantDataSourceService', () => {
     loggerLog = jest
       .spyOn(Logger.prototype, 'log')
       .mockImplementation(() => {});
+
     loggerError = jest
       .spyOn(Logger.prototype, 'error')
       .mockImplementation(() => {});
@@ -32,6 +33,7 @@ describe('TenantDataSourceService', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 

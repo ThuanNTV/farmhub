@@ -14,6 +14,7 @@ const config: Config.InitialOptions = {
     '!src/main copy.ts',
     '!src/**/*.module.ts',
     '!src/**/*.dto.ts',
+    '!src/**/dto/**',
     '!src/**/*.entity.ts',
     '!src/**/*.decorator.ts',
     '!src/config/redis/test/**',

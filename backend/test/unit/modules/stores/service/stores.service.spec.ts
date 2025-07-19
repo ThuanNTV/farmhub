@@ -99,6 +99,10 @@ describe('StoresService', () => {
     tenantDataSourceService = module.get(TenantDataSourceService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('createStore', () => {
     const baseStoreDto = {
       managerUserId: 'user-001',

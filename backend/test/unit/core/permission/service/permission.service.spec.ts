@@ -16,6 +16,10 @@ describe('PermissionService', () => {
     service = new PermissionService(usersRepo, userStoreMappingsRepo);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('hasPermission', () => {
     it('trả về false nếu không có permission', async () => {
       await expect(service.hasPermission('u1', '')).resolves.toBe(false);

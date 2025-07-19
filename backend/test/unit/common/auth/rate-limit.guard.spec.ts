@@ -13,6 +13,10 @@ describe('RateLimitGuard', () => {
     guard = new RateLimitGuard(reflector);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   function createContext(request: any): ExecutionContext {
     return {
       switchToHttp: () => ({ getRequest: () => request }),

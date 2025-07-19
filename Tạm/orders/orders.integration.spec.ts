@@ -91,6 +91,10 @@ describe('OrdersService Integration', () => {
   beforeEach(async () => {
     // Clean up database before each test
     await orderItemRepository.delete({ orderId: testOrderData.orderCode });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
     await orderRepository.delete({ orderCode: testOrderData.orderCode });
     await productRepository.delete({ product_id: testProduct.product_id });
 

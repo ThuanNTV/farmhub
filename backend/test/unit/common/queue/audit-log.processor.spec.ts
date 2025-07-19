@@ -23,6 +23,7 @@ describe('AuditLogProcessor', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 

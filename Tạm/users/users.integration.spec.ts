@@ -13,8 +13,7 @@ import { AuditInterceptor } from '../../../src/common/auth/audit.interceptor';
 import { AllExceptionsFilter } from '../../../src/common/interceptors/all-exceptions.filter';
 import { TransformInterceptor } from '../../../src/common/interceptors/transform.interceptor';
 
-describe('Users Integration Tests', () => {
-  let app: INestApplication;
+describe('Users Integration Tests', () => {let app: INestApplication;
   let dataSource: DataSource;
 
   const testUser = {
@@ -83,6 +82,10 @@ describe('Users Integration Tests', () => {
     await dataSource.query(
       `DELETE FROM "user" WHERE user_name = '${testUser.userName}'`,
     );
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('POST /users', () => {

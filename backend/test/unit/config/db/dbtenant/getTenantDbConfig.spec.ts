@@ -11,6 +11,10 @@ describe('getTenantDbConfig', () => {
   });
 
   afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
     process.env = OLD_ENV;
     jest.restoreAllMocks();
   });
@@ -53,11 +57,11 @@ describe('getTenantDbConfig', () => {
     process.env.TENANT_DB_IDLE_TIMEOUT = '5678';
     process.env.TENANT_DB_REAP_INTERVAL = '999';
     const config = getTenantDbConfig('myschema') as PostgresConnectionOptions;
-    expect((config.extra as any).max).toBe(10);
-    expect((config.extra as any).min).toBe(2);
-    expect((config.extra as any).acquireTimeoutMillis).toBe(1234);
-    expect((config.extra as any).idleTimeoutMillis).toBe(5678);
-    expect((config.extra as any).reapIntervalMillis).toBe(999);
+    expect(config.extra.max).toBe(10);
+    expect(config.extra.min).toBe(2);
+    expect(config.extra.acquireTimeoutMillis).toBe(1234);
+    expect(config.extra.idleTimeoutMillis).toBe(5678);
+    expect(config.extra.reapIntervalMillis).toBe(999);
   });
 
   it('cache config đúng', () => {

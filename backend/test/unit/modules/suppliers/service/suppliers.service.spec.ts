@@ -48,12 +48,16 @@ describe('SuppliersService', () => {
         SuppliersService,
         {
           provide: TenantDataSourceService,
-          useValue: setup.mockTenantDataSourceService,
+          useValue: { getTenantDataSource: jest.fn() },
         },
       ],
     }).compile();
 
     service = module.get<SuppliersService>(SuppliersService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   afterEach(async () => {

@@ -77,6 +77,10 @@ describe('StoresController', () => {
     storesService = module.get(StoresService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('create', () => {
     it('should create a store successfully', async () => {
       const createStoreDto: CreateStoreDto = {

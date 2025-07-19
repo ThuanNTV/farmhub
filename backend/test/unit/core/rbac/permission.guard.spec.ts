@@ -40,6 +40,10 @@ describe('PermissionGuard', () => {
     guard = new PermissionGuard(reflector);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('trả về true nếu không có permission yêu cầu', () => {
     (reflector.getAllAndOverride as jest.Mock).mockReturnValue([]);
     const ctx = mockContext(mockUser());
