@@ -221,7 +221,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   ): Promise<OrderItemResponseDto[]> {
     const repo = await this.getRepo(storeId);
     const orderItems = await repo.find({
-      where: { orderId: orderId, isDeleted: false },
+      where: { orderId, isDeleted: false },
       relations: ['product'],
       order: { createdAt: 'ASC' },
     });

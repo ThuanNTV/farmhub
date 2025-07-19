@@ -5,8 +5,10 @@ import * as DailyRotateFile from 'winston-daily-rotate-file';
 
 // Helper function to get log level based on environment
 export const getLogLevel = (): string => {
-  return process.env.LOG_LEVEL ??
-    (process.env.NODE_ENV === 'production' ? 'info' : 'debug');
+  return (
+    process.env.LOG_LEVEL ??
+    (process.env.NODE_ENV === 'production' ? 'info' : 'debug')
+  );
 };
 
 // Tạo transport cho file log với rotation
@@ -30,9 +32,7 @@ export const createFileTransport = (filename: string, level: string) => {
 export const winstonConfig = {
   level: getLogLevel(),
   format: winston.format.combine(
-    winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
-    }),
+    winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.colorize({ all: true }),
     winston.format.printf(({ timestamp, level, message, context, stack }) => {

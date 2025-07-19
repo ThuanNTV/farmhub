@@ -20,7 +20,7 @@ export class ExampleProductService {
     try {
       // Tạo product (giả lập)
       const newProduct = {
-        id: 'product-' + Date.now(),
+        id: `product-${Date.now()}`,
         ...productData,
         created_at: new Date(),
       };

@@ -19,59 +19,35 @@ export class AuthService {
   ): Promise<any> {
     const user =
       await this.usersService.findOneUsernameOrEmail(usernameOrEmail);
-    if (!user || !user.password_hash) {
-      if (
-        this['securityService'] &&
-        this['securityService'].recordFailedLoginAttempt &&
-        clientIP
-      )
+    if (!user?.password_hash) {
+      if (this['securityService']?.recordFailedLoginAttempt && clientIP)
         this['securityService'].recordFailedLoginAttempt(clientIP);
       return null;
     }
-    if (
-      this['securityService'] &&
-      this['securityService'].isLoginBlocked &&
-      clientIP
-    ) {
+    if (this['securityService']?.isLoginBlocked && clientIP) {
       if (this['securityService'].isLoginBlocked(clientIP)) {
         throw new UnauthorizedException();
       }
     }
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      if (
-        this['securityService'] &&
-        this['securityService'].recordFailedLoginAttempt &&
-        clientIP
-      )
+      if (this['securityService']?.recordFailedLoginAttempt && clientIP)
         this['securityService'].recordFailedLoginAttempt(clientIP);
       return null;
     }
     if (user.is_deleted) {
-      if (
-        this['securityService'] &&
-        this['securityService'].recordFailedLoginAttempt &&
-        clientIP
-      )
+      if (this['securityService']?.recordFailedLoginAttempt && clientIP)
         this['securityService'].recordFailedLoginAttempt(clientIP);
       throw new UnauthorizedException(
         'Tài khoản không hoạt động hoặc đã bị xoá',
       );
     }
     if (!user.is_active) {
-      if (
-        this['securityService'] &&
-        this['securityService'].recordFailedLoginAttempt &&
-        clientIP
-      )
+      if (this['securityService']?.recordFailedLoginAttempt && clientIP)
         this['securityService'].recordFailedLoginAttempt(clientIP);
       throw new UnauthorizedException();
     }
-    if (
-      this['securityService'] &&
-      this['securityService'].recordSuccessfulLogin &&
-      clientIP
-    )
+    if (this['securityService']?.recordSuccessfulLogin && clientIP)
       this['securityService'].recordSuccessfulLogin(clientIP);
     // Chuyển sang kiểu SafeUser
     return {
@@ -94,12 +70,7 @@ export class AuthService {
       email: user.email,
     };
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-    if (
-      clientIP &&
-      userAgent &&
-      this['securityService'] &&
-      this['securityService'].createSession
-    ) {
+    if (clientIP && userAgent && this['securityService']?.createSession) {
       this['securityService'].createSession(
         user.user_id || user.userId,
         sessionId,
@@ -118,7 +89,7 @@ export class AuthService {
   }
 
   async logout(token: string) {
-    if (this['securityService'] && this['securityService'].blacklistToken)
+    if (this['securityService']?.blacklistToken)
       this['securityService'].blacklistToken(token, 'User logout');
     return { message: 'Đăng xuất thành công' };
   }

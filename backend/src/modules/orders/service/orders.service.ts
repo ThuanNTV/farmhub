@@ -146,7 +146,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async findOne(storeId: string, orderId: string) {
     const repo = await this.getRepo(storeId);
     const order = await repo.findOne({
-      where: { orderId: orderId, isDeleted: false },
+      where: { orderId, isDeleted: false },
       relations: ['orderItems'],
     });
     if (!order) {
@@ -168,7 +168,7 @@ export class OrdersService extends TenantBaseService<Order> {
     // Find the order
     const order = await repo.findOne({
       where: {
-        orderId: orderId,
+        orderId,
         orderCode: dto.orderCode,
         isDeleted: false,
         status: OrderStatus.PENDING,
@@ -287,7 +287,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async restore(storeId: string, orderId: string) {
     const repo = await this.getRepo(storeId);
     const entity = await repo.findOne({
-      where: { orderId: orderId, isDeleted: true },
+      where: { orderId, isDeleted: true },
       relations: ['orderItems'],
     });
     if (!entity) {
@@ -395,7 +395,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async findByCustomer(storeId: string, customerId: string) {
     const repo = await this.getRepo(storeId);
     return await repo.find({
-      where: { customerId: customerId, isDeleted: false },
+      where: { customerId, isDeleted: false },
       relations: ['orderItems'],
     });
   }
@@ -404,7 +404,7 @@ export class OrdersService extends TenantBaseService<Order> {
     const repo = await this.getRepo(storeId);
     // Fetch the original order with items
     const original = await repo.findOne({
-      where: { orderId: orderId, isDeleted: false },
+      where: { orderId, isDeleted: false },
       relations: ['orderItems'],
     });
     if (!original) {
@@ -622,7 +622,7 @@ export class OrdersService extends TenantBaseService<Order> {
       for (const item of orderItems) {
         await this.auditTransactionService.logStockUpdate(
           userId,
-          (item as any).productId!,
+          (item as any).productId,
           -(item as any).quantity!,
           `Order creation: ${savedOrder.orderCode}`,
           manager,

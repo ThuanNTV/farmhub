@@ -87,7 +87,7 @@ async function testRedisSimple() {
     // Test cache statistics
     console.log('📊 Testing cache statistics...');
     const stats = await cacheService.getStats();
-    if (stats && stats.stats) {
+    if (stats?.stats) {
       console.log('\ud83d\udcc8 Cache Statistics:');
       console.log(`- Connected Clients: ${stats.stats.connected_clients}`);
       console.log(`- Used Memory: ${stats.stats.used_memory}`);

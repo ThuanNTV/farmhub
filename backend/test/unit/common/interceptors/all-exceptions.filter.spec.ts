@@ -51,7 +51,7 @@ describe('AllExceptionsFilter', () => {
 
   it('BadRequestException với message array', () => {
     const ex = new BadRequestException(['err1', 'err2']);
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -63,7 +63,7 @@ describe('AllExceptionsFilter', () => {
 
   it('BadRequestException với message string', () => {
     const ex = new BadRequestException('err');
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith({
       status: 'error',
@@ -75,7 +75,7 @@ describe('AllExceptionsFilter', () => {
 
   it('HttpException khác', () => {
     const ex = new HttpException('err', 403);
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(403);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -87,7 +87,7 @@ describe('AllExceptionsFilter', () => {
 
   it('Error thường', () => {
     const ex = new Error('fail');
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -99,7 +99,7 @@ describe('AllExceptionsFilter', () => {
 
   it('object lạ', () => {
     const ex = { foo: 1 };
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -112,7 +112,7 @@ describe('AllExceptionsFilter', () => {
   it('trả về debug khi NODE_ENV=development', () => {
     process.env.NODE_ENV = 'development';
     const ex = new HttpException('err', 400);
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ debug: expect.any(Object) }),
     );
@@ -122,7 +122,7 @@ describe('AllExceptionsFilter', () => {
   it('không trả về debug khi NODE_ENV!=development', () => {
     process.env.NODE_ENV = 'production';
     const ex = new HttpException('err', 400);
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.json).not.toHaveBeenCalledWith(
       expect.objectContaining({ debug: expect.any(Object) }),
     );
@@ -156,7 +156,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('exception là null', () => {
-    filter.catch(null, mockHost as any);
+    filter.catch(null, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
@@ -164,7 +164,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('exception là undefined', () => {
-    filter.catch(undefined, mockHost as any);
+    filter.catch(undefined, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
@@ -172,7 +172,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('exception là number', () => {
-    filter.catch(123, mockHost as any);
+    filter.catch(123, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
@@ -180,7 +180,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('exception là string', () => {
-    filter.catch('error string', mockHost as any);
+    filter.catch('error string', mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
@@ -188,7 +188,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('exception là boolean', () => {
-    filter.catch(true, mockHost as any);
+    filter.catch(true, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Lỗi hệ thống', code: 500 }),
@@ -198,7 +198,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   it('BadRequestException với getResponse trả về object không có message', () => {
     const ex = new BadRequestException();
     jest.spyOn(ex, 'getResponse').mockReturnValue({ foo: 'bar' });
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: ex.message, code: 400 }),
@@ -210,7 +210,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
       throw new Error('logger fail');
     });
     const ex = new Error('fail');
-    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
+    expect(() => filter.catch(ex, mockHost)).not.toThrow();
     expect(mockResponse.status).toHaveBeenCalledWith(500);
   });
 
@@ -223,7 +223,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
       }),
     };
     const ex = new Error('fail');
-    filter.catch(ex, mockHost as any);
+    filter.catch(ex, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
   });
 
@@ -232,7 +232,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
       throw new Error('status fail');
     });
     const ex = new Error('fail');
-    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
+    expect(() => filter.catch(ex, mockHost)).not.toThrow();
   });
 
   it('response.json throw error không làm crash filter', () => {
@@ -240,7 +240,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
       throw new Error('json fail');
     });
     const ex = new Error('fail');
-    expect(() => filter.catch(ex, mockHost as any)).not.toThrow();
+    expect(() => filter.catch(ex, mockHost)).not.toThrow();
   });
 });
 
@@ -269,7 +269,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('code 23505 trả về CONFLICT', () => {
-    filter.catch({ code: '23505' }, mockHost as any);
+    filter.catch({ code: '23505' }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Dữ liệu đã tồn tại' }),
@@ -277,7 +277,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('code 23503 trả về BAD_REQUEST', () => {
-    filter.catch({ code: '23503' }, mockHost as any);
+    filter.catch({ code: '23503' }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Dữ liệu tham chiếu không tồn tại' }),
@@ -285,7 +285,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('code 23502 trả về BAD_REQUEST', () => {
-    filter.catch({ code: '23502' }, mockHost as any);
+    filter.catch({ code: '23502' }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Thiếu thông tin bắt buộc' }),
@@ -293,7 +293,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('code ECONNREFUSED trả về SERVICE_UNAVAILABLE', () => {
-    filter.catch({ code: 'ECONNREFUSED' }, mockHost as any);
+    filter.catch({ code: 'ECONNREFUSED' }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(
       HttpStatus.SERVICE_UNAVAILABLE,
     );
@@ -303,7 +303,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('code khác trả về INTERNAL_SERVER_ERROR', () => {
-    filter.catch({ code: '999', message: 'err' }, mockHost as any);
+    filter.catch({ code: '999', message: 'err' }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
@@ -313,7 +313,7 @@ describe('DatabaseExceptionFilter', () => {
   });
 
   it('object không code trả về INTERNAL_SERVER_ERROR', () => {
-    filter.catch({ foo: 1 }, mockHost as any);
+    filter.catch({ foo: 1 }, mockHost);
     expect(mockResponse.status).toHaveBeenCalledWith(
       HttpStatus.INTERNAL_SERVER_ERROR,
     );

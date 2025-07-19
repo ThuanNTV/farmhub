@@ -157,8 +157,8 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
     const repo = await this.getRepo(storeId);
     const existing = await repo.findOne({
       where: {
-        stockTransferId: stockTransferId,
-        productId: productId,
+        stockTransferId,
+        productId,
         isDeleted: false,
       },
     });

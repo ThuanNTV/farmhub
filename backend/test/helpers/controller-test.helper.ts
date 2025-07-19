@@ -301,20 +301,20 @@ export class ControllerTestPatterns {
       testValidation: () => {
         describe(`${methodName} validation`, () => {
           it('should accept valid DTO', async () => {
-            (service as any)[methodName].mockResolvedValue({});
+            service[methodName].mockResolvedValue({});
 
             await expect(
-              (controller as any)[methodName](storeId, validDto),
+              controller[methodName](storeId, validDto),
             ).resolves.not.toThrow();
           });
 
           invalidDtos.forEach(({ dto, expectedError }, index) => {
             it(`should reject invalid DTO case ${index + 1}`, async () => {
               const error = new Error(expectedError);
-              (service as any)[methodName].mockRejectedValue(error);
+              service[methodName].mockRejectedValue(error);
 
               await expect(
-                (controller as any)[methodName](storeId, dto),
+                controller[methodName](storeId, dto),
               ).rejects.toThrow(expectedError);
             });
           });

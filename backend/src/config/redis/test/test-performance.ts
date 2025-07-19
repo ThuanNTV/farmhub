@@ -237,7 +237,7 @@ class PerformanceTester {
 
     try {
       const stats = await this.cacheService.getStats();
-      if (stats && stats.stats) {
+      if (stats?.stats) {
         console.log('Redis Statistics:');
         console.log(`- Connected Clients: ${stats.stats.connected_clients}`);
         console.log(`- Used Memory: ${stats.stats.used_memory}`);

@@ -33,13 +33,13 @@ export class PrintingService {
     const customerRepo = ds.getRepository(Customer);
 
     const order = (await orderRepo.findOne({
-      where: { orderId: orderId, isDeleted: false },
+      where: { orderId, isDeleted: false },
       relations: ['customer', 'payment_method'],
     })) as Order;
 
     // Get order items
     const orderItems: OrderItem[] = await orderItemRepo.find({
-      where: { orderId: orderId, isDeleted: false },
+      where: { orderId, isDeleted: false },
       relations: ['product'],
     });
 

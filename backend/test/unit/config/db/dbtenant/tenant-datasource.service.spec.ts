@@ -386,7 +386,7 @@ describe('TenantDataSourceService', () => {
 
 afterAll(() => {
   // Đảm bảo biến service đã được khai báo ở scope ngoài
-  if ((global as any).service && (global as any).service.cleanupInterval) {
+  if ((global as any).service?.cleanupInterval) {
     clearInterval((global as any).service.cleanupInterval);
   }
 });

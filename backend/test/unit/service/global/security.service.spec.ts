@@ -266,7 +266,7 @@ describe('SecurityService', () => {
       // Note: In real scenario, this would happen via setInterval
       // For testing, we'll just verify the logic
       const attempts = (service as any).failedLoginAttempts.get(identifier);
-      if (attempts && attempts.blockedUntil) {
+      if (attempts?.blockedUntil) {
         attempts.blockedUntil = Date.now() - 1000; // Set to past time
       }
 

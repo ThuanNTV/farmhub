@@ -361,7 +361,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(mockOrder);
       expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { orderId: orderId, isDeleted: false },
+        where: { orderId, isDeleted: false },
         relations: ['orderItems'],
       });
     });
@@ -614,7 +614,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { customerId: customerId, isDeleted: false },
+        where: { customerId, isDeleted: false },
         relations: ['orderItems'],
       });
     });
