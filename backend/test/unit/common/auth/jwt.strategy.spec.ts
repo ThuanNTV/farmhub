@@ -1,4 +1,4 @@
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 import { JwtStrategy } from '../../../../src/common/auth/jwt.strategy';
 
 describe('JwtStrategy', () => {

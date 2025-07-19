@@ -1,4 +1,4 @@
-import { UserRole } from '../../../src/modules/users/dto/create-user.dto';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
 
 export const userFixtures = {
   admin: {

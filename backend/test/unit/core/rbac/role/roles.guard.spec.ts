@@ -1,7 +1,7 @@
-import { RolesGuard } from 'src/core/rbac/role/roles.guard';
+import { RolesGuard } from '@core/rbac/role/roles.guard';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContext } from '@nestjs/common';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { CreateUserDto, UserRole } from '@modules/users/dto/create-user.dto';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;

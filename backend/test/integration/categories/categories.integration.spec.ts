@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { CategoriesService } from '../../../src/service/categories.service';
 import { Category } from '../../../src/entities/tenant/category.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { TenantDatabaseModule } from '../../../src/config/db/dbtenant/tenant-database.module';
-import { CategoriesModule } from '../../../src/modules/categories.module';
 import { TenantDataSourceService } from '../../../src/config/db/dbtenant/tenant-datasource.service';
 import { InternalServerErrorException } from '@nestjs/common';
+import { CategoriesService } from '../../../src/modules/categories/service/categories.service';
+import { CategoriesModule } from '../../../src/modules/categories/categories.module';
+import { TenantDatabaseModule } from '../../../src/config/db/dbtenant/tenant-database.module';
 
 describe('CategoriesService Integration', () => {
   let app: INestApplication;

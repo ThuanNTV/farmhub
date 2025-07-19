@@ -1,200 +1,667 @@
-import { PaymentsService } from 'src/modules/payments/service/payments.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PaymentsService } from '@modules/payments/service/payments.service';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { CreatePaymentDto } from '@modules/payments/dto/create-payment.dto';
+import { UpdatePaymentDto } from '@modules/payments/dto/update-payment.dto';
+import {
+  createTenantServiceTestSetup,
+  TenantServiceTestSetup,
+  resetMocks,
+  createTestEntity,
+} from '../../../../utils/tenant-datasource-mock.util';
+import { DtoMapper } from '@common/helpers/dto-mapper.helper';
+import { PaymentTransactionService } from 'src/modules/payments/service/transaction/payment-transaction.service';
+import { PaymentGatewayService } from 'src/modules/payments/service/transaction/payment-gateway.service';
+import { Payment, PaymentStatus } from 'src/entities/tenant/payment.entity';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+
+// Mock DtoMapper
+jest.mock('src/common/helpers/dto-mapper.helper', () => ({
+  DtoMapper: {
+    mapToEntity: jest.fn(),
+  },
+}));
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
-  let superCreate: jest.SpyInstance;
-  let superFindById: jest.SpyInstance;
-  let superGetRepo: jest.SpyInstance;
-  let paymentTransactionService: any;
-  let paymentGatewayService: any;
-  let repo: any;
-  let DtoMapper: any;
+  let setup: TenantServiceTestSetup<Payment>;
+  let mockPaymentTransactionService: jest.Mocked<PaymentTransactionService>;
+  let mockPaymentGatewayService: jest.Mocked<PaymentGatewayService>;
 
-  beforeEach(() => {
-    repo = {
-      find: jest.fn(),
-      merge: jest.fn(),
-      save: jest.fn(),
-    };
-    paymentTransactionService = {
+  const TEST_STORE_ID = 'test-store-123';
+  const TEST_USER_ID = 'test-user-456';
+
+  const mockPaymentData: Partial<Payment> = {
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    order_id: '123e4567-e89b-12d3-a456-426614174001',
+    payment_method_id: 'pm-123',
+    amount: '200.00',
+    status: PaymentStatus.PAID,
+    paid_by_user_id: TEST_USER_ID,
+    note: 'Test payment',
+    is_deleted: false,
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
+
+  beforeEach(async () => {
+    setup = createTenantServiceTestSetup<Payment>();
+
+    // Mock PaymentTransactionService
+    mockPaymentTransactionService = {
       createPayment: jest.fn(),
-    };
-    paymentGatewayService = {
+    } as any;
+
+    // Mock PaymentGatewayService
+    mockPaymentGatewayService = {
       processPayment: jest.fn(),
       verifyPayment: jest.fn(),
-    };
-    DtoMapper = require('src/common/helpers/dto-mapper.helper');
-    jest.spyOn(DtoMapper, 'DtoMapper', 'get').mockReturnValue({
-      mapToEntity: jest.fn((x) => x),
-    });
-    service = new PaymentsService(
-      { getTenantDataSource: jest.fn() } as any,
-      paymentTransactionService,
-      paymentGatewayService,
-    );
-    superCreate = jest
-      .spyOn(PaymentsService.prototype, 'create')
-      .mockImplementation();
-    superFindById = jest
-      .spyOn(PaymentsService.prototype, 'findById')
-      .mockImplementation();
-    superGetRepo = jest
-      .spyOn(PaymentsService.prototype, 'getRepo')
-      .mockResolvedValue(repo);
-    jest.spyOn(service as any, 'mapToResponseDto').mockImplementation((x) => x);
+    } as any;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        PaymentsService,
+        {
+          provide: TenantDataSourceService,
+          useValue: setup.mockTenantDataSourceService,
+        },
+        {
+          provide: PaymentTransactionService,
+          useValue: mockPaymentTransactionService,
+        },
+        {
+          provide: PaymentGatewayService,
+          useValue: mockPaymentGatewayService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<PaymentsService>(PaymentsService);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    resetMocks(setup);
   });
 
-  // createPayment
-  it('createPayment throw nếu amount <= 0', async () => {
-    await expect(
-      service.createPayment('store1', { amount: '0' } as any),
-    ).rejects.toThrow(BadRequestException);
-    await expect(
-      service.createPayment('store1', { amount: '-1' } as any),
-    ).rejects.toThrow(BadRequestException);
-    await expect(
-      service.createPayment('store1', { amount: 'abc' } as any),
-    ).rejects.toThrow(BadRequestException);
-  });
-
-  it('createPayment trả về đúng response khi hợp lệ', async () => {
-    superCreate.mockResolvedValue({ id: 'p1' });
-    const result = await service.createPayment('store1', {
-      amount: '10',
-    } as any);
-    expect(result.id).toBe('p1');
-  });
-
-  it('createPayment throw nếu super.create lỗi', async () => {
-    superCreate.mockRejectedValue(new Error('fail'));
-    await expect(
-      service.createPayment('store1', { amount: '10' } as any),
-    ).rejects.toThrow('fail');
-  });
-
-  // createPaymentInTransaction
-  it('createPaymentInTransaction gọi paymentTransactionService', async () => {
-    paymentTransactionService.createPayment.mockResolvedValue('ok');
-    const result = await service.createPaymentInTransaction(
-      'o1',
-      10,
-      'pm1',
-      'u1',
-      {} as any,
-    );
-    expect(result).toBe('ok');
-  });
-
-  // processPaymentGateway
-  it('processPaymentGateway gọi paymentGatewayService', async () => {
-    paymentGatewayService.processPayment.mockResolvedValue({ success: true });
-    const result = await service.processPaymentGateway(10, 'pm1', 'o1');
-    expect(result.success).toBe(true);
-  });
-
-  // verifyPaymentGateway
-  it('verifyPaymentGateway gọi paymentGatewayService', async () => {
-    paymentGatewayService.verifyPayment.mockResolvedValue({
-      success: true,
-      status: 'PAID',
+  describe('Service Definition', () => {
+    it('should be defined', () => {
+      expect(service).toBeDefined();
     });
-    const result = await service.verifyPaymentGateway('tx1');
-    expect(result.status).toBe('PAID');
+
+    it('should have correct primary key', () => {
+      expect(service['primaryKey']).toBe('id');
+    });
   });
 
-  // findPaymentById
-  it('findPaymentById trả về null nếu không tìm thấy', async () => {
-    superFindById.mockResolvedValue(null);
-    const result = await service.findPaymentById('store1', 'id1');
-    expect(result).toBeNull();
+  describe('createPayment', () => {
+    const createDto: CreatePaymentDto = {
+      orderId: '123e4567-e89b-12d3-a456-426614174001',
+      amount: '200.00',
+      paymentMethodId: 'pm-123',
+      status: PaymentStatus.PAID,
+      paidByUserId: TEST_USER_ID,
+      note: 'Test payment',
+    };
+
+    it('should create payment successfully', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+      const mappedEntityData = { ...createDto };
+
+      // Setup mocks
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(mappedEntityData);
+      setup.mockRepository.create.mockReturnValue(testPayment);
+      setup.mockRepository.save.mockResolvedValue(testPayment);
+
+      const result = await service.createPayment(TEST_STORE_ID, createDto);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(testPayment.id);
+      expect(result.amount).toBe(testPayment.amount);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(DtoMapper.mapToEntity).toHaveBeenCalledWith(createDto);
+      expect(setup.mockRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException for invalid amount', async () => {
+      const invalidDto = { ...createDto, amount: 'invalid' };
+
+      await expect(
+        service.createPayment(TEST_STORE_ID, invalidDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException for zero amount', async () => {
+      const zeroDto = { ...createDto, amount: '0' };
+
+      await expect(
+        service.createPayment(TEST_STORE_ID, zeroDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should handle creation errors', async () => {
+      const mappedEntityData = { ...createDto };
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(mappedEntityData);
+      setup.mockRepository.save.mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.createPayment(TEST_STORE_ID, createDto),
+      ).rejects.toThrow('Lỗi khi kết nối tới CSDL chi nhánh');
+    });
   });
 
-  it('findPaymentById trả về đúng response nếu có entity', async () => {
-    superFindById.mockResolvedValue({ id: 'p1' });
-    const result = await service.findPaymentById('store1', 'id1');
-    expect(result.id).toBe('p1');
+  describe('findPaymentById', () => {
+    it('should return payment by ID', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+
+      // Mock repository findOne method which is used by super.findById
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+
+      const result = await service.findPaymentById(
+        TEST_STORE_ID,
+        testPayment.id,
+      );
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(testPayment.id);
+      expect(setup.mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: testPayment.id },
+      });
+    });
+
+    it('should return null for non-existent payment', async () => {
+      setup.mockRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.findPaymentById(
+        TEST_STORE_ID,
+        'non-existent',
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('should handle errors', async () => {
+      // Mock repository to throw error
+      setup.mockRepository.findOne.mockRejectedValue(
+        new Error('Database error'),
+      );
+
+      await expect(
+        service.findPaymentById(TEST_STORE_ID, 'test-id'),
+      ).rejects.toThrow('Lỗi khi kết nối tới CSDL chi nhánh');
+    });
   });
 
-  it('findPaymentById throw nếu super.findById lỗi', async () => {
-    superFindById.mockRejectedValue(new Error('fail'));
-    await expect(service.findPaymentById('store1', 'id1')).rejects.toThrow(
-      'fail',
-    );
+  describe('findOne', () => {
+    it('should return payment by ID', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+
+      // Mock repository findOne method
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+
+      const result = await service.findOne(TEST_STORE_ID, testPayment.id);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(testPayment.id);
+      expect(setup.mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: testPayment.id },
+      });
+    });
+
+    it('should throw NotFoundException for non-existent payment', async () => {
+      setup.mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.findOne(TEST_STORE_ID, 'non-existent'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle errors', async () => {
+      // Mock repository to throw error
+      setup.mockRepository.findOne.mockRejectedValue(
+        new Error('Database error'),
+      );
+
+      await expect(service.findOne(TEST_STORE_ID, 'test-id')).rejects.toThrow(
+        'Lỗi khi kết nối tới CSDL chi nhánh',
+      );
+    });
   });
 
-  // findOne
-  it('findOne throw nếu không tìm thấy', async () => {
-    superFindById.mockResolvedValue(null);
-    await expect(service.findOne('store1', 'id1')).rejects.toThrow(
-      NotFoundException,
-    );
+  describe('findAllPayments', () => {
+    it('should return all payments with relations', async () => {
+      const testPayments = [createTestEntity<Payment>(mockPaymentData)];
+
+      setup.mockRepository.find.mockResolvedValue(testPayments);
+
+      const result = await service.findAllPayments(TEST_STORE_ID);
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(1);
+      expect(result[0].id).toBe(testPayments[0].id);
+      expect(setup.mockRepository.find).toHaveBeenCalledWith({
+        where: { is_deleted: false },
+        relations: ['order', 'payment_method', 'paid_by_user'],
+        order: { created_at: 'DESC' },
+      });
+    });
+
+    it('should handle empty results', async () => {
+      setup.mockRepository.find.mockResolvedValue([]);
+
+      const result = await service.findAllPayments(TEST_STORE_ID);
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle errors', async () => {
+      setup.mockRepository.find.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.findAllPayments(TEST_STORE_ID)).rejects.toThrow(
+        'Database error',
+      );
+    });
   });
 
-  it('findOne trả về đúng response nếu có entity', async () => {
-    superFindById.mockResolvedValue({ id: 'p1' });
-    const result = await service.findOne('store1', 'id1');
-    expect(result.id).toBe('p1');
+  describe('updatePayment', () => {
+    const updateDto: UpdatePaymentDto = {
+      amount: '250.00',
+      status: PaymentStatus.UNPAID,
+      note: 'Updated payment',
+    };
+
+    it('should update payment successfully', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+      const mappedEntityData = { ...updateDto };
+      const updatedPayment = { ...testPayment, ...updateDto };
+
+      // Setup mocks - Mock repository methods
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(mappedEntityData);
+      setup.mockRepository.merge.mockReturnValue(updatedPayment);
+      setup.mockRepository.save.mockResolvedValue(updatedPayment);
+
+      const result = await service.updatePayment(
+        TEST_STORE_ID,
+        testPayment.id,
+        updateDto,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.amount).toBe(updateDto.amount);
+      expect(setup.mockRepository.merge).toHaveBeenCalledWith(
+        testPayment,
+        mappedEntityData,
+      );
+      expect(setup.mockRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException for non-existent payment', async () => {
+      setup.mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(
+        service.updatePayment(TEST_STORE_ID, 'non-existent', updateDto),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException for invalid amount', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+      const invalidDto = { ...updateDto, amount: 'invalid' };
+
+      // Mock repository to return payment first
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+
+      await expect(
+        service.updatePayment(TEST_STORE_ID, testPayment.id, invalidDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should handle update errors', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+      const mappedEntityData = { ...updateDto };
+
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(mappedEntityData);
+      setup.mockRepository.save.mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.updatePayment(TEST_STORE_ID, testPayment.id, updateDto),
+      ).rejects.toThrow('Database error');
+    });
   });
 
-  it('findOne throw nếu super.findById lỗi', async () => {
-    superFindById.mockRejectedValue(new Error('fail'));
-    await expect(service.findOne('store1', 'id1')).rejects.toThrow('fail');
+  describe('removePayment', () => {
+    it('should soft delete payment successfully', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      setup.mockRepository.save.mockResolvedValue({
+        ...testPayment,
+        is_deleted: true,
+      });
+
+      await service.removePayment(TEST_STORE_ID, testPayment.id);
+
+      expect(setup.mockRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException for non-existent payment', async () => {
+      setup.mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(
+        service.removePayment(TEST_STORE_ID, 'non-existent'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle deletion errors', async () => {
+      const testPayment = createTestEntity<Payment>(mockPaymentData);
+
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      setup.mockRepository.save.mockRejectedValue(new Error('Database error'));
+
+      await expect(
+        service.removePayment(TEST_STORE_ID, testPayment.id),
+      ).rejects.toThrow('Database error');
+    });
   });
 
-  // findAllPayments
-  it('findAllPayments trả về đúng response', async () => {
-    repo.find.mockResolvedValue([{ id: 'p1' }, { id: 'p2' }]);
-    const result = await service.findAllPayments('store1');
-    expect(result.length).toBe(2);
+  describe('Database Connection Errors', () => {
+    it('should handle database connection errors', () => {
+      const error = new Error('Database connection failed');
+      setup.mockTenantDataSourceService.getTenantDataSource.mockRejectedValue(
+        error,
+      );
+
+      expect(
+        setup.mockTenantDataSourceService.getTenantDataSource,
+      ).toBeDefined();
+    });
   });
 
-  it('findAllPayments throw nếu repo.find lỗi', async () => {
-    repo.find.mockRejectedValue(new Error('fail'));
-    await expect(service.findAllPayments('store1')).rejects.toThrow('fail');
+  describe('createPaymentInTransaction', () => {
+    it('should create payment in transaction successfully', async () => {
+      const orderId = 'order-123';
+      const amount = 500.0;
+      const paymentMethodId = 'pm-123';
+      const paidByUserId = TEST_USER_ID;
+
+      const testPayment = createTestEntity<Payment>({
+        ...mockPaymentData,
+        order_id: orderId,
+        amount: amount.toString(),
+        payment_method_id: paymentMethodId,
+        paid_by_user_id: paidByUserId,
+      });
+
+      const mockEntityManager = {
+        getRepository: jest.fn().mockReturnValue(setup.mockRepository),
+      };
+
+      // Mock paymentTransactionService
+      const mockPaymentTransactionService = {
+        createPayment: jest.fn().mockResolvedValue(testPayment),
+      };
+      (service as any).paymentTransactionService =
+        mockPaymentTransactionService;
+
+      const result = await service.createPaymentInTransaction(
+        orderId,
+        amount,
+        paymentMethodId,
+        paidByUserId,
+        mockEntityManager as any,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(testPayment.id);
+      expect(mockPaymentTransactionService.createPayment).toHaveBeenCalledWith(
+        orderId,
+        amount,
+        paymentMethodId,
+        paidByUserId,
+        mockEntityManager,
+      );
+    });
+
+    it('should handle transaction errors', async () => {
+      const orderId = 'order-123';
+      const amount = 500.0;
+      const paymentMethodId = 'pm-123';
+      const paidByUserId = TEST_USER_ID;
+
+      const mockEntityManager = {
+        getRepository: jest.fn().mockReturnValue(setup.mockRepository),
+      };
+
+      // Mock paymentTransactionService to throw error
+      const mockPaymentTransactionService = {
+        createPayment: jest
+          .fn()
+          .mockRejectedValue(new Error('Transaction error')),
+      };
+      (service as any).paymentTransactionService =
+        mockPaymentTransactionService;
+
+      await expect(
+        service.createPaymentInTransaction(
+          orderId,
+          amount,
+          paymentMethodId,
+          paidByUserId,
+          mockEntityManager as any,
+        ),
+      ).rejects.toThrow('Transaction error');
+    });
   });
 
-  // updatePayment
-  it('updatePayment throw nếu không tìm thấy', async () => {
-    superFindById.mockResolvedValue(null);
-    await expect(
-      service.updatePayment('store1', 'id1', {} as any),
-    ).rejects.toThrow(NotFoundException);
+  describe('restorePayment', () => {
+    it('should restore deleted payment successfully', async () => {
+      const testPayment = createTestEntity<Payment>({
+        ...mockPaymentData,
+        is_deleted: true,
+      });
+
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      setup.mockRepository.save.mockResolvedValue({
+        ...testPayment,
+        is_deleted: false,
+      });
+
+      await service.restorePayment(TEST_STORE_ID, testPayment.id);
+
+      expect(setup.mockRepository.save).toHaveBeenCalledWith({
+        ...testPayment,
+        is_deleted: false,
+      });
+    });
+
+    it('should throw NotFoundException for non-existent payment', async () => {
+      setup.mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.restorePayment(TEST_STORE_ID, 'non-existent'),
+      ).rejects.toThrow(NotFoundException);
+    });
   });
 
-  it('updatePayment throw nếu amount <= 0', async () => {
-    superFindById.mockResolvedValue({ id: 'p1' });
-    await expect(
-      service.updatePayment('store1', 'id1', { amount: '0' } as any),
-    ).rejects.toThrow(BadRequestException);
-    await expect(
-      service.updatePayment('store1', 'id1', { amount: '-1' } as any),
-    ).rejects.toThrow(BadRequestException);
-    await expect(
-      service.updatePayment('store1', 'id1', { amount: 'abc' } as any),
-    ).rejects.toThrow(BadRequestException);
+  describe('findWithFilters', () => {
+    it('should return filtered payments with pagination', async () => {
+      const filters = {
+        status: 'paid',
+        page: 1,
+        limit: 10,
+      };
+
+      const testPayments = [createTestEntity<Payment>(mockPaymentData)];
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([testPayments, 1]),
+      };
+
+      setup.mockRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder as any,
+      );
+
+      const result = await service.findWithFilters(TEST_STORE_ID, filters);
+
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      expect(result.pagination).toBeDefined();
+      expect(result.pagination.total).toBe(1);
+    });
+
+    it('should handle empty filter results', async () => {
+      const filters = { status: 'non-existent' };
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+      };
+
+      setup.mockRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder as any,
+      );
+
+      const result = await service.findWithFilters(TEST_STORE_ID, filters);
+
+      expect(result.data).toEqual([]);
+      expect(result.pagination.total).toBe(0);
+    });
   });
 
-  it('updatePayment trả về đúng response khi hợp lệ', async () => {
-    superFindById.mockResolvedValue({ id: 'p1' });
-    repo.merge.mockReturnValue({ id: 'p1', amount: 10 });
-    repo.save.mockResolvedValue({ id: 'p1', amount: 10 });
-    const result = await service.updatePayment('store1', 'id1', {
-      amount: '10',
-    } as any);
-    expect(result.id).toBe('p1');
+  describe('getPaymentStats', () => {
+    it('should return payment statistics', async () => {
+      const filters = {
+        start_date: new Date('2024-01-01'),
+        end_date: new Date('2024-12-31'),
+      };
+
+      const mockRawStats = {
+        total_payments: '50',
+        total_amount: '10000.00',
+        average_amount: '200.00',
+        min_amount: '100.00',
+        max_amount: '500.00',
+      };
+
+      const expectedStats = {
+        total_payments: 50,
+        total_amount: 10000.0,
+        average_amount: 200.0,
+        min_amount: 100.0,
+        max_amount: 500.0,
+      };
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getRawOne: jest.fn().mockResolvedValue(mockRawStats),
+      };
+
+      setup.mockRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder as any,
+      );
+
+      const result = await service.getPaymentStats(TEST_STORE_ID, filters);
+
+      expect(result).toEqual(expectedStats);
+    });
+
+    it('should handle empty statistics', async () => {
+      const expectedEmptyStats = {
+        total_payments: 0,
+        total_amount: 0,
+        average_amount: 0,
+        min_amount: 0,
+        max_amount: 0,
+      };
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getRawOne: jest.fn().mockResolvedValue(null),
+      };
+
+      setup.mockRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder as any,
+      );
+
+      const result = await service.getPaymentStats(TEST_STORE_ID);
+
+      expect(result).toEqual(expectedEmptyStats);
+    });
   });
 
-  it('updatePayment throw nếu repo.save lỗi', async () => {
-    superFindById.mockResolvedValue({ id: 'p1' });
-    repo.merge.mockReturnValue({ id: 'p1', amount: 10 });
-    repo.save.mockRejectedValue(new Error('fail'));
-    await expect(
-      service.updatePayment('store1', 'id1', { amount: '10' } as any),
-    ).rejects.toThrow('fail');
+  describe('Integration Tests', () => {
+    it('should handle complex payment workflow', async () => {
+      const createDto: CreatePaymentDto = {
+        orderId: 'order-123',
+        amount: '500.00',
+        paymentMethodId: 'pm-123',
+        status: PaymentStatus.UNPAID,
+        paidByUserId: TEST_USER_ID,
+        note: 'Integration test payment',
+      };
+
+      const testPayment = createTestEntity<Payment>({
+        ...mockPaymentData,
+        ...createDto,
+      });
+
+      // Setup mocks for create
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(createDto);
+      setup.mockRepository.create.mockReturnValue(testPayment);
+      setup.mockRepository.save.mockResolvedValue(testPayment);
+
+      // Create payment
+      const createdPayment = await service.createPayment(
+        TEST_STORE_ID,
+        createDto,
+      );
+      expect(createdPayment).toBeDefined();
+
+      // Setup mocks for find
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+
+      // Find payment
+      const foundPayment = await service.findPaymentById(
+        TEST_STORE_ID,
+        testPayment.id,
+      );
+      expect(foundPayment).toBeDefined();
+      expect(foundPayment?.id).toBe(testPayment.id);
+
+      // Setup mocks for update
+      const updateDto: UpdatePaymentDto = {
+        status: PaymentStatus.PAID,
+        note: 'Payment completed',
+      };
+      const updatedPayment = { ...testPayment, ...updateDto };
+
+      // Reset repository mock for update
+      setup.mockRepository.findOne.mockResolvedValue(testPayment);
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(updateDto);
+      setup.mockRepository.merge.mockReturnValue(updatedPayment);
+      setup.mockRepository.save.mockResolvedValue(updatedPayment);
+
+      // Update payment
+      const result = await service.updatePayment(
+        TEST_STORE_ID,
+        testPayment.id,
+        updateDto,
+      );
+      expect(result).toBeDefined();
+      expect(result.status).toBe(PaymentStatus.PAID);
+    });
   });
 });

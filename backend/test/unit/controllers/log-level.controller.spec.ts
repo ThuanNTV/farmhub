@@ -1,6 +1,6 @@
-import { LogLevelController } from 'src/controllers/log-level.controller';
-import { LogLevelService } from 'src/utils/log-level.service';
-import { ChangeLogLevelDto } from 'src/controllers/log-level.controller';
+import { LogLevelController } from '../../../src/controllers/log-level.controller';
+import { LogLevelService } from '../../../src/utils/log-level.service';
+import { ChangeLogLevelDto } from '../../../src/controllers/log-level.controller';
 
 describe('LogLevelController', () => {
   let controller: LogLevelController;

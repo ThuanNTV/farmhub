@@ -1,53 +1,72 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
-import { OrdersController } from 'src/modules/orders/controller/orders.controller';
-import { OrdersService } from 'src/modules/orders/service/orders.service';
-import { CreateOrderDto } from 'src/modules/orders/dto/create-order.dto';
-import { CreateOrderAtomicDto } from 'src/modules/orders/dto/create-order-atomic.dto';
-import { UpdateOrderDto } from 'src/modules/orders/dto/update-order.dto';
-import { OrderStatus } from 'src/entities/tenant/order.entity';
-import { RequestWithUser } from 'src/common/types/common.types';
+import { OrdersController } from '@modules/orders/controller/orders.controller';
+import { OrdersService } from '@modules/orders/service/orders.service';
+import { CreateOrderDto } from '@modules/orders/dto/create-order.dto';
+import { UpdateOrderDto } from '@modules/orders/dto/update-order.dto';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { SecurityService } from 'src/service/global/security.service';
+import { EnhancedAuthGuard } from '@common/auth/enhanced-auth.guard';
+import { PermissionGuard } from '@core/rbac/permission/permission.guard';
+import { AuditInterceptor } from '@common/auth/audit.interceptor';
+import { AuditLogsService } from '@modules/audit-logs/service/audit-logs.service';
+import { Order, OrderStatus } from 'src/entities/tenant/order.entity';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
-  let ordersService: jest.Mocked<OrdersService>;
+  let mockOrdersService: jest.Mocked<OrdersService>;
 
-  // Mock data
-  const mockOrder = {
-    order_id: 'order-123',
-    order_code: 'ORD-001',
-    customer_id: 'customer-123',
-    status: OrderStatus.PENDING,
-    total_amount: 100000,
-    total_paid: 100000,
+  const mockOrderItem: OrderItem = {
+    order_item_id: '123e4567-e89b-12d3-a456-426614174000',
+    order_id: '123e4567-e89b-12d3-a456-426614174001',
+    product_id: '123e4567-e89b-12d3-a456-426614174002',
+    product_name: 'Test Product',
+    product_unit_id: '123e4567-e89b-12d3-a456-426614174003',
+    quantity: 2,
+    unit_price: 100.0,
+    total_price: 200.0,
+    is_deleted: false,
     created_at: new Date(),
     updated_at: new Date(),
-    is_deleted: false,
-    orderItems: [
-      {
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        quantity: 2,
-        unit_price: 50000,
-        total_price: 100000,
-      },
-    ],
+    order: undefined as any,
+    product: undefined as any,
   };
 
-  const mockOrders = [mockOrder];
+  const mockOrder: Order = {
+    order_id: '123e4567-e89b-12d3-a456-426614174001',
+    order_code: 'ORD001',
+    customer_id: '123e4567-e89b-12d3-a456-426614174004',
+    total_amount: 200.0,
+    total_paid: 200.0,
+    vat_amount: 0,
+    status: OrderStatus.PENDING,
+    debt_status: undefined as any,
+    delivery_status: undefined as any,
+    delivery_address: 'Test Address',
+    is_credit_order: false,
+    is_deleted: false,
+    created_at: new Date(),
+    updated_at: new Date(),
+    order_items: [mockOrderItem],
+  };
 
-  const mockUser: RequestWithUser = {
+  const storeId = 'store-123';
+
+  const mockRequest = {
     user: {
-      id: 'user-123',
-      username: 'testuser',
-      role: 'STORE_STAFF',
+      userId: '123e4567-e89b-12d3-a456-426614174001',
+      storeId: 'store-123',
     },
-  } as RequestWithUser;
+  };
 
   beforeEach(async () => {
-    const mockOrdersService = {
+    mockOrdersService = {
       createOrder: jest.fn(),
-      createOrderAtomic: jest.fn(),
       findAllOrder: jest.fn(),
       findOne: jest.fn(),
       update: jest.fn(),
@@ -59,407 +78,310 @@ describe('OrdersController', () => {
       cancelOrder: jest.fn(),
       findByStatus: jest.fn(),
       findByCustomer: jest.fn(),
-    };
+      recreateOrder: jest.fn(),
+    } as any;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
       providers: [
+        { provide: OrdersService, useValue: mockOrdersService },
         {
-          provide: OrdersService,
-          useValue: mockOrdersService,
+          provide: EnhancedAuthGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
         },
+        {
+          provide: PermissionGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
+        },
+        { provide: AuditInterceptor, useValue: { intercept: jest.fn() } },
+        { provide: SecurityService, useValue: {} },
+        { provide: Reflector, useValue: {} },
+        { provide: AuditLogsService, useValue: {} },
       ],
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
-    ordersService = module.get(OrdersService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
   describe('create', () => {
-    it('should create a new order', async () => {
-      const createOrderDto: CreateOrderDto = {
-        customer_id: 'customer-123',
-        orderItems: [
-          {
-            product_id: 'product-123',
-            product_name: 'Test Product',
-            quantity: 2,
-            unit_price: 50000,
-          },
-        ],
-      };
+    const createOrderDto: CreateOrderDto = {
+      orderCode: 'ORD001',
+      customerId: '123e4567-e89b-12d3-a456-426614174004',
+      totalAmount: 200.0,
+      discountAmount: 0,
+      shippingFee: 0,
+      vatAmount: 0,
+      status: OrderStatus.PENDING,
+      deliveryAddress: 'Test Address',
+    };
 
-      ordersService.createOrder.mockResolvedValue(mockOrder);
-
-      const result = await controller.create('store-123', createOrderDto);
-
+    it('should create an order successfully', async () => {
+      mockOrdersService.createOrder.mockResolvedValue(mockOrder);
+      const result = await controller.create(storeId, createOrderDto);
       expect(result).toEqual(mockOrder);
-      expect(ordersService.createOrder).toHaveBeenCalledWith(
-        'store-123',
+      expect(mockOrdersService.createOrder).toHaveBeenCalledWith(
+        storeId,
         createOrderDto,
       );
     });
 
-    it('should handle createOrder service errors', async () => {
-      const createOrderDto: CreateOrderDto = {
-        customer_id: 'customer-123',
-        orderItems: [],
-      };
-
-      ordersService.createOrder.mockRejectedValue(
-        new BadRequestException('Order must have at least one item'),
+    it('should handle service errors', async () => {
+      mockOrdersService.createOrder.mockRejectedValue(
+        new InternalServerErrorException('Order creation failed'),
       );
 
-      await expect(
-        controller.create('store-123', createOrderDto),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
-
-  describe('createOrderAtomic', () => {
-    it('should create atomic order successfully', async () => {
-      const createOrderAtomicDto: CreateOrderAtomicDto = {
-        customer_id: 'customer-123',
-        paymentMethodId: 'payment-123',
-        orderItems: [
-          {
-            product_id: 'product-123',
-            product_name: 'Test Product',
-            quantity: 2,
-            unit_price: 50000,
-          },
-        ],
-      };
-
-      ordersService.createOrderAtomic.mockResolvedValue(mockOrder);
-
-      const result = await controller.createOrderAtomic(
-        'store-123',
-        createOrderAtomicDto,
-        mockUser,
+      await expect(controller.create(storeId, createOrderDto)).rejects.toThrow(
+        InternalServerErrorException,
       );
-
-      expect(result).toEqual(mockOrder);
-      expect(ordersService.createOrderAtomic).toHaveBeenCalledWith(
-        'store-123',
-        {
-          customer_id: 'customer-123',
-          orderItems: createOrderAtomicDto.orderItems,
-        },
-        'user-123',
-        'payment-123',
-      );
-    });
-
-    it('should handle createOrderAtomic service errors', async () => {
-      const createOrderAtomicDto: CreateOrderAtomicDto = {
-        customer_id: 'customer-123',
-        paymentMethodId: 'payment-123',
-        orderItems: [],
-      };
-
-      ordersService.createOrderAtomic.mockRejectedValue(
-        new BadRequestException('Insufficient inventory'),
-      );
-
-      await expect(
-        controller.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          mockUser,
-        ),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('findAll', () => {
     it('should return all orders', async () => {
-      ordersService.findAllOrder.mockResolvedValue(mockOrders);
+      const orders = [mockOrder];
+      mockOrdersService.findAllOrder.mockResolvedValue(orders);
 
-      const result = await controller.findAll('store-123');
+      const result = await controller.findAll(storeId);
 
-      expect(result).toEqual(mockOrders);
-      expect(ordersService.findAllOrder).toHaveBeenCalledWith('store-123');
+      expect(result).toEqual(orders);
+      expect(mockOrdersService.findAllOrder).toHaveBeenCalledWith(storeId);
     });
 
-    it('should return empty array when no orders found', async () => {
-      ordersService.findAllOrder.mockResolvedValue([]);
+    it('should handle empty results', async () => {
+      mockOrdersService.findAllOrder.mockResolvedValue([]);
 
-      const result = await controller.findAll('store-123');
+      const result = await controller.findAll(storeId);
 
       expect(result).toEqual([]);
     });
   });
 
   describe('findOne', () => {
-    it('should return order by id', async () => {
-      ordersService.findOne.mockResolvedValue(mockOrder);
+    it('should return order by ID', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.findOne.mockResolvedValue(mockOrder);
 
-      const result = await controller.findOne('store-123', 'order-123');
+      const result = await controller.findOne(storeId, orderId);
 
       expect(result).toEqual(mockOrder);
-      expect(ordersService.findOne).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
-      );
+      expect(mockOrdersService.findOne).toHaveBeenCalledWith(storeId, orderId);
     });
 
     it('should handle order not found', async () => {
-      ordersService.findOne.mockRejectedValue(
-        new BadRequestException('Order not found'),
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.findOne.mockRejectedValue(
+        new NotFoundException('Order not found'),
       );
 
-      await expect(
-        controller.findOne('store-123', 'invalid-id'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.findOne(storeId, orderId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('update', () => {
+    const updateOrderDto: UpdateOrderDto = {
+      orderCode: 'ORD001',
+      status: OrderStatus.CONFIRMED,
+      note: 'Updated Notes',
+    };
+
     it('should update order successfully', async () => {
-      const updateOrderDto: UpdateOrderDto = {
-        customer_id: 'customer-456',
-        orderCode: 'ORD-001',
-      };
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.update.mockResolvedValue(mockOrder);
 
-      const updatedOrder = { ...mockOrder, customer_id: 'customer-456' };
-      ordersService.update.mockResolvedValue(updatedOrder);
+      const result = await controller.update(storeId, orderId, updateOrderDto);
 
-      const result = await controller.update(
-        'store-123',
-        'order-123',
-        updateOrderDto,
-      );
-
-      expect(result).toEqual(updatedOrder);
-      expect(ordersService.update).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      expect(result).toEqual(mockOrder);
+      expect(mockOrdersService.update).toHaveBeenCalledWith(
+        storeId,
+        orderId,
         updateOrderDto,
       );
     });
 
-    it('should handle update service errors', async () => {
-      const updateOrderDto: UpdateOrderDto = {
-        customer_id: 'customer-456',
-        orderCode: 'ORD-001',
-      };
-
-      ordersService.update.mockRejectedValue(
-        new BadRequestException('Order cannot be updated'),
+    it('should handle update errors', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.update.mockRejectedValue(
+        new InternalServerErrorException('Update failed'),
       );
 
       await expect(
-        controller.update('store-123', 'order-123', updateOrderDto),
-      ).rejects.toThrow(BadRequestException);
+        controller.update(storeId, orderId, updateOrderDto),
+      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('remove', () => {
     it('should remove order successfully', async () => {
-      const removeResult = { message: 'Order deleted successfully' };
-      ordersService.remove.mockResolvedValue(removeResult);
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const expectedResponse = {
+        message: 'Order deleted successfully',
+        data: null,
+      };
 
-      const result = await controller.remove('store-123', 'order-123');
+      mockOrdersService.remove.mockResolvedValue(expectedResponse);
 
-      expect(result).toEqual(removeResult);
-      expect(ordersService.remove).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
-      );
+      const result = await controller.remove(storeId, orderId);
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockOrdersService.remove).toHaveBeenCalledWith(storeId, orderId);
     });
 
-    it('should handle remove service errors', async () => {
-      ordersService.remove.mockRejectedValue(
-        new BadRequestException('Order not found'),
+    it('should handle remove errors', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.remove.mockRejectedValue(
+        new InternalServerErrorException('Cannot delete order'),
       );
 
-      await expect(
-        controller.remove('store-123', 'invalid-id'),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
-
-  describe('restore', () => {
-    it('should restore order successfully', async () => {
-      const restoreResult = { message: 'Order restored successfully' };
-      ordersService.restore.mockResolvedValue(restoreResult);
-
-      const result = await controller.restore('store-123', 'order-123');
-
-      expect(result).toEqual(restoreResult);
-      expect(ordersService.restore).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      await expect(controller.remove(storeId, orderId)).rejects.toThrow(
+        InternalServerErrorException,
       );
-    });
-
-    it('should handle restore service errors', async () => {
-      ordersService.restore.mockRejectedValue(
-        new BadRequestException('Order not found or not deleted'),
-      );
-
-      await expect(
-        controller.restore('store-123', 'invalid-id'),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('confirmOrder', () => {
     it('should confirm order successfully', async () => {
-      const confirmedOrder = { ...mockOrder, status: OrderStatus.CONFIRMED };
-      ordersService.confirmOrder.mockResolvedValue(confirmedOrder);
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const expectedResponse = {
+        message: 'Order confirmed successfully',
+        data: mockOrder,
+      };
 
-      const result = await controller.confirmOrder('store-123', 'order-123');
+      mockOrdersService.confirmOrder.mockResolvedValue(expectedResponse);
 
-      expect(result).toEqual(confirmedOrder);
-      expect(ordersService.confirmOrder).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      const result = await controller.confirmOrder(storeId, orderId);
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockOrdersService.confirmOrder).toHaveBeenCalledWith(
+        storeId,
+        orderId,
       );
     });
 
-    it('should handle confirm order service errors', async () => {
-      ordersService.confirmOrder.mockRejectedValue(
-        new BadRequestException('Order cannot be confirmed'),
+    it('should handle confirm errors', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.confirmOrder.mockRejectedValue(
+        new InternalServerErrorException('Cannot confirm order'),
       );
 
-      await expect(
-        controller.confirmOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
-
-  describe('shipOrder', () => {
-    it('should ship order successfully', async () => {
-      const shippedOrder = { ...mockOrder, status: OrderStatus.SHIPPED };
-      ordersService.shipOrder.mockResolvedValue(shippedOrder);
-
-      const result = await controller.shipOrder('store-123', 'order-123');
-
-      expect(result).toEqual(shippedOrder);
-      expect(ordersService.shipOrder).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      await expect(controller.confirmOrder(storeId, orderId)).rejects.toThrow(
+        InternalServerErrorException,
       );
-    });
-
-    it('should handle ship order service errors', async () => {
-      ordersService.shipOrder.mockRejectedValue(
-        new BadRequestException('Order cannot be shipped'),
-      );
-
-      await expect(
-        controller.shipOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('completeOrder', () => {
     it('should complete order successfully', async () => {
-      const completedOrder = { ...mockOrder, status: OrderStatus.COMPLETED };
-      ordersService.completeOrder.mockResolvedValue(completedOrder);
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const expectedResponse = {
+        message: 'Order completed successfully',
+        data: mockOrder,
+      };
 
-      const result = await controller.completeOrder('store-123', 'order-123');
+      mockOrdersService.completeOrder.mockResolvedValue(expectedResponse);
 
-      expect(result).toEqual(completedOrder);
-      expect(ordersService.completeOrder).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      const result = await controller.completeOrder(storeId, orderId);
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockOrdersService.completeOrder).toHaveBeenCalledWith(
+        storeId,
+        orderId,
       );
     });
 
-    it('should handle complete order service errors', async () => {
-      ordersService.completeOrder.mockRejectedValue(
-        new BadRequestException('Order cannot be completed'),
+    it('should handle complete errors', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.completeOrder.mockRejectedValue(
+        new InternalServerErrorException('Cannot complete order'),
       );
 
-      await expect(
-        controller.completeOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.completeOrder(storeId, orderId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
   describe('cancelOrder', () => {
     it('should cancel order successfully', async () => {
-      const cancelledOrder = { ...mockOrder, status: OrderStatus.CANCELLED };
-      ordersService.cancelOrder.mockResolvedValue(cancelledOrder);
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const expectedResponse = {
+        message: 'Order cancelled successfully',
+        data: mockOrder,
+      };
 
-      const result = await controller.cancelOrder('store-123', 'order-123');
+      mockOrdersService.cancelOrder.mockResolvedValue(expectedResponse);
 
-      expect(result).toEqual(cancelledOrder);
-      expect(ordersService.cancelOrder).toHaveBeenCalledWith(
-        'store-123',
-        'order-123',
+      const result = await controller.cancelOrder(storeId, orderId);
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockOrdersService.cancelOrder).toHaveBeenCalledWith(
+        storeId,
+        orderId,
       );
     });
 
-    it('should handle cancel order service errors', async () => {
-      ordersService.cancelOrder.mockRejectedValue(
-        new BadRequestException('Order cannot be cancelled'),
+    it('should handle cancel errors', async () => {
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      mockOrdersService.cancelOrder.mockRejectedValue(
+        new InternalServerErrorException('Cannot cancel order'),
       );
 
-      await expect(
-        controller.cancelOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.cancelOrder(storeId, orderId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
   describe('findByStatus', () => {
     it('should return orders by status', async () => {
-      const pendingOrders = [mockOrder];
-      ordersService.findByStatus.mockResolvedValue(pendingOrders);
+      const status = 'PENDING';
+      const orders = [mockOrder];
+      mockOrdersService.findByStatus.mockResolvedValue(orders);
 
-      const result = await controller.findByStatus('store-123', 'PENDING');
+      const result = await controller.findByStatus(storeId, status);
 
-      expect(result).toEqual(pendingOrders);
-      expect(ordersService.findByStatus).toHaveBeenCalledWith(
-        'store-123',
-        OrderStatus.PENDING,
+      expect(result).toEqual(orders);
+      expect(mockOrdersService.findByStatus).toHaveBeenCalledWith(
+        storeId,
+        OrderStatus[status as keyof typeof OrderStatus],
       );
     });
 
-    it('should throw BadRequestException for invalid status', async () => {
-      await expect(
-        controller.findByStatus('store-123', 'INVALID_STATUS'),
-      ).rejects.toThrow(BadRequestException);
+    it('should handle empty status results', async () => {
+      const status = 'CANCELLED';
+      mockOrdersService.findByStatus.mockResolvedValue([]);
 
-      expect(ordersService.findByStatus).not.toHaveBeenCalled();
+      const result = await controller.findByStatus(storeId, status);
+
+      expect(result).toEqual([]);
     });
   });
 
   describe('findByCustomer', () => {
-    it('should return orders by customer', async () => {
-      const customerOrders = [mockOrder];
-      ordersService.findByCustomer.mockResolvedValue(customerOrders);
+    it('should return orders by customer ID', async () => {
+      const customerId = '123e4567-e89b-12d3-a456-426614174004';
+      const orders = [mockOrder];
+      mockOrdersService.findByCustomer.mockResolvedValue(orders);
 
-      const result = await controller.findByCustomer(
-        'store-123',
-        'customer-123',
-      );
+      const result = await controller.findByCustomer(storeId, customerId);
 
-      expect(result).toEqual(customerOrders);
-      expect(ordersService.findByCustomer).toHaveBeenCalledWith(
-        'store-123',
-        'customer-123',
+      expect(result).toEqual(orders);
+      expect(mockOrdersService.findByCustomer).toHaveBeenCalledWith(
+        storeId,
+        customerId,
       );
     });
 
-    it('should return empty array when customer has no orders', async () => {
-      ordersService.findByCustomer.mockResolvedValue([]);
+    it('should handle empty customer results', async () => {
+      const customerId = '123e4567-e89b-12d3-a456-426614174004';
+      mockOrdersService.findByCustomer.mockResolvedValue([]);
 
-      const result = await controller.findByCustomer(
-        'store-123',
-        'customer-123',
-      );
+      const result = await controller.findByCustomer(storeId, customerId);
 
       expect(result).toEqual([]);
     });

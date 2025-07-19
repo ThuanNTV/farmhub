@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../../src/app.module';
+import { AppModule } from 'src/app.module';
 import { DataSource } from 'typeorm';
-import { Store } from '../../../src/entities/global/store.entity';
+import { Store } from 'src/entities/global/store.entity';
 
 describe('Stores E2E Tests', () => {
   let app: INestApplication;

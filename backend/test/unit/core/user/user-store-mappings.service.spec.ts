@@ -3,12 +3,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException, ConflictException } from '@nestjs/common';
-import { UserStoreMappingsService } from 'src/core/user/service/user-store-mappings.service';
+import { UserStoreMappingsService } from '@core/user/service/user-store-mappings.service';
+import { CreateUserStoreMappingDto } from '@modules/user-store-mappings/dto/create-userStoreMapping.dto';
+import { UpdateUserStoreMappingDto } from '@modules/user-store-mappings/dto/update-userStoreMapping.dto';
 import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
 import { User } from 'src/entities/global/user.entity';
 import { Store } from 'src/entities/global/store.entity';
-import { CreateUserStoreMappingDto } from 'src/modules/user-store-mappings/dto/create-userStoreMapping.dto';
-import { UpdateUserStoreMappingDto } from 'src/modules/user-store-mappings/dto/update-userStoreMapping.dto';
 
 describe('UserStoreMappingsService', () => {
   let service: UserStoreMappingsService;

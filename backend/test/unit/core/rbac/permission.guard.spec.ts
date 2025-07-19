@@ -1,10 +1,10 @@
 import {
-  PermissionGuard,
   Permission,
+  PermissionGuard,
 } from 'src/core/rbac/permission/permission.guard';
 import { Reflector } from '@nestjs/core';
 import { ForbiddenException, ExecutionContext } from '@nestjs/common';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { CreateUserDto, UserRole } from 'src/modules/users/dto/create-user.dto';
 
 describe('PermissionGuard', () => {
   let guard: PermissionGuard;
@@ -119,7 +119,6 @@ describe('PermissionGuard', () => {
 
   it('test getNestedValue trả về undefined nếu path sai', () => {
     const obj = { a: { b: 1 } };
-    // @ts-ignore
     expect(guard['getNestedValue'](obj, 'a.b.c')).toBeUndefined();
   });
 });

@@ -1,9 +1,9 @@
-import { PermissionService } from 'src/core/permission/service/permission.service';
+import { PermissionService } from '@core/permission/service/permission.service';
 import { Repository } from 'typeorm';
-import { User } from 'src/entities/global/user.entity';
-import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { CreateUserDto, UserRole } from '@modules/users/dto/create-user.dto';
+import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
+import { User } from 'src/entities/global/user.entity';
 
 describe('PermissionService', () => {
   let service: PermissionService;

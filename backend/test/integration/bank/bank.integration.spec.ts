@@ -3,11 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BankService } from '../../../src/modules/bank/service/bank.service';
 import { Bank } from '../../../src/entities/global/bank.entity';
-import { CreateBankDto } from '../../../src/dto/dtoBank/create-bank.dto';
 import { NotFoundException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GlobalDatabaseModule } from '../../../src/config/db/dbtenant/global-database.module';
-import { BankModule } from '../../../src/modules/bank.module';
+import { BankModule } from '../../../src/modules/bank/bank.module';
+import { CreateBankDto } from '../../../src/modules/bank/dto/create-bank.dto';
 
 describe('BankService Integration', () => {
   let app: INestApplication;
@@ -56,7 +56,7 @@ describe('BankService Integration', () => {
       expect(result).toBeDefined();
       expect(result.name).toBe(createBankDto.name);
       expect(result.id).toBe(createBankDto.id);
-      expect(result.createdByUserId).toBe(testUserId);
+      expect(result.created_by_user_id).toBe(testUserId);
 
       // Verify the bank exists in real database
       const foundBank = await bankService.findOne(createBankDto.id!);

@@ -1,231 +1,521 @@
-import { ProductsService } from 'src/modules/products/service/products.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ProductsService } from '@modules/products/service/products.service';
+import { CreateProductDto } from '@modules/products/dto/create-product.dto';
+import { UpdateProductDto } from '@modules/products/dto/update-product.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { Product } from 'src/entities/tenant/product.entity';
 
 describe('ProductsService', () => {
   let service: ProductsService;
-  let superGetRepo: jest.SpyInstance;
-  let superFindById: jest.SpyInstance;
-  let repo: any;
-  let auditLogsService: any;
+  let mockTenantDataSourceService: jest.Mocked<TenantDataSourceService>;
+  let mockRepository: jest.Mocked<any>;
 
-  beforeEach(() => {
-    repo = {
-      findOneBy: jest.fn(),
-      find: jest.fn(),
-      create: jest.fn((x) => x),
-      save: jest.fn(),
-      merge: jest.fn((a, b) => ({ ...a, ...b })),
-    };
-    auditLogsService = {
+  const mockProduct: Product = {
+    product_id: '123e4567-e89b-12d3-a456-426614174000',
+    product_code: 'TEST001',
+    name: 'Test Product',
+    slug: 'test-product',
+    description: 'Test Product Description',
+    category_id: '123e4567-e89b-12d3-a456-426614174001',
+    brand: 'Test Brand',
+    unit_id: '123e4567-e89b-12d3-a456-426614174002',
+    price_retail: 100.0,
+    price_wholesale: 80.0,
+    credit_price: 120.0,
+    cost_price: 60.0,
+    barcode: '1234567890123',
+    stock: 50,
+    min_stock_level: 10,
+    images: '{"url": "test-image.jpg"}',
+    specs: '{"color": "red", "size": "M"}',
+    warranty_info: '1 year warranty',
+    supplier_id: '123e4567-e89b-12d3-a456-426614174003',
+    is_active: true,
+    is_deleted: false,
+    created_at: new Date(),
+    updated_at: new Date(),
+    created_by_user_id: '123e4567-e89b-12d3-a456-426614174004',
+    updated_by_user_id: '123e4567-e89b-12d3-a456-426614174004',
+    getUnit: async () => null,
+    getCreatedByUser: async () => null,
+    getUpdatedByUser: async () => null,
+  };
+
+  beforeEach(async () => {
+    mockRepository = {
       create: jest.fn(),
+      save: jest.fn(),
+      find: jest.fn(),
+      findOne: jest.fn(),
+      findOneBy: jest.fn(),
+      merge: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     };
-    service = new ProductsService({} as any, auditLogsService);
-    superGetRepo = jest
-      .spyOn(ProductsService.prototype, 'getRepo')
-      .mockResolvedValue(repo);
-    superFindById = jest
-      .spyOn(ProductsService.prototype, 'findById')
-      .mockImplementation();
+
+    mockTenantDataSourceService = {
+      getTenantDataSource: jest.fn(),
+    } as any;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ProductsService,
+        {
+          provide: TenantDataSourceService,
+          useValue: mockTenantDataSourceService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<ProductsService>(ProductsService);
+
+    // Setup default mocks
+    const mockDataSource = {
+      getRepository: jest.fn().mockReturnValue(mockRepository),
+      isInitialized: true,
+    } as any;
+    mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+      mockDataSource as DataSource,
+    );
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
-  // createProduct
-  it('createProduct throw nếu đã tồn tại productId', async () => {
-    superFindById.mockResolvedValue({ product_id: 'p1' });
-    await expect(
-      service.createProduct('store1', {
-        productId: 'p1',
-        productCode: 'c1',
-      } as any),
-    ).rejects.toThrow(InternalServerErrorException);
+  describe('createProduct', () => {
+    const createProductDto: CreateProductDto = {
+      productId: '123e4567-e89b-12d3-a456-426614174000',
+      productCode: 'TEST001',
+      name: 'Test Product',
+      slug: 'test-product',
+      description: 'Test Product Description',
+      categoryId: '123e4567-e89b-12d3-a456-426614174001',
+      brand: 'Test Brand',
+      unitId: '123e4567-e89b-12d3-a456-426614174002',
+      priceRetail: 100.0,
+      priceWholesale: 80.0,
+      creditPrice: 120.0,
+      costPrice: 60.0,
+      barcode: '1234567890123',
+      stock: 50,
+      minStockLevel: 10,
+      images: '{"url": "test-image.jpg"}',
+      specs: '{"color": "red", "size": "M"}',
+      warrantyInfo: '1 year warranty',
+      supplierId: '123e4567-e89b-12d3-a456-426614174003',
+      isActive: true,
+      isDeleted: false,
+    };
+
+    it('should create a product successfully', async () => {
+      const storeId = 'store-123';
+
+      // Mock findById to return null (product doesn't exist)
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+
+      // Mock findByproductCode to return null (product code doesn't exist)
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock repository methods
+      mockRepository.create.mockReturnValue(mockProduct);
+      mockRepository.save.mockResolvedValue(mockProduct);
+
+      const result = await service.createProduct(storeId, createProductDto);
+
+      expect(result).toEqual(mockProduct);
+      expect(mockRepository.create).toHaveBeenCalledWith(createProductDto);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockProduct);
+    });
+
+    it('should throw error if product with same ID already exists', async () => {
+      const storeId = 'store-123';
+
+      jest.spyOn(service, 'findById').mockResolvedValue(mockProduct);
+
+      await expect(
+        service.createProduct(storeId, createProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw error if product with same product code already exists', async () => {
+      const storeId = 'store-123';
+
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(mockProduct);
+
+      await expect(
+        service.createProduct(storeId, createProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
   });
 
-  it('createProduct throw nếu đã tồn tại productCode', async () => {
-    superFindById.mockResolvedValue(null);
-    jest
-      .spyOn(service, 'findByproductCode')
-      .mockResolvedValue({ product_id: 'p2' });
-    await expect(
-      service.createProduct('store1', {
-        productId: 'p1',
-        productCode: 'c1',
-      } as any),
-    ).rejects.toThrow(InternalServerErrorException);
-  });
+  describe('findById', () => {
+    it('should return product by ID', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
 
-  it('createProduct trả về đúng product khi hợp lệ', async () => {
-    superFindById.mockResolvedValue(null);
-    jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
-    repo.save.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.createProduct('store1', {
-      productId: 'p1',
-      productCode: 'c1',
-      createdByUserId: 'u1',
-    } as any);
-    expect(result.product_id).toBe('p1');
-    expect(auditLogsService.create).toHaveBeenCalled();
-  });
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
 
-  it('createProduct throw nếu repo.save lỗi', async () => {
-    superFindById.mockResolvedValue(null);
-    jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
-    repo.save.mockRejectedValue(new Error('fail'));
-    await expect(
-      service.createProduct('store1', {
-        productId: 'p1',
-        productCode: 'c1',
-        createdByUserId: 'u1',
-      } as any),
-    ).rejects.toThrow('fail');
-  });
+      const result = await service.findById(storeId, productId);
 
-  // findById
-  it('findById trả về đúng product', async () => {
-    repo.findOneBy.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.findById('store1', 'p1');
-    expect(result.product_id).toBe('p1');
-  });
-
-  // findByproductCode
-  it('findByproductCode trả về đúng product', async () => {
-    repo.findOneBy.mockResolvedValue({ product_code: 'c1' });
-    const result = await service.findByproductCode('store1', 'c1');
-    expect(result.product_code).toBe('c1');
-  });
-
-  // findOne
-  it('findOne throw nếu không tìm thấy', async () => {
-    repo.findOneBy.mockResolvedValue(null);
-    await expect(service.findOne('store1', 'p1')).rejects.toThrow(
-      NotFoundException,
-    );
-  });
-
-  it('findOne trả về đúng product', async () => {
-    repo.findOneBy.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.findOne('store1', 'p1');
-    expect(result.product_id).toBe('p1');
-  });
-
-  it('findOne throw nếu repo.findOneBy lỗi', async () => {
-    repo.findOneBy.mockRejectedValue(new Error('fail'));
-    await expect(service.findOne('store1', 'p1')).rejects.toThrow('fail');
-  });
-
-  // findOneProduc
-  it('findOneProduc throw nếu không tìm thấy', async () => {
-    repo.findOneBy.mockResolvedValue(null);
-    await expect(service.findOneProduc('store1', 'p1')).rejects.toThrow(
-      NotFoundException,
-    );
-  });
-
-  it('findOneProduc trả về đúng {repo, product}', async () => {
-    repo.findOneBy.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.findOneProduc('store1', 'p1');
-    expect(result.product.product_id).toBe('p1');
-    expect(result.repo).toBe(repo);
-  });
-
-  // findAll
-  it('findAll trả về đúng products', async () => {
-    repo.find.mockResolvedValue([{ product_id: 'p1' }, { product_id: 'p2' }]);
-    const result = await service.findAll('store1');
-    expect(result.length).toBe(2);
-  });
-
-  it('findAll throw nếu repo.find lỗi', async () => {
-    repo.find.mockRejectedValue(new Error('fail'));
-    await expect(service.findAll('store1')).rejects.toThrow('fail');
-  });
-
-  // update
-  it('update throw nếu không tìm thấy product', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockRejectedValue(new NotFoundException());
-    await expect(service.update('store1', 'p1', {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
-  });
-
-  it('update throw nếu productCode đã tồn tại và khác productId', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockResolvedValue({ repo, product: { product_id: 'p1' } });
-    jest
-      .spyOn(service, 'findByproductCode')
-      .mockResolvedValue({ product_id: 'p2' });
-    await expect(
-      service.update('store1', 'p1', { productCode: 'c1' } as any),
-    ).rejects.toThrow(InternalServerErrorException);
-  });
-
-  it('update trả về đúng product khi hợp lệ', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockResolvedValue({ repo, product: { product_id: 'p1' } });
-    jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
-    repo.save.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.update('store1', 'p1', {
-      productCode: 'c1',
-      updatedByUserId: 'u1',
-    } as any);
-    expect(result.product_id).toBe('p1');
-    expect(auditLogsService.create).toHaveBeenCalled();
-  });
-
-  it('update throw nếu repo.save lỗi', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockResolvedValue({ repo, product: { product_id: 'p1' } });
-    jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
-    repo.save.mockRejectedValue(new Error('fail'));
-    await expect(
-      service.update('store1', 'p1', {
-        productCode: 'c1',
-        updatedByUserId: 'u1',
-      } as any),
-    ).rejects.toThrow('fail');
-  });
-
-  // remove
-  it('remove throw nếu không tìm thấy product', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockRejectedValue(new NotFoundException());
-    await expect(service.remove('store1', 'p1')).rejects.toThrow(
-      NotFoundException,
-    );
-  });
-
-  it('remove trả về đúng message khi hợp lệ', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockResolvedValue({
-        repo,
-        product: { product_id: 'p1', updated_by_user_id: 'u1' },
+      expect(result).toEqual(mockProduct);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
+        product_id: productId,
+        is_deleted: false,
+        is_active: true,
       });
-    repo.save.mockResolvedValue({ product_id: 'p1' });
-    const result = await service.remove('store1', 'p1');
-    expect(result.message).toContain('đã được xóa');
-    expect(auditLogsService.create).toHaveBeenCalled();
+    });
+
+    it('should return null if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      const result = await service.findById(storeId, productId);
+
+      expect(result).toBeNull();
+    });
   });
 
-  it('remove throw nếu repo.save lỗi', async () => {
-    jest
-      .spyOn(service, 'findOneProduc')
-      .mockResolvedValue({
-        repo,
-        product: { product_id: 'p1', updated_by_user_id: 'u1' },
+  describe('findByproductCode', () => {
+    it('should return product by product code', async () => {
+      const storeId = 'store-123';
+      const productCode = 'TEST001';
+
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+
+      const result = await service.findByproductCode(storeId, productCode);
+
+      expect(result).toEqual(mockProduct);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
+        product_code: productCode,
+        is_deleted: false,
+        is_active: true,
       });
-    repo.save.mockRejectedValue(new Error('fail'));
-    await expect(service.remove('store1', 'p1')).rejects.toThrow('fail');
+    });
+
+    it('should return null if product code not found', async () => {
+      const storeId = 'store-123';
+      const productCode = 'NONEXISTENT';
+
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      const result = await service.findByproductCode(storeId, productCode);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return product by ID', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+
+      const result = await service.findOne(storeId, productId);
+
+      expect(result).toEqual(mockProduct);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
+        product_id: productId,
+        is_deleted: false,
+        is_active: true,
+      });
+    });
+
+    it('should throw NotFoundException if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.findOne(storeId, productId)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all active products', async () => {
+      const storeId = 'store-123';
+      const products = [mockProduct];
+
+      mockRepository.find.mockResolvedValue(products);
+
+      const result = await service.findAll(storeId);
+
+      expect(result).toEqual(products);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { is_deleted: false, is_active: true },
+      });
+    });
+
+    it('should return empty array when no products exist', async () => {
+      const storeId = 'store-123';
+
+      mockRepository.find.mockResolvedValue([]);
+
+      const result = await service.findAll(storeId);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('remove', () => {
+    it('should soft delete product successfully', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      jest.spyOn(service, 'findOneProduc').mockResolvedValue({
+        repo: mockRepository,
+        product: mockProduct,
+      });
+      mockRepository.save.mockResolvedValue(mockProduct);
+
+      const result = await service.remove(storeId, productId);
+
+      expect(result).toEqual({
+        message: `✅ Sản phẩm với ID "${productId}" đã được xóa`,
+        data: null,
+      });
+      expect(mockProduct.is_deleted).toBe(true);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockProduct);
+    });
+
+    it('should throw NotFoundException if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      jest
+        .spyOn(service, 'findOneProduc')
+        .mockRejectedValue(
+          new NotFoundException(
+            `❌ Không tìm thấy sản phẩm với ID "${productId}"`,
+          ),
+        );
+
+      await expect(service.remove(storeId, productId)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('restore', () => {
+    it('should restore deleted product successfully', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const deletedProduct = { ...mockProduct, is_deleted: true };
+
+      mockRepository.findOne.mockResolvedValue(deletedProduct);
+      mockRepository.save.mockResolvedValue(deletedProduct);
+
+      const result = await service.restore(storeId, productId);
+
+      expect(result).toEqual({
+        message: 'Khôi phục sản phẩm thành công',
+        data: deletedProduct,
+      });
+      expect(deletedProduct.is_deleted).toBe(false);
+      expect(mockRepository.save).toHaveBeenCalledWith(deletedProduct);
+    });
+
+    it('should throw error if product not found or not deleted', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.restore(storeId, productId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update product successfully with productCode validation', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateProductDto: UpdateProductDto = {
+        name: 'Updated Product',
+        productCode: 'UPDATED001',
+      };
+
+      const updatedProduct = { ...mockProduct, ...updateProductDto };
+
+      jest.spyOn(service, 'findOneProduc').mockResolvedValue({
+        repo: mockRepository,
+        product: mockProduct,
+      });
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+      mockRepository.merge.mockReturnValue(updatedProduct);
+      mockRepository.save.mockResolvedValue(updatedProduct);
+
+      const result = await service.update(storeId, productId, updateProductDto);
+
+      expect(result).toEqual(updatedProduct);
+      expect(mockRepository.merge).toHaveBeenCalledWith(
+        mockProduct,
+        updateProductDto,
+      );
+      expect(mockRepository.save).toHaveBeenCalledWith(updatedProduct);
+    });
+
+    it('should throw error if productCode already exists for different product', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateProductDto: UpdateProductDto = {
+        productCode: 'EXISTING001',
+      };
+
+      const existingProduct = { ...mockProduct, product_id: 'different-id' };
+
+      jest.spyOn(service, 'findOneProduc').mockResolvedValue({
+        repo: mockRepository,
+        product: mockProduct,
+      });
+      jest
+        .spyOn(service, 'findByproductCode')
+        .mockResolvedValue(existingProduct);
+
+      await expect(
+        service.update(storeId, productId, updateProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+  });
+
+  describe('error handling', () => {
+    it('should handle database connection errors', async () => {
+      const storeId = 'store-123';
+      mockRepository.findOneBy.mockRejectedValue(
+        new Error('Database connection failed'),
+      );
+
+      await expect(service.findById(storeId, 'test-id')).rejects.toThrow();
+    });
+
+    it('should handle repository save errors', async () => {
+      const storeId = 'store-123';
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+      mockRepository.save.mockRejectedValue(new Error('Save operation failed'));
+
+      await expect(service.remove(storeId, 'test-id')).rejects.toThrow();
+    });
+  });
+
+  describe('validation scenarios', () => {
+    it('should handle duplicate product code during creation', async () => {
+      const storeId = 'store-123';
+      const createProductDto: CreateProductDto = {
+        productId: '123e4567-e89b-12d3-a456-426614174000',
+        productCode: 'DUPLICATE001',
+        name: 'Test Product',
+        slug: 'test-product',
+        description: 'Test Product Description',
+        categoryId: '123e4567-e89b-12d3-a456-426614174001',
+        priceRetail: 100.0,
+        stock: 50,
+        minStockLevel: 10,
+        isActive: true,
+        isDeleted: false,
+      };
+
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(mockProduct);
+
+      await expect(
+        service.createProduct(storeId, createProductDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should handle invalid product ID format', async () => {
+      const storeId = 'store-123';
+      const invalidId = 'invalid-id';
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.findOne(storeId, invalidId)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('product management scenarios', () => {
+    it('should handle product activation/deactivation', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateDto: UpdateProductDto = {
+        isActive: false,
+      };
+
+      const deactivatedProduct = { ...mockProduct, is_active: false };
+
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+      mockRepository.merge.mockReturnValue(deactivatedProduct);
+      mockRepository.save.mockResolvedValue(deactivatedProduct);
+
+      const result = await service.update(storeId, productId, updateDto);
+
+      expect(result.is_active).toBe(false);
+    });
+
+    it('should handle stock updates', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateDto: UpdateProductDto = {
+        stock: 100,
+        minStockLevel: 20,
+      };
+
+      const updatedProduct = {
+        ...mockProduct,
+        stock: 100,
+        min_stock_level: 20,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+      mockRepository.merge.mockReturnValue(updatedProduct);
+      mockRepository.save.mockResolvedValue(updatedProduct);
+
+      const result = await service.update(storeId, productId, updateDto);
+
+      expect(result.stock).toBe(100);
+      expect(result.min_stock_level).toBe(20);
+    });
+
+    it('should handle price updates', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateDto: UpdateProductDto = {
+        priceRetail: 150.0,
+        priceWholesale: 120.0,
+        creditPrice: 180.0,
+        costPrice: 90.0,
+      };
+
+      const updatedProduct = {
+        ...mockProduct,
+        price_retail: 150.0,
+        price_wholesale: 120.0,
+        credit_price: 180.0,
+        cost_price: 90.0,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue(mockProduct);
+      mockRepository.merge.mockReturnValue(updatedProduct);
+      mockRepository.save.mockResolvedValue(updatedProduct);
+
+      const result = await service.update(storeId, productId, updateDto);
+
+      expect(result.price_retail).toBe(150.0);
+      expect(result.price_wholesale).toBe(120.0);
+      expect(result.credit_price).toBe(180.0);
+      expect(result.cost_price).toBe(90.0);
+    });
   });
 });

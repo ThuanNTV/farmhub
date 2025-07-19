@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { JwtAuthGuard } from '../../src/common/auth/jwt-auth.guard';
 import { EnhancedAuthGuard } from '../../src/common/auth/enhanced-auth.guard';
-import { PermissionGuard } from 'src/common/auth/permission.guard';
+import { PermissionGuard } from '@common/auth/permission.guard';
 import { App } from 'supertest/types';
 
 // Helper function to safely convert HttpServer to supertest App type

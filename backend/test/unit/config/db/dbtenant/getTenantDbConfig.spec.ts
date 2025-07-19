@@ -1,6 +1,6 @@
-import { getTenantDbConfig } from 'src/config/db/dbtenant/getTenantDbConfig';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import * as fs from 'fs';
+import { getTenantDbConfig } from 'src/config/db/dbtenant/getTenantDbConfig';
 
 describe('getTenantDbConfig', () => {
   const OLD_ENV = process.env;

@@ -6,10 +6,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { Request } from 'express';
 import { SafeUser } from 'src/dto/auth/auth.dto';
 import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import { throwError } from 'rxjs';
 
 interface RequestWithUser extends Request {
   user?: SafeUser;

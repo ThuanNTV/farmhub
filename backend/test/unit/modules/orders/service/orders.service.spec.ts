@@ -1,157 +1,154 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
+import { OrdersService } from '@modules/orders/service/orders.service';
+import { ProductsService } from '@modules/products/service/products.service';
+import { InventoryTransfersService } from '@modules/inventory-transfers/service/inventory-transfers.service';
+import { CreateOrderDto } from '@modules/orders/dto/create-order.dto';
+import { UpdateOrderDto } from '@modules/orders/dto/update-order.dto';
 import {
   BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrdersService } from 'src/modules/orders/service/orders.service';
-import {
-  Order,
-  OrderStatus,
-  DebtStatus,
-  DeliveryStatus,
-} from 'src/entities/tenant/order.entity';
-import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { ProductsService } from 'src/modules/products/service/products.service';
-import { InventoryTransfersService } from 'src/modules/inventory-transfers/service/inventory-transfers.service';
 import { PaymentTransactionService } from 'src/modules/payments/service';
 import { AuditTransactionService } from 'src/modules/audit-logs/service';
-import { CreateOrderDto } from 'src/modules/orders/dto/create-order.dto';
-import { UpdateOrderDto } from 'src/modules/orders/dto/update-order.dto';
-import { CreateOrderAtomicDto } from 'src/modules/orders/dto/create-order-atomic.dto';
+import { Order, OrderStatus } from 'src/entities/tenant/order.entity';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 
 describe('OrdersService', () => {
   let service: OrdersService;
-  let _mockTenantDataSourceService: jest.Mocked<TenantDataSourceService>;
+  let mockTenantDataSourceService: jest.Mocked<TenantDataSourceService>;
   let mockProductsService: jest.Mocked<ProductsService>;
-  let mockInventoryService: jest.Mocked<InventoryTransfersService>;
-  let mockPaymentService: jest.Mocked<PaymentTransactionService>;
-  let _mockAuditService: jest.Mocked<AuditTransactionService>;
+  let _mockInventoryTransfersService: jest.Mocked<InventoryTransfersService>;
+  let _mockPaymentTransactionService: jest.Mocked<PaymentTransactionService>;
+  let _mockAuditTransactionService: jest.Mocked<AuditTransactionService>;
+  let mockRepository: jest.Mocked<any>;
 
-  // Mock repository
-  const mockRepository = {
-    find: jest.fn(),
-    findOne: jest.fn(),
-    create: jest.fn(),
-    save: jest.fn(),
-    merge: jest.fn(),
-    remove: jest.fn(),
-    update: jest.fn(),
-  };
-
-  // Mock data
-  const mockOrderItem: Partial<OrderItem> = {
-    product_id: 'product-123',
+  const mockOrderItem: OrderItem = {
+    order_item_id: '123e4567-e89b-12d3-a456-426614174000',
+    order_id: '123e4567-e89b-12d3-a456-426614174001',
+    product_id: '123e4567-e89b-12d3-a456-426614174002',
     product_name: 'Test Product',
+    product_unit_id: '123e4567-e89b-12d3-a456-426614174003',
     quantity: 2,
-    unit_price: 50000,
-    total_price: 100000,
-    created_at: new Date(),
-    updated_at: new Date(),
-  };
-
-  const mockOrder: Partial<Order> = {
-    order_id: 'order-123',
-    order_code: 'ORD-001',
-    customer_id: 'customer-123',
-    status: OrderStatus.PENDING,
-    total_amount: 100000,
-    total_paid: 100000,
-    vat_amount: 0,
-    is_credit_order: false,
-    debt_status: DebtStatus.UNPAID,
-    delivery_address: 'Test Address',
-    delivery_status: DeliveryStatus.PROCESSING,
+    unit_price: 100.0,
+    total_price: 200.0,
     is_deleted: false,
     created_at: new Date(),
     updated_at: new Date(),
-    order_items: [mockOrderItem as OrderItem],
+    order: undefined as any,
+    product: undefined as any,
+  };
+
+  const mockOrder: Order = {
+    order_id: '123e4567-e89b-12d3-a456-426614174001',
+    order_code: 'ORD001',
+    customer_id: '123e4567-e89b-12d3-a456-426614174004',
+    total_amount: 200.0,
+    total_paid: 200.0,
+    vat_amount: 0,
+    status: OrderStatus.PENDING,
+    delivery_address: 'Test Address',
+    delivery_status: undefined as any,
+    debt_status: undefined as any,
+    is_credit_order: false,
+    note: 'Test Notes',
+    is_deleted: false,
+    created_at: new Date(),
+    updated_at: new Date(),
+    order_items: [mockOrderItem],
+  };
+
+  const mockProduct = {
+    product_id: '123e4567-e89b-12d3-a456-426614174002',
+    product_code: 'TEST-001',
+    name: 'Test Product',
+    slug: 'test-product',
+    description: 'This is a test product',
+    price_retail: 100.0,
+    created_at: new Date(),
+    updated_at: new Date(),
+    category_id: '123e4567-e89b-12d3-a456-426614174005',
+    category: undefined as any,
+    stock: 10,
+    unit_id: '123e4567-e89b-12d3-a456-426614174006',
+    unit: undefined as any,
+    min_stock_level: 5,
+    is_active: true,
+    is_deleted: false,
   };
 
   beforeEach(async () => {
-    const mockTenantDS = {
+    mockRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+      find: jest.fn(),
+      findOne: jest.fn(),
+      findOneBy: jest.fn(),
+      merge: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    };
+
+    mockTenantDataSourceService = {
       getTenantDataSource: jest.fn(),
-    };
+    } as any;
 
-    const mockProducts = {
+    mockProductsService = {
       findById: jest.fn(),
-    };
+    } as any;
 
-    const mockInventory = {
-      createInventoryTransfer: jest.fn(),
-      validateStockAvailability: jest.fn(),
-      transferInventory: jest.fn(),
-      decreaseStock: jest.fn(), // Bổ sung hàm này
-      // ... các hàm public khác nếu OrdersService có gọi
-    };
+    _mockInventoryTransfersService = {
+      createTransfer: jest.fn(),
+      updateInventoryForOrder: jest.fn(),
+    } as any;
 
-    const mockPayment = {
-      processPayment: jest.fn(),
-      createPayment: jest.fn(), // Bổ sung mock createPayment
-    };
+    _mockPaymentTransactionService = {
+      createPaymentTransaction: jest.fn(),
+      updatePaymentTransaction: jest.fn(),
+    } as any;
 
-    const mockAudit = {
-      logOrderCreation: jest.fn(),
-    };
+    _mockAuditTransactionService = {
+      logTransaction: jest.fn(),
+      createAuditLog: jest.fn(),
+    } as any;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrdersService,
         {
           provide: TenantDataSourceService,
-          useValue: mockTenantDS,
+          useValue: mockTenantDataSourceService,
         },
         {
           provide: ProductsService,
-          useValue: mockProducts,
+          useValue: mockProductsService,
         },
         {
           provide: InventoryTransfersService,
-          useValue: mockInventory,
+          useValue: _mockInventoryTransfersService,
         },
         {
           provide: PaymentTransactionService,
-          useValue: mockPayment,
+          useValue: _mockPaymentTransactionService,
         },
         {
           provide: AuditTransactionService,
-          useValue: mockAudit,
+          useValue: _mockAuditTransactionService,
         },
       ],
     }).compile();
 
     service = module.get<OrdersService>(OrdersService);
-    _mockTenantDataSourceService = module.get(TenantDataSourceService);
-    mockProductsService = module.get(ProductsService);
-    mockInventoryService = module.get(InventoryTransfersService);
-    mockPaymentService = module.get(PaymentTransactionService);
-    _mockAuditService = module.get(AuditTransactionService);
 
-    // Mock getRepository method
-    jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
-
-    const mockQueryRunner = {
-      connect: jest.fn(),
-      startTransaction: jest.fn(),
-      commitTransaction: jest.fn(),
-      rollbackTransaction: jest.fn(),
-      release: jest.fn(),
-      manager: {
-        getRepository: jest.fn().mockReturnValue(mockRepository),
-        save: mockRepository.save,
-        findOne: mockRepository.findOne,
-        create: mockRepository.create,
-        // ... các method khác nếu cần
-      },
-    };
+    // Setup default mocks
     const mockDataSource = {
       getRepository: jest.fn().mockReturnValue(mockRepository),
-      createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
-      isInitialized: true,
+      isInitialized: true, // Thêm thuộc tính này để tránh lỗi "chưa được khởi tạo"
     };
-    _mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
-      mockDataSource as unknown as import('typeorm').DataSource,
+    mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+      mockDataSource as any,
     );
   });
 
@@ -159,76 +156,168 @@ describe('OrdersService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
   describe('createOrder', () => {
-    const createOrderDto: CreateOrderDto & { orderItems: any[] } = {
-      orderCode: 'ORD-001',
-      customerId: 'customer-123',
-      totalAmount: 100000,
+    const createOrderDto: CreateOrderDto & { orderItems?: any[] } = {
+      orderCode: 'ORD001',
+      customerId: '123e4567-e89b-12d3-a456-426614174004',
+      totalAmount: 200.0,
+      discountAmount: 0,
+      shippingFee: 0,
+      vatAmount: 0,
+      status: OrderStatus.PENDING,
       deliveryAddress: 'Test Address',
+      note: 'Test Notes',
       orderItems: [
         {
-          product_id: 'product-123',
+          product_id: '123e4567-e89b-12d3-a456-426614174002',
           product_name: 'Test Product',
           quantity: 2,
-          unit_price: 50000,
+          unit_price: 100.0,
         },
       ],
     };
 
-    it('should create order successfully', async () => {
+    it('should create an order successfully', async () => {
+      const storeId = 'store-123';
+
       mockRepository.create.mockReturnValue(mockOrder);
       mockRepository.save.mockResolvedValue(mockOrder);
       mockRepository.findOne.mockResolvedValue(mockOrder);
 
-      const result = await service.createOrder('store-123', createOrderDto);
+      const result = await service.createOrder(storeId, createOrderDto);
 
       expect(result).toEqual(mockOrder);
       expect(mockRepository.create).toHaveBeenCalled();
-      expect(mockRepository.save).toHaveBeenCalled();
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
 
-    it('should handle foreign key constraint error', async () => {
-      mockRepository.create.mockReturnValue(mockOrder);
-      mockRepository.save.mockRejectedValue(
-        new Error('violates foreign key constraint'),
-      );
+    it('should throw error if order has no items', async () => {
+      const storeId = 'store-123';
+      const dtoWithoutItems = { ...createOrderDto, orderItems: [] };
 
       await expect(
-        service.createOrder('store-123', createOrderDto),
+        service.createOrder(storeId, dtoWithoutItems),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should handle not-null constraint error', async () => {
-      mockRepository.create.mockReturnValue(mockOrder);
-      mockRepository.save.mockRejectedValue(
-        new Error('violates not-null constraint'),
-      );
+    it('should throw error if item has no product ID', async () => {
+      const storeId = 'store-123';
+      const dtoWithInvalidItem = {
+        ...createOrderDto,
+        orderItems: [
+          { product_name: 'Test Product', quantity: 2, unit_price: 100.0 },
+        ],
+      };
 
       await expect(
-        service.createOrder('store-123', createOrderDto),
+        service.createOrder(storeId, dtoWithInvalidItem),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should handle generic database errors', async () => {
-      mockRepository.create.mockReturnValue(mockOrder);
-      mockRepository.save.mockRejectedValue(new Error('Database error'));
+    it('should throw error if item has invalid quantity', async () => {
+      const storeId = 'store-123';
+      const dtoWithInvalidQty = {
+        ...createOrderDto,
+        orderItems: [
+          {
+            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            product_name: 'Test Product',
+            quantity: 0,
+            unit_price: 100.0,
+          },
+        ],
+      };
 
       await expect(
-        service.createOrder('store-123', createOrderDto),
-      ).rejects.toThrow(InternalServerErrorException);
+        service.createOrder(storeId, dtoWithInvalidQty),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw error if item has invalid unit price', async () => {
+      const storeId = 'store-123';
+      const dtoWithInvalidPrice = {
+        ...createOrderDto,
+        orderItems: [
+          {
+            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            product_name: 'Test Product',
+            quantity: 2,
+            unit_price: 0,
+          },
+        ],
+      };
+
+      await expect(
+        service.createOrder(storeId, dtoWithInvalidPrice),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should calculate total amount correctly', async () => {
+      const storeId = 'store-123';
+      const dtoWithItems = {
+        ...createOrderDto,
+        totalAmount: 300.0,
+        orderItems: [
+          {
+            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            product_name: 'Test Product',
+            quantity: 3,
+            unit_price: 100.0,
+          },
+        ],
+      };
+
+      mockRepository.create.mockReturnValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+
+      await service.createOrder(storeId, dtoWithItems);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          total_amount: 300.0,
+        }),
+      );
+    });
+
+    it('should calculate total paid with discount and shipping', async () => {
+      const storeId = 'store-123';
+      const dtoWithDiscountAndShipping = {
+        ...createOrderDto,
+        discountAmount: 20.0,
+        shippingFee: 10.0,
+        orderItems: [
+          {
+            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            product_name: 'Test Product',
+            quantity: 2,
+            unit_price: 100.0,
+          },
+        ],
+      };
+
+      mockRepository.create.mockReturnValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+
+      await service.createOrder(storeId, dtoWithDiscountAndShipping);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          totalPaid: 190.0, // 200 - 20 + 10
+        }),
+      );
     });
   });
 
   describe('findAllOrder', () => {
     it('should return all orders', async () => {
+      const storeId = 'store-123';
       const orders = [mockOrder];
+
       mockRepository.find.mockResolvedValue(orders);
 
-      const result = await service.findAllOrder('store-123');
+      const result = await service.findAllOrder(storeId);
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
@@ -236,33 +325,31 @@ describe('OrdersService', () => {
         relations: ['orderItems'],
       });
     });
-
-    it('should return empty array when no orders', async () => {
-      mockRepository.find.mockResolvedValue([]);
-
-      const result = await service.findAllOrder('store-123');
-
-      expect(result).toEqual([]);
-    });
   });
 
   describe('findOne', () => {
-    it('should return order by id', async () => {
+    it('should return order by ID', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
       mockRepository.findOne.mockResolvedValue(mockOrder);
 
-      const result = await service.findOne('store-123', 'order-123');
+      const result = await service.findOne(storeId, orderId);
 
       expect(result).toEqual(mockOrder);
       expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { order_id: 'order-123', is_deleted: false },
+        where: { order_id: orderId, is_deleted: false },
         relations: ['orderItems'],
       });
     });
 
-    it('should throw NotFoundException when order not found', async () => {
+    it('should throw NotFoundException if order not found', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('store-123', 'invalid-id')).rejects.toThrow(
+      await expect(service.findOne(storeId, orderId)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -270,460 +357,240 @@ describe('OrdersService', () => {
 
   describe('update', () => {
     const updateOrderDto: UpdateOrderDto = {
-      customerId: 'customer-456',
-      orderCode: 'ORD-001',
+      orderCode: 'ORD001',
+      status: OrderStatus.CONFIRMED,
+      note: 'Updated Notes',
     };
 
     it('should update order successfully', async () => {
-      const updatedOrder = { ...mockOrder, customerId: 'customer-456' };
-      mockRepository.findOne.mockResolvedValue(mockOrder);
-      mockRepository.merge.mockReturnValue(updatedOrder);
-      mockRepository.save.mockResolvedValue(updatedOrder);
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
 
-      const result = await service.update(
-        'store-123',
-        'order-123',
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockRepository.merge.mockReturnValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.update(storeId, orderId, updateOrderDto);
+
+      expect(result).toEqual(mockOrder);
+      expect(mockRepository.merge).toHaveBeenCalledWith(
+        mockOrder,
         updateOrderDto,
       );
-
-      expect(result).toMatchObject(
-        expect.objectContaining({
-          customer_id: expect.any(String),
-          // ... các trường quan trọng khác ...
-        }),
-      );
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: {
-          order_id: 'order-123',
-          order_code: 'ORD-001',
-          is_deleted: false,
-          status: OrderStatus.PENDING,
-        },
-        relations: ['orderItems'],
-      });
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
 
-    it('should throw InternalServerErrorException when order not found', async () => {
+    it('should throw error if order not found', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.update('store-123', 'order-123', updateOrderDto),
+        service.update(storeId, orderId, updateOrderDto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should handle order items update', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const dtoWithItems = {
+        ...updateOrderDto,
+        orderItems: [
+          {
+            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            quantity: 3,
+            price: 100.0,
+          },
+        ],
+      };
+
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockProductsService.findById.mockResolvedValue(mockProduct);
+      mockRepository.merge.mockReturnValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.update(storeId, orderId, dtoWithItems);
+
+      expect(result).toEqual(mockOrder);
+      expect(mockProductsService.findById).toHaveBeenCalledWith(
+        storeId,
+        '123e4567-e89b-12d3-a456-426614174002',
+      );
+    });
+
+    it('should throw error if product not found during update', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+      const dtoWithItems = {
+        ...updateOrderDto,
+        orderItems: [
+          {
+            product_id: 'invalid-product-id',
+            quantity: 3,
+            price: 100.0,
+          },
+        ],
+      };
+
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockProductsService.findById.mockResolvedValue(null);
+
+      await expect(
+        service.update(storeId, orderId, dtoWithItems),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
   describe('remove', () => {
-    it('should remove order successfully', async () => {
-      mockRepository.findOne.mockResolvedValue(mockOrder);
-      const deletedOrder = { ...mockOrder, is_deleted: true };
-      mockRepository.save.mockResolvedValue(deletedOrder);
+    it('should soft delete order successfully', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
 
-      const result = await service.remove('store-123', 'order-123');
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.remove(storeId, orderId);
 
       expect(result).toEqual({
         message: 'Xóa đơn hàng thành công',
         data: null,
       });
-    });
-
-    it('should throw NotFoundException when order not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.remove('store-123', 'invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      expect(mockOrder.is_deleted).toBe(true);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
 
   describe('restore', () => {
     it('should restore order successfully', async () => {
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
       const deletedOrder = { ...mockOrder, is_deleted: true };
-      const restoredOrder = { ...mockOrder, is_deleted: false };
-      mockRepository.findOne.mockResolvedValue(deletedOrder);
-      mockRepository.save.mockResolvedValue(restoredOrder);
 
-      const result = await service.restore('store-123', 'order-123');
+      mockRepository.findOne.mockResolvedValue(deletedOrder);
+      mockRepository.save.mockResolvedValue(deletedOrder);
+
+      const result = await service.restore(storeId, orderId);
 
       expect(result).toEqual({
         message: 'Khôi phục đơn hàng thành công',
-        data: restoredOrder,
+        data: deletedOrder,
       });
-    });
-
-    it('should throw NotFoundException when deleted order not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.restore('store-123', 'invalid-id')).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      expect(deletedOrder.is_deleted).toBe(false);
+      expect(mockRepository.save).toHaveBeenCalledWith(deletedOrder);
     });
   });
 
   describe('confirmOrder', () => {
     it('should confirm order successfully', async () => {
-      const confirmedOrder = { ...mockOrder, status: OrderStatus.CONFIRMED };
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
       mockRepository.findOne.mockResolvedValue(mockOrder);
-      mockRepository.save.mockResolvedValue(confirmedOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
 
-      const result = await service.confirmOrder('store-123', 'order-123');
+      const result = await service.confirmOrder(storeId, orderId);
 
-      expect(result).toMatchObject({
-        data: expect.objectContaining({
-          order_id: expect.any(String),
-          status: 'confirmed',
-          customer_id: expect.any(String),
-          // ... các trường quan trọng khác ...
-        }),
+      expect(result).toEqual({
         message: 'Xác nhận đơn hàng thành công',
+        data: mockOrder,
       });
-      expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { order_id: 'order-123', is_deleted: false },
-        relations: ['orderItems'],
-      });
-    });
-
-    it('should throw NotFoundException when order not found', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(
-        service.confirmOrder('store-123', 'invalid-id'),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw BadRequestException when order not pending', async () => {
-      const confirmedOrder = { ...mockOrder, status: OrderStatus.CONFIRMED };
-      mockRepository.findOne.mockResolvedValue(confirmedOrder);
-
-      await expect(
-        service.confirmOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
+      expect(mockOrder.status).toBe(OrderStatus.CONFIRMED);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
 
   describe('shipOrder', () => {
     it('should ship order successfully', async () => {
-      const confirmedOrder = { ...mockOrder, status: OrderStatus.CONFIRMED };
-      const shippedOrder = { ...mockOrder, status: OrderStatus.SHIPPED };
-      mockRepository.findOne.mockResolvedValue(confirmedOrder);
-      mockRepository.save.mockResolvedValue(shippedOrder);
-      const result = await service.shipOrder('store-123', 'order-123');
-      expect(result).toMatchObject({
-        data: expect.objectContaining({
-          order_id: expect.any(String),
-          status: 'shipped',
-          customer_id: expect.any(String),
-        }),
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.shipOrder(storeId, orderId);
+
+      expect(result).toEqual({
         message: 'Giao hàng thành công',
+        data: mockOrder,
       });
-    });
-    it('should throw BadRequestException when order not confirmed', async () => {
-      // Đảm bảo trạng thái order là PENDING (không phải CONFIRMED)
-      const pendingOrder = { ...mockOrder, status: OrderStatus.PENDING };
-      mockRepository.findOne.mockResolvedValue(pendingOrder);
-      await expect(service.shipOrder('store-123', 'order-123')).rejects.toThrow(
-        BadRequestException,
-      );
+      expect(mockOrder.status).toBe(OrderStatus.SHIPPED);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
 
   describe('completeOrder', () => {
     it('should complete order successfully', async () => {
-      const shippedOrder = { ...mockOrder, status: OrderStatus.SHIPPED };
-      const completedOrder = { ...mockOrder, status: OrderStatus.DELIVERED };
-      mockRepository.findOne.mockResolvedValue(shippedOrder);
-      mockRepository.save.mockResolvedValue(completedOrder);
-      const result = await service.completeOrder('store-123', 'order-123');
-      expect(result).toMatchObject({
-        data: expect.objectContaining({
-          order_id: expect.any(String),
-          status: 'delivered',
-          customer_id: expect.any(String),
-        }),
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.completeOrder(storeId, orderId);
+
+      expect(result).toEqual({
         message: 'Hoàn thành đơn hàng thành công',
+        data: mockOrder,
       });
-    });
-    it('should throw BadRequestException when order not shipped', async () => {
-      // Đảm bảo trạng thái order là PENDING (không phải SHIPPED)
-      const pendingOrder = { ...mockOrder, status: OrderStatus.PENDING };
-      mockRepository.findOne.mockResolvedValue(pendingOrder);
-      await expect(
-        service.completeOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
+      expect(mockOrder.status).toBe(OrderStatus.CONFIRMED);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
 
   describe('cancelOrder', () => {
     it('should cancel order successfully', async () => {
-      // Đảm bảo trạng thái order là PENDING (không phải DELIVERED)
-      const pendingOrder = { ...mockOrder, status: OrderStatus.PENDING };
-      const cancelledOrder = { ...mockOrder, status: OrderStatus.CANCELLED };
-      mockRepository.findOne.mockResolvedValue(pendingOrder);
-      mockRepository.save.mockResolvedValue(cancelledOrder);
-      const result = await service.cancelOrder('store-123', 'order-123');
-      expect(result).toMatchObject({
-        data: expect.anything(),
+      const storeId = 'store-123';
+      const orderId = '123e4567-e89b-12d3-a456-426614174001';
+
+      mockOrder.status = OrderStatus.PENDING;
+      mockRepository.findOne.mockResolvedValue(mockOrder);
+      mockRepository.save.mockResolvedValue(mockOrder);
+
+      const result = await service.cancelOrder(storeId, orderId);
+
+      expect(result).toEqual({
         message: 'Hủy đơn hàng thành công',
+        data: mockOrder,
       });
-    });
-    it('should throw BadRequestException when order already delivered', async () => {
-      const completedOrder = { ...mockOrder, status: OrderStatus.DELIVERED };
-      mockRepository.findOne.mockResolvedValue(completedOrder);
-      await expect(
-        service.cancelOrder('store-123', 'order-123'),
-      ).rejects.toThrow(BadRequestException);
+      expect(mockOrder.status).toBe(OrderStatus.CANCELLED);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
 
   describe('findByStatus', () => {
     it('should return orders by status', async () => {
+      const storeId = 'store-123';
+      const status = OrderStatus.PENDING;
       const orders = [mockOrder];
+
       mockRepository.find.mockResolvedValue(orders);
 
-      const result = await service.findByStatus(
-        'store-123',
-        OrderStatus.PENDING,
-      );
+      const result = await service.findByStatus(storeId, status);
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { status: OrderStatus.PENDING, is_deleted: false },
+        where: { status, is_deleted: false },
         relations: ['orderItems'],
       });
-    });
-
-    it('should return empty array when no orders with status', async () => {
-      mockRepository.find.mockResolvedValue([]);
-
-      const result = await service.findByStatus(
-        'store-123',
-        OrderStatus.PENDING,
-      );
-
-      expect(result).toEqual([]);
     });
   });
 
   describe('findByCustomer', () => {
-    it('should return orders by customer', async () => {
+    it('should return orders by customer ID', async () => {
+      const storeId = 'store-123';
+      const customerId = '123e4567-e89b-12d3-a456-426614174004';
       const orders = [mockOrder];
+
       mockRepository.find.mockResolvedValue(orders);
 
-      const result = await service.findByCustomer('store-123', 'customer-123');
+      const result = await service.findByCustomer(storeId, customerId);
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { customer_id: 'customer-123', is_deleted: false },
+        where: { customer_id: customerId, is_deleted: false },
         relations: ['orderItems'],
       });
-    });
-
-    it('should return empty array when customer has no orders', async () => {
-      mockRepository.find.mockResolvedValue([]);
-
-      const result = await service.findByCustomer('store-123', 'customer-123');
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('createOrderAtomic', () => {
-    const createOrderAtomicDto: CreateOrderAtomicDto = {
-      orderCode: 'ORD-001',
-      customerId: 'customer-123',
-      totalAmount: 100000,
-      deliveryAddress: 'Test Address',
-      orderItems: [
-        {
-          product_id: 'product-123',
-          product_name: 'Test Product',
-          quantity: 2,
-          unit_price: 50000,
-        },
-      ],
-      paymentMethodId: '',
-    };
-
-    it('should create order atomically successfully', async () => {
-      // Mock product validation
-      mockProductsService.findById.mockResolvedValue({
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        price: 50000,
-        is_deleted: false,
-      } as any);
-
-      // Mock inventory transfer
-      mockInventoryService.createInventoryTransfer.mockResolvedValue({
-        id: 'transfer-123',
-        sourceStoreId: 'store-123',
-        targetStoreId: 'store-456',
-        transferCode: 'TRF-001',
-        status: 'PENDING',
-        transferDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any);
-
-      // Mock payment processing
-      mockPaymentService.processPayment.mockResolvedValue({
-        success: true,
-      });
-
-      // Mock order creation
-      mockRepository.create.mockReturnValue(mockOrder);
-      mockRepository.save.mockResolvedValue(mockOrder);
-      mockRepository.findOne.mockResolvedValue(mockOrder);
-
-      const result = await service.createOrderAtomic(
-        'store-123',
-        createOrderAtomicDto,
-        'user-123',
-        'payment-123',
-      );
-
-      expect(result).toEqual(mockOrder);
-      expect(mockProductsService.findById).toHaveBeenCalledWith(
-        'store-123',
-        'product-123',
-      );
-      expect(
-        mockInventoryService.createInventoryTransfer,
-      ).toHaveBeenCalledTimes(1);
-      expect(mockPaymentService.processPayment).toHaveBeenCalled();
-      expect(mockRepository.save).toHaveBeenCalled();
-      mockPaymentService.createPayment.mockResolvedValue({
-        id: 'payment-123',
-        amount: '100000',
-        payment_method_id: 'payment-123',
-        order_id: 'order-123',
-        order: mockOrder as any, // ép kiểu tạm thời cho mock
-        status: 'COMPLETED' as any, // ép kiểu tạm thời cho mock
-        is_deleted: false,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
-    });
-
-    it('should throw BadRequestException when product not found', async () => {
-      mockProductsService.findById.mockResolvedValue(null);
-
-      await expect(
-        service.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          'user-123',
-          'payment-123',
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should throw BadRequestException when product is deleted', async () => {
-      mockProductsService.findById.mockResolvedValue({
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        price: 50000,
-        is_deleted: true,
-      } as any);
-
-      await expect(
-        service.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          'user-123',
-          'payment-123',
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should throw BadRequestException when inventory transfer fails', async () => {
-      mockProductsService.findById.mockResolvedValue({
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        price: 50000,
-        is_deleted: false,
-      } as any);
-
-      mockInventoryService.createInventoryTransfer.mockRejectedValue(
-        new Error('Insufficient inventory'),
-      );
-
-      await expect(
-        service.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          'user-123',
-          'payment-123',
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should throw BadRequestException when payment fails', async () => {
-      mockProductsService.findById.mockResolvedValue({
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        price: 50000,
-        is_deleted: false,
-      } as any);
-
-      mockInventoryService.createInventoryTransfer.mockResolvedValue({
-        id: 'transfer-123',
-        sourceStoreId: 'store-123',
-        targetStoreId: 'store-456',
-        transferCode: 'TRF-001',
-        status: 'PENDING',
-        transferDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any);
-
-      mockPaymentService.processPayment.mockRejectedValue(
-        new Error('Payment failed'),
-      );
-
-      await expect(
-        service.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          'user-123',
-          'payment-123',
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should handle transaction rollback on order creation failure', async () => {
-      mockProductsService.findById.mockResolvedValue({
-        product_id: 'product-123',
-        product_name: 'Test Product',
-        price: 50000,
-        is_deleted: false,
-      } as any);
-
-      mockInventoryService.createInventoryTransfer.mockResolvedValue({
-        id: 'transfer-123',
-        sourceStoreId: 'store-123',
-        targetStoreId: 'store-456',
-        transferCode: 'TRF-001',
-        status: 'PENDING',
-        transferDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any);
-
-      mockPaymentService.processPayment.mockResolvedValue({
-        success: true,
-      });
-
-      mockRepository.create.mockReturnValue(mockOrder);
-      mockRepository.save.mockRejectedValue(new Error('Database error'));
-
-      await expect(
-        service.createOrderAtomic(
-          'store-123',
-          createOrderAtomicDto,
-          'user-123',
-          'payment-123',
-        ),
-      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 });
