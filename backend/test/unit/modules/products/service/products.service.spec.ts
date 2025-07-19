@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from '@modules/products/service/products.service';
-import { CreateProductDto } from '@modules/products/dto/create-product.dto';
-import { UpdateProductDto } from '@modules/products/dto/update-product.dto';
+import { ProductsService } from 'src/modules/products/service/products.service';
+import { CreateProductDto } from 'src/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from 'src/modules/products/dto/update-product.dto';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -9,41 +9,52 @@ import {
 import { DataSource } from 'typeorm';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
+import { AuditLogsService } from 'src/modules/audit-logs/service';
 
 describe('ProductsService', () => {
+  // Tắt log error của NestJS và console.error khi chạy test
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
   let service: ProductsService;
   let mockTenantDataSourceService: jest.Mocked<TenantDataSourceService>;
   let mockRepository: jest.Mocked<any>;
+  let mockAuditLogsService: any;
+
+  const mockCategory = {} as any;
 
   const mockProduct: Product = {
-    product_id: '123e4567-e89b-12d3-a456-426614174000',
-    product_code: 'TEST001',
+    product_id: 'p1',
+    product_code: 'C1',
     name: 'Test Product',
     slug: 'test-product',
-    description: 'Test Product Description',
-    category_id: '123e4567-e89b-12d3-a456-426614174001',
-    brand: 'Test Brand',
-    unit_id: '123e4567-e89b-12d3-a456-426614174002',
-    price_retail: 100.0,
-    price_wholesale: 80.0,
-    credit_price: 120.0,
-    cost_price: 60.0,
-    barcode: '1234567890123',
-    stock: 50,
-    min_stock_level: 10,
-    images: '{"url": "test-image.jpg"}',
-    specs: '{"color": "red", "size": "M"}',
-    warranty_info: '1 year warranty',
-    supplier_id: '123e4567-e89b-12d3-a456-426614174003',
+    description: 'desc',
+    category_id: 'cat1',
+    category: mockCategory,
+    brand: 'Brand',
+    unit_id: 'u1',
+    price_retail: 100,
+    price_wholesale: 90,
+    credit_price: 80,
+    cost_price: 70,
+    barcode: 'B1',
+    stock: 10,
+    min_stock_level: 1,
+    images: '',
+    specs: '',
+    warranty_info: '',
+    supplier_id: 'sup1',
     is_active: true,
     is_deleted: false,
     created_at: new Date(),
     updated_at: new Date(),
-    created_by_user_id: '123e4567-e89b-12d3-a456-426614174004',
-    updated_by_user_id: '123e4567-e89b-12d3-a456-426614174004',
-    getUnit: async () => null,
-    getCreatedByUser: async () => null,
-    getUpdatedByUser: async () => null,
+    created_by_user_id: 'u1',
+    updated_by_user_id: 'u2',
+    getUnit: jest.fn(),
+    getCreatedByUser: jest.fn(),
+    getUpdatedByUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -62,12 +73,18 @@ describe('ProductsService', () => {
       getTenantDataSource: jest.fn(),
     } as any;
 
+    mockAuditLogsService = { create: jest.fn() };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
         {
           provide: TenantDataSourceService,
           useValue: mockTenantDataSourceService,
+        },
+        {
+          provide: AuditLogsService,
+          useValue: mockAuditLogsService,
         },
       ],
     }).compile();
@@ -152,6 +169,60 @@ describe('ProductsService', () => {
       await expect(
         service.createProduct(storeId, createProductDto),
       ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should log and throw if repo.save throws', async () => {
+      const storeId = 'store-123';
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.create.mockReturnValue({ product_id: 'p1' });
+      mockRepository.save.mockRejectedValue(new Error('fail-save'));
+      await expect(
+        service.createProduct(storeId, {
+          productId: 'p1',
+          productCode: 'C1',
+        } as any),
+      ).rejects.toThrow('fail-save');
+    });
+    it('should log and throw if auditLogsService.create throws', async () => {
+      const storeId = 'store-123';
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.create.mockReturnValue({ product_id: 'p1' });
+      mockRepository.save.mockResolvedValue({ product_id: 'p1' });
+      mockAuditLogsService.create.mockRejectedValue(new Error('fail-audit'));
+      await expect(
+        service.createProduct(storeId, {
+          productId: 'p1',
+          productCode: 'C1',
+        } as any),
+      ).rejects.toThrow('fail-audit');
+    });
+    it('should log and throw if getRepo throws', async () => {
+      const storeId = 'store-123';
+      mockTenantDataSourceService.getTenantDataSource.mockRejectedValue(
+        new Error('fail-getRepo'),
+      );
+      await expect(
+        service.createProduct(storeId, {
+          productId: 'p1',
+          productCode: 'C1',
+        } as any),
+      ).rejects.toThrow('Lỗi khi kết nối tới CSDL chi nhánh');
+    });
+    it('should log and throw if unknown error', async () => {
+      const storeId = 'store-123';
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.create.mockImplementation(() => {
+        throw new Error('fail-unknown');
+      });
+      await expect(
+        service.createProduct(storeId, {
+          productId: 'p1',
+          productCode: 'C1',
+        } as any),
+      ).rejects.toThrow('fail-unknown');
     });
   });
 
@@ -266,6 +337,12 @@ describe('ProductsService', () => {
 
       expect(result).toEqual([]);
     });
+
+    it('should log and throw if repo.find throws', async () => {
+      const storeId = 'store-123';
+      mockRepository.find.mockRejectedValue(new Error('fail-find'));
+      await expect(service.findAll(storeId)).rejects.toThrow('fail-find');
+    });
   });
 
   describe('remove', () => {
@@ -305,6 +382,27 @@ describe('ProductsService', () => {
         NotFoundException,
       );
     });
+
+    it('should throw if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue(null);
+      await expect(service.remove(storeId, productId)).rejects.toThrow();
+    });
+    it('should log and throw if repo.save throws', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue({
+        product_id: 'p1',
+        is_deleted: false,
+      });
+      mockRepository.save.mockRejectedValue(new Error('fail-save'));
+      await expect(service.remove(storeId, productId)).rejects.toThrow(
+        'fail-save',
+      );
+    });
   });
 
   describe('restore', () => {
@@ -334,6 +432,29 @@ describe('ProductsService', () => {
 
       await expect(service.restore(storeId, productId)).rejects.toThrow(
         InternalServerErrorException,
+      );
+    });
+
+    it('should throw if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue(null);
+      await expect(service.restore(storeId, productId)).rejects.toThrow();
+    });
+    it('should log and throw if repo.save throws', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockRepository.findOneBy.mockResolvedValue({
+        product_id: 'p1',
+        is_deleted: true,
+      });
+      mockRepository.save.mockRejectedValue(
+        new Error('Sản phẩm không tồn tại hoặc chưa bị xóa mềm'),
+      );
+      await expect(service.restore(storeId, productId)).rejects.toThrow(
+        'Sản phẩm không tồn tại hoặc chưa bị xóa mềm',
       );
     });
   });
@@ -374,7 +495,13 @@ describe('ProductsService', () => {
         productCode: 'EXISTING001',
       };
 
-      const existingProduct = { ...mockProduct, product_id: 'different-id' };
+      const existingProduct = {
+        ...mockProduct,
+        product_id: 'different-id',
+        getUnit: jest.fn(),
+        getCreatedByUser: jest.fn(),
+        getUpdatedByUser: jest.fn(),
+      };
 
       jest.spyOn(service, 'findOneProduc').mockResolvedValue({
         repo: mockRepository,
@@ -387,6 +514,32 @@ describe('ProductsService', () => {
       await expect(
         service.update(storeId, productId, updateProductDto),
       ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw if product not found', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      await expect(
+        service.update(storeId, productId, { productCode: 'C2' } as any),
+      ).rejects.toThrow();
+    });
+    it('should log and throw if repo.save throws', async () => {
+      const storeId = 'store-123';
+      const productId = '123e4567-e89b-12d3-a456-426614174000';
+      mockRepository.findOneBy.mockResolvedValueOnce({
+        product_id: 'p1',
+        product_code: 'C1',
+      });
+      mockRepository.findOneBy.mockResolvedValueOnce(null);
+      mockRepository.merge.mockReturnValue({
+        product_id: 'p1',
+        product_code: 'C2',
+      });
+      mockRepository.save.mockRejectedValue(new Error('fail-save'));
+      await expect(
+        service.update(storeId, productId, { productCode: 'C2' } as any),
+      ).rejects.toThrow('fail-save');
     });
   });
 

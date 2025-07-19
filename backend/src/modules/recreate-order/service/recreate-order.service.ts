@@ -40,7 +40,7 @@ export class RecreateOrderService extends TenantBaseService<Order> {
 
       // Tìm đơn hàng gốc
       const originalOrder = await orderRepo.findOne({
-        where: { order_id: originalOrderId, is_deleted: false },
+        where: { orderId: originalOrderId, isDeleted: false },
         relations: ['orderItems'],
       });
 
@@ -52,20 +52,20 @@ export class RecreateOrderService extends TenantBaseService<Order> {
 
       // Lấy danh sách sản phẩm của đơn hàng gốc
       const originalOrderItems = await orderItemRepo.find({
-        where: { order_id: originalOrderId, is_deleted: false },
+        where: { orderId: originalOrderId, isDeleted: false },
       });
 
       return await dataSource.transaction(async (manager) => {
         // Tạo đơn hàng mới dựa trên đơn hàng gốc
         const newOrder = manager.getRepository(Order).create({
-          customer_id: originalOrder.customer_id,
-          total_amount: originalOrder.total_amount,
+          customerId: originalOrder.customerId,
+          totalAmount: originalOrder.totalAmount,
           status: OrderStatus.PENDING,
           note: `Recreated from order ${originalOrderId}`,
-          processed_by_user_id: userId,
-          created_at: new Date(),
-          updated_at: new Date(),
-          is_deleted: false,
+          processedByUserId: userId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isDeleted: false,
         });
 
         const savedOrder = await manager.getRepository(Order).save(newOrder);
@@ -73,23 +73,23 @@ export class RecreateOrderService extends TenantBaseService<Order> {
         // Tạo các sản phẩm cho đơn hàng mới
         for (const originalItem of originalOrderItems) {
           const newOrderItem = manager.getRepository(OrderItem).create({
-            order_id: savedOrder.order_id,
-            product_id: originalItem.product_id,
-            product_name: originalItem.product_name,
-            product_unit_id: originalItem.product_unit_id,
+            orderId: savedOrder.orderId,
+            productId: originalItem.productId,
+            productName: originalItem.productName,
+            productUnitId: originalItem.productUnitId,
             quantity: originalItem.quantity,
-            unit_price: originalItem.unit_price,
-            total_price: originalItem.total_price,
-            created_at: new Date(),
-            updated_at: new Date(),
-            is_deleted: false,
+            unitPrice: originalItem.unitPrice,
+            totalPrice: originalItem.totalPrice,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isDeleted: false,
           });
 
           await manager.getRepository(OrderItem).save(newOrderItem);
         }
 
         this.logger.log(
-          `Order recreated successfully: ${savedOrder.order_id} from ${originalOrderId}`,
+          `Order recreated successfully: ${savedOrder.orderId} from ${originalOrderId}`,
         );
 
         return savedOrder;
@@ -121,9 +121,9 @@ export class RecreateOrderService extends TenantBaseService<Order> {
       const recreatedOrders = await orderRepo.find({
         where: {
           note: `Recreated from order ${orderId}`,
-          is_deleted: false,
+          isDeleted: false,
         },
-        order: { created_at: 'DESC' },
+        order: { createdAt: 'DESC' },
       });
 
       this.logger.log(

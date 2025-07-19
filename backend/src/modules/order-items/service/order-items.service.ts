@@ -36,9 +36,9 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
     const repo = await this.getRepo(storeId);
     const existingItem = await repo.findOne({
       where: {
-        order_id: createOrderItemDto.orderId,
-        product_id: createOrderItemDto.productId,
-        is_deleted: false,
+        orderId: createOrderItemDto.orderId,
+        productId: createOrderItemDto.productId,
+        isDeleted: false,
       },
     });
 
@@ -57,8 +57,8 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
 
     const orderItem = repo.create({
       ...entityData,
-      created_by_user_id: userId,
-      updated_by_user_id: userId,
+      createdByUserId: userId,
+      updatedByUserId: userId,
     });
 
     const saved: OrderItem = await repo.save(orderItem);
@@ -68,9 +68,9 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   async findAllOrderItems(storeId: string): Promise<OrderItemResponseDto[]> {
     const repo = await this.getRepo(storeId);
     const orderItems = await repo.find({
-      where: { is_deleted: false },
+      where: { isDeleted: false },
       relations: ['order', 'product'],
-      order: { created_at: 'DESC' },
+      order: { createdAt: 'DESC' },
     });
     return orderItems.map((item) => this.mapToResponseDto(item));
   }
@@ -78,7 +78,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   async findOne(storeId: string, id: string): Promise<OrderItemResponseDto> {
     const repo = await this.getRepo(storeId);
     const orderItem = await repo.findOne({
-      where: { order_item_id: id, is_deleted: false },
+      where: { orderItemId: id, isDeleted: false },
       relations: ['order', 'product'],
     });
 
@@ -97,7 +97,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   ): Promise<OrderItemResponseDto> {
     const repo = await this.getRepo(storeId);
     const orderItem = await repo.findOne({
-      where: { order_item_id: id, is_deleted: false },
+      where: { orderItemId: id, isDeleted: false },
     });
 
     if (!orderItem) {
@@ -107,22 +107,22 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
     // Validate foreign keys if provided
     if (updateOrderItemDto.orderId || updateOrderItemDto.productId) {
       await this.validateForeignKeys(storeId, {
-        orderId: updateOrderItemDto.orderId ?? orderItem.order_id,
-        productId: updateOrderItemDto.productId ?? orderItem.product_id,
+        orderId: updateOrderItemDto.orderId ?? orderItem.orderId,
+        productId: updateOrderItemDto.productId ?? orderItem.productId,
       });
     }
 
     // Check unique constraint if order_id or product_id is being updated
     if (updateOrderItemDto.orderId || updateOrderItemDto.productId) {
-      const newOrderId = updateOrderItemDto.orderId ?? orderItem.order_id;
-      const newProductId = updateOrderItemDto.productId ?? orderItem.product_id;
+      const newOrderId = updateOrderItemDto.orderId ?? orderItem.orderId;
+      const newProductId = updateOrderItemDto.productId ?? orderItem.productId;
 
       const existingItem = await repo.findOne({
         where: {
-          order_id: newOrderId,
-          product_id: newProductId,
-          order_item_id: Not(id),
-          is_deleted: false,
+          orderId: newOrderId,
+          productId: newProductId,
+          orderItemId: Not(id),
+          isDeleted: false,
         },
       });
 
@@ -140,30 +140,30 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
       updateOrderItemDto.quantity
     ) {
       this.validateNumericFields({
-        unitPrice: updateOrderItemDto.unitPrice ?? orderItem.unit_price,
-        totalPrice: updateOrderItemDto.totalPrice ?? orderItem.total_price,
+        unitPrice: updateOrderItemDto.unitPrice ?? orderItem.unitPrice,
+        totalPrice: updateOrderItemDto.totalPrice ?? orderItem.totalPrice,
         quantity: updateOrderItemDto.quantity ?? orderItem.quantity,
       });
     }
 
     // Update fields individually to ensure proper type conversion
     if (updateOrderItemDto.orderId)
-      orderItem.order_id = updateOrderItemDto.orderId;
+      orderItem.orderId = updateOrderItemDto.orderId;
     if (updateOrderItemDto.productId)
-      orderItem.product_id = updateOrderItemDto.productId;
+      orderItem.productId = updateOrderItemDto.productId;
     if (updateOrderItemDto.productName)
-      orderItem.product_name = updateOrderItemDto.productName;
+      orderItem.productName = updateOrderItemDto.productName;
     if (updateOrderItemDto.productUnitId)
-      orderItem.product_unit_id = updateOrderItemDto.productUnitId;
+      orderItem.productUnitId = updateOrderItemDto.productUnitId;
     if (updateOrderItemDto.quantity)
       orderItem.quantity = updateOrderItemDto.quantity;
     if (updateOrderItemDto.unitPrice)
-      orderItem.unit_price = updateOrderItemDto.unitPrice;
+      orderItem.unitPrice = updateOrderItemDto.unitPrice;
     if (updateOrderItemDto.totalPrice)
-      orderItem.total_price = updateOrderItemDto.totalPrice;
+      orderItem.totalPrice = updateOrderItemDto.totalPrice;
     if (updateOrderItemDto.note) orderItem.note = updateOrderItemDto.note;
 
-    orderItem.updated_by_user_id = userId;
+    orderItem.updatedByUserId = userId;
 
     const saved = await repo.save(orderItem);
     return this.mapToResponseDto(saved);
@@ -176,7 +176,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   ): Promise<{ message: string }> {
     const repo = await this.getRepo(storeId);
     const orderItem = await repo.findOne({
-      where: { order_item_id: id, is_deleted: false },
+      where: { orderItemId: id, isDeleted: false },
     });
 
     if (!orderItem) {
@@ -184,8 +184,8 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
     }
 
     // Soft delete
-    orderItem.is_deleted = true;
-    orderItem.updated_by_user_id = userId;
+    orderItem.isDeleted = true;
+    orderItem.updatedByUserId = userId;
     await repo.save(orderItem);
 
     return { message: `Order item with ID ${id} has been soft deleted` };
@@ -198,7 +198,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   ): Promise<OrderItemResponseDto> {
     const repo = await this.getRepo(storeId);
     const orderItem = await repo.findOne({
-      where: { order_item_id: id, is_deleted: true },
+      where: { orderItemId: id, isDeleted: true },
     });
 
     if (!orderItem) {
@@ -208,8 +208,8 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
     }
 
     // Restore
-    orderItem.is_deleted = false;
-    orderItem.updated_by_user_id = userId;
+    orderItem.isDeleted = false;
+    orderItem.updatedByUserId = userId;
 
     const saved = await repo.save(orderItem);
     return this.mapToResponseDto(saved);
@@ -221,9 +221,9 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
   ): Promise<OrderItemResponseDto[]> {
     const repo = await this.getRepo(storeId);
     const orderItems = await repo.find({
-      where: { order_id: orderId, is_deleted: false },
+      where: { orderId: orderId, isDeleted: false },
       relations: ['product'],
-      order: { created_at: 'ASC' },
+      order: { createdAt: 'ASC' },
     });
     return orderItems.map((item) => this.mapToResponseDto(item));
   }
@@ -238,7 +238,7 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
 
     if (dto.orderId) {
       const order = await orderRepo.findOne({
-        where: { order_id: dto.orderId, is_deleted: false },
+        where: { orderId: dto.orderId, isDeleted: false },
       });
       if (!order) {
         throw new BadRequestException(`Order with ID ${dto.orderId} not found`);
@@ -282,20 +282,20 @@ export class OrderItemsService extends TenantBaseService<OrderItem> {
 
   private mapToResponseDto(orderItem: OrderItem): OrderItemResponseDto {
     return {
-      orderItemId: orderItem.order_item_id,
-      orderId: orderItem.order_id,
-      productId: orderItem.product_id,
-      productName: orderItem.product_name,
-      productUnitId: orderItem.product_unit_id,
+      orderItemId: orderItem.orderItemId,
+      orderId: orderItem.orderId,
+      productId: orderItem.productId,
+      productName: orderItem.productName,
+      productUnitId: orderItem.productUnitId,
       quantity: orderItem.quantity,
-      unitPrice: orderItem.unit_price,
-      totalPrice: orderItem.total_price,
+      unitPrice: orderItem.unitPrice,
+      totalPrice: orderItem.totalPrice,
       note: orderItem.note,
-      createdAt: orderItem.created_at,
-      updatedAt: orderItem.updated_at,
-      createdByUserId: orderItem.created_by_user_id,
-      updatedByUserId: orderItem.updated_by_user_id,
-      isDeleted: orderItem.is_deleted,
+      createdAt: orderItem.createdAt,
+      updatedAt: orderItem.updatedAt,
+      createdByUserId: orderItem.createdByUserId,
+      updatedByUserId: orderItem.updatedByUserId,
+      isDeleted: orderItem.isDeleted,
     };
   }
 }

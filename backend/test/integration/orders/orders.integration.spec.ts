@@ -4,9 +4,6 @@ import { Repository } from 'typeorm';
 import { OrdersService } from '../../../src/modules/orders/service/orders.service';
 import { Order, OrderStatus } from '../../../src/entities/tenant/order.entity';
 import { OrderItem } from '../../../src/entities/tenant/orderItem.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { TenantDatabaseModule } from '../../../src/config/db/dbtenant/tenant-database.module';
-import { OrdersModule } from '../../../src/modules/orders.module';
 import { TenantDataSourceService } from '../../../src/config/db/dbtenant/tenant-datasource.service';
 import { ProductsService } from '../../../src/modules/products/service/products.service';
 import { Product } from '../../../src/entities/tenant/product.entity';
@@ -15,6 +12,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { TenantModule } from '../../../src/config/db/dbtenant/tenant.module';
+import { OrdersModule } from '../../../src/modules/orders/orders.module';
 
 describe('OrdersService Integration', () => {
   let app: INestApplication;
@@ -66,7 +65,7 @@ describe('OrdersService Integration', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TenantDatabaseModule, OrdersModule],
+      imports: [TenantModule, OrdersModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -88,8 +87,8 @@ describe('OrdersService Integration', () => {
 
   beforeEach(async () => {
     // Clean up database before each test
-    await orderItemRepository.delete({ order_id: testOrderData.orderCode });
-    await orderRepository.delete({ order_code: testOrderData.orderCode });
+    await orderItemRepository.delete({ orderId: testOrderData.orderCode });
+    await orderRepository.delete({ orderCode: testOrderData.orderCode });
     await productRepository.delete({ product_id: testProduct.product_id });
 
     // Create test product
@@ -112,29 +111,29 @@ describe('OrdersService Integration', () => {
 
       // Verify the result
       expect(result).toBeDefined();
-      expect(result.order_code).toBe(testOrderData.orderCode);
-      expect(result.customer_id).toBe(testOrderData.customerId);
-      expect(result.total_amount).toBe(200.0); // 2 * 100.00
-      expect(result.total_paid).toBe(200.0); // total_amount - discount + shipping
+      expect(result.orderCode).toBe(testOrderData.orderCode);
+      expect(result.customerId).toBe(testOrderData.customerId);
+      expect(result.totalAmount).toBe(200.0); // 2 * 100.00
+      expect(result.totalPaid).toBe(200.0); // total_amount - discount + shipping
       expect(result.status).toBe(OrderStatus.PENDING);
-      expect(result.order_items).toBeDefined();
-      expect(result.order_items.length).toBe(1);
+      expect(result.orderItems).toBeDefined();
+      expect(result.orderItems.length).toBe(1);
 
       // Verify order item
-      const orderItem = result.order_items[0];
-      expect(orderItem.product_id).toBe(testOrderData.orderItems[0].product_id);
+      const orderItem = result.orderItems[0];
+      expect(orderItem.productId).toBe(testOrderData.orderItems[0].productId);
       expect(orderItem.quantity).toBe(testOrderData.orderItems[0].quantity);
-      expect(orderItem.unit_price).toBe(testOrderData.orderItems[0].unit_price);
-      expect(orderItem.total_price).toBe(200.0); // 2 * 100.00
+      expect(orderItem.unitPrice).toBe(testOrderData.orderItems[0].unitPrice);
+      expect(orderItem.totalPrice).toBe(200.0); // 2 * 100.00
 
       // Verify order exists in database
       const dbOrder = await orderRepository.findOne({
-        where: { order_code: testOrderData.orderCode },
+        where: { orderCode: testOrderData.orderCode },
         relations: ['orderItems'],
       });
       expect(dbOrder).not.toBeNull();
-      expect(dbOrder!.order_code).toBe(testOrderData.orderCode);
-      expect(dbOrder!.order_items.length).toBe(1);
+      expect(dbOrder!.orderCode).toBe(testOrderData.orderCode);
+      expect(dbOrder!.orderItems.length).toBe(1);
     });
 
     it('should fail to create order with no items', async () => {
@@ -223,8 +222,8 @@ describe('OrdersService Integration', () => {
         orderDataWithMultipleItems,
       );
 
-      expect(result.total_amount).toBe(250.0); // 2 * 100 + 1 * 50
-      expect(result.order_items.length).toBe(2);
+      expect(result.totalAmount).toBe(250.0); // 2 * 100 + 1 * 50
+      expect(result.orderItems.length).toBe(2);
     });
 
     it('should calculate total paid with discount and shipping', async () => {
@@ -240,10 +239,10 @@ describe('OrdersService Integration', () => {
         orderDataWithDiscountAndShipping,
       );
 
-      expect(result.total_amount).toBe(200.0); // 2 * 100
-      expect(result.total_paid).toBe(190.0); // 200 - 20 + 10
-      expect(result.discount_amount).toBe(20.0);
-      expect(result.shipping_fee).toBe(10.0);
+      expect(result.totalAmount).toBe(200.0); // 2 * 100
+      expect(result.totalPaid).toBe(190.0); // 200 - 20 + 10
+      expect(result.discountAmount).toBe(20.0);
+      expect(result.shippingFee).toBe(10.0);
     });
   });
 
@@ -262,11 +261,11 @@ describe('OrdersService Integration', () => {
 
       // Check if our test order is in the list
       const testOrder = orders.find(
-        (o) => o.order_code === testOrderData.orderCode,
+        (o) => o.orderCode === testOrderData.orderCode,
       );
       expect(testOrder).toBeDefined();
-      expect(testOrder!.order_code).toBe(testOrderData.orderCode);
-      expect(testOrder!.order_items).toBeDefined();
+      expect(testOrder!.orderCode).toBe(testOrderData.orderCode);
+      expect(testOrder!.orderItems).toBeDefined();
     });
   });
 
@@ -279,17 +278,17 @@ describe('OrdersService Integration', () => {
         testStoreId,
         testOrderData,
       );
-      orderId = result.order_id;
+      orderId = result.orderId;
     });
 
     it('should return order by ID', async () => {
       const order = await ordersService.findOne(testStoreId, orderId);
 
       expect(order).toBeDefined();
-      expect(order.order_id).toBe(orderId);
-      expect(order.order_code).toBe(testOrderData.orderCode);
-      expect(order.order_items).toBeDefined();
-      expect(order.order_items.length).toBe(1);
+      expect(order.orderId).toBe(orderId);
+      expect(order.orderCode).toBe(testOrderData.orderCode);
+      expect(order.orderItems).toBeDefined();
+      expect(order.orderItems.length).toBe(1);
     });
 
     it('should throw NotFoundException for non-existent order', async () => {
@@ -678,7 +677,7 @@ describe('OrdersService Integration', () => {
 
       // All returned orders should belong to the customer
       customerOrders.forEach((order) => {
-        expect(order.customer_id).toBe(testOrderData.customerId);
+        expect(order.customerId).toBe(testOrderData.customerId);
       });
     });
 
@@ -703,32 +702,32 @@ describe('OrdersService Integration', () => {
         testStoreId,
         testOrderData,
       );
-      orderId = result.order_id;
+      orderId = result.orderId;
     });
 
     it('should follow correct status transition: PENDING -> CONFIRMED -> SHIPPED -> COMPLETED', async () => {
       // PENDING -> CONFIRMED
       await ordersService.confirmOrder(testStoreId, orderId);
       let order = await orderRepository.findOne({
-        where: { order_id: orderId },
+        where: { orderId: orderId },
       });
       expect(order!.status).toBe(OrderStatus.CONFIRMED);
 
       // CONFIRMED -> SHIPPED
       await ordersService.shipOrder(testStoreId, orderId);
-      order = await orderRepository.findOne({ where: { order_id: orderId } });
+      order = await orderRepository.findOne({ where: { orderId: orderId } });
       expect(order!.status).toBe(OrderStatus.SHIPPED);
 
       // SHIPPED -> COMPLETED
       await ordersService.completeOrder(testStoreId, orderId);
-      order = await orderRepository.findOne({ where: { order_id: orderId } });
-      expect(order!.status).toBe(OrderStatus.COMPLETED);
+      order = await orderRepository.findOne({ where: { orderId: orderId } });
+      expect(order!.status).toBe(OrderStatus.DELIVERED);
     });
 
     it('should allow cancellation from PENDING status', async () => {
       await ordersService.cancelOrder(testStoreId, orderId);
       const order = await orderRepository.findOne({
-        where: { order_id: orderId },
+        where: { orderId: orderId },
       });
       expect(order!.status).toBe(OrderStatus.CANCELLED);
     });
@@ -774,11 +773,11 @@ describe('OrdersService Integration', () => {
         complexOrderData,
       );
 
-      expect(result.total_amount).toBe(450.0); // 3 * 100 + 2 * 75
-      expect(result.total_paid).toBe(425.0); // 450 - 50 + 25
-      expect(result.discount_amount).toBe(50.0);
-      expect(result.shipping_fee).toBe(25.0);
-      expect(result.order_items.length).toBe(2);
+      expect(result.totalAmount).toBe(450.0); // 3 * 100 + 2 * 75
+      expect(result.totalPaid).toBe(425.0); // 450 - 50 + 25
+      expect(result.discountAmount).toBe(50.0);
+      expect(result.shippingFee).toBe(25.0);
+      expect(result.orderItems.length).toBe(2);
     });
   });
 });

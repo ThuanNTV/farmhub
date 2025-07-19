@@ -219,7 +219,12 @@ describe('OrdersService', () => {
       const dtoWithInvalidItem = {
         ...createOrderDto,
         orderItems: [
-          { productName: 'Test Product', quantity: 2, unitPrice: 100.0, price: 200.0 },
+          {
+            productName: 'Test Product',
+            quantity: 2,
+            unitPrice: 100.0,
+            price: 200.0,
+          },
         ],
       };
 
