@@ -23,7 +23,7 @@ import { OrderStatus } from 'src/entities/tenant/order.entity';
 import { OrderItemData } from 'src/common/types/common.types';
 
 export function calculateOrderTotal(items: OrderItem[]): number {
-  return items.reduce((sum, item) => sum + item.total_price, 0);
+  return items.reduce((sum, item) => sum + item.totalPrice, 0);
 }
 
 export function calculateTotalPaid(
@@ -60,8 +60,8 @@ export class OrdersService extends TenantBaseService<Order> {
 
     // Validate chi tiết sản phẩm
     for (const [index, item] of orderItems.entries()) {
-      const itemLabel = item.product_name ?? `#${index + 1}`;
-      if (!item.product_id) {
+      const itemLabel = item.productName ?? `#${index + 1}`;
+      if (!item.productId) {
         throw new BadRequestException(
           `❌ Sản phẩm "${itemLabel}" thiếu productId`,
         );
@@ -71,7 +71,7 @@ export class OrdersService extends TenantBaseService<Order> {
           `❌ Sản phẩm "${itemLabel}" phải có số lượng > 0`,
         );
       }
-      if (!item.unit_price || item.unit_price <= 0) {
+      if (!item.unitPrice || item.unitPrice <= 0) {
         throw new BadRequestException(
           `❌ Sản phẩm "${itemLabel}" phải có giá > 0`,
         );
@@ -80,14 +80,14 @@ export class OrdersService extends TenantBaseService<Order> {
 
     const calculatedItems = orderItems.map((item) =>
       plainToInstance(OrderItem, {
-        productId: item.product_id,
-        product_name: item.product_name,
-        product_unit_id: item.product_unit_id,
+        productId: item.productId,
+        productName: item.productName,
+        productUnitId: item.productUnitId,
         quantity: item.quantity,
-        unit_price: item.unit_price,
-        total_price: Number(item.unit_price) * Number(item.quantity),
-        created_at: new Date(),
-        updated_at: new Date(),
+        unitPrice: item.unitPrice,
+        totalPrice: Number(item.unitPrice) * Number(item.quantity),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }),
     );
 
@@ -111,7 +111,7 @@ export class OrdersService extends TenantBaseService<Order> {
     try {
       const savedOrder = await repo.save(order);
       return await repo.findOne({
-        where: { order_id: savedOrder.order_id },
+        where: { orderId: savedOrder.orderId },
         relations: ['orderItems'],
       });
     } catch (error) {
@@ -138,7 +138,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async findAllOrder(storeId: string) {
     const repo = await this.getRepo(storeId);
     return await repo.find({
-      where: { is_deleted: false },
+      where: { isDeleted: false },
       relations: ['orderItems'],
     });
   }
@@ -146,7 +146,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async findOne(storeId: string, orderId: string) {
     const repo = await this.getRepo(storeId);
     const order = await repo.findOne({
-      where: { order_id: orderId, is_deleted: false },
+      where: { orderId: orderId, isDeleted: false },
       relations: ['orderItems'],
     });
     if (!order) {
@@ -168,9 +168,9 @@ export class OrdersService extends TenantBaseService<Order> {
     // Find the order
     const order = await repo.findOne({
       where: {
-        order_id: orderId,
-        order_code: dto.orderCode,
-        is_deleted: false,
+        orderId: orderId,
+        orderCode: dto.orderCode,
+        isDeleted: false,
         status: OrderStatus.PENDING,
       },
       relations: ['orderItems'],
@@ -189,66 +189,66 @@ export class OrdersService extends TenantBaseService<Order> {
 
     // Handle orderItems if provided
     if (dto.orderItems) {
-      const existingItems = order.order_items.filter((i) => !i.is_deleted);
+      const existingItems = order.orderItems.filter((i) => !i.isDeleted);
       const finalItems: OrderItem[] = [];
       const processedProductIds = new Set<string>();
 
       for (const itemDto of dto.orderItems as Array<Partial<OrderItem>>) {
         const existing = existingItems.find(
-          (item) => item.product_id === itemDto.product_id,
+          (item) => item.productId === itemDto.productId,
         );
         const product = await this.productsService.findById(
           storeId,
-          itemDto.product_id as string,
+          itemDto.productId as string,
         );
         if (!product) {
           throw new InternalServerErrorException(
-            `❌ Sản phẩm ${itemDto.product_id} không tồn tại!`,
+            `❌ Sản phẩm ${itemDto.productId} không tồn tại!`,
           );
         }
         if (existing) {
           // Update existing item
           existing.quantity = itemDto.quantity ?? existing.quantity;
-          existing.unit_price = itemDto.unit_price ?? existing.unit_price;
-          existing.product_name = itemDto.product_name ?? existing.product_name;
-          existing.product_unit_id =
-            itemDto.product_unit_id ?? existing.product_unit_id;
-          existing.total_price =
-            (existing.quantity || 0) * (existing.unit_price || 0);
-          existing.is_deleted = false;
-          existing.updated_at = new Date();
+          existing.unitPrice = itemDto.unitPrice ?? existing.unitPrice;
+          existing.productName = itemDto.productName ?? existing.productName;
+          existing.productUnitId =
+            itemDto.productUnitId ?? existing.productUnitId;
+          existing.totalPrice =
+            (existing.quantity || 0) * (existing.unitPrice || 0);
+          existing.isDeleted = false;
+          existing.updatedAt = new Date();
           finalItems.push(existing);
         } else {
           // Create new item - KEY CHANGE: Don't set the order relation
           const newItem = plainToInstance(OrderItem, {
             ...itemDto,
-            order_id: order.order_id, // Only set the foreign key
-            total_price: (itemDto.quantity ?? 0) * (itemDto.unit_price ?? 0),
-            is_deleted: false,
-            created_at: new Date(),
-            updated_at: new Date(),
+            orderId: order.orderId, // Only set the foreign key
+            totalPrice: (itemDto.quantity ?? 0) * (itemDto.unitPrice ?? 0),
+            isDeleted: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
 
           // DO NOT set newItem.order = order;
           finalItems.push(newItem);
         }
 
-        if (itemDto.product_id) {
-          processedProductIds.add(itemDto.product_id);
+        if (itemDto.productId) {
+          processedProductIds.add(itemDto.productId);
         }
       }
 
       // Mark remaining items as deleted
       for (const remaining of existingItems) {
-        if (!processedProductIds.has(remaining.product_id)) {
-          remaining.is_deleted = true;
-          remaining.updated_at = new Date();
+        if (!processedProductIds.has(remaining.productId)) {
+          remaining.isDeleted = true;
+          remaining.updatedAt = new Date();
           finalItems.push(remaining);
         }
       }
 
       // Set the final items array
-      updated.order_items = finalItems;
+      updated.orderItems = finalItems;
     }
 
     try {
@@ -257,7 +257,7 @@ export class OrdersService extends TenantBaseService<Order> {
 
       // Return fresh data to ensure relations are properly loaded
       return await repo.findOne({
-        where: { order_id: savedOrder.order_id, is_deleted: false },
+        where: { orderId: savedOrder.orderId, isDeleted: false },
         relations: ['orderItems'],
       });
     } catch (error) {
@@ -276,7 +276,7 @@ export class OrdersService extends TenantBaseService<Order> {
     const repo = await this.getRepo(storeId);
     const entity = await this.findByIdOrFail(storeId, orderId);
 
-    entity.is_deleted = true;
+    entity.isDeleted = true;
     await repo.save(entity);
     return {
       message: 'Xóa đơn hàng thành công',
@@ -287,7 +287,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async restore(storeId: string, orderId: string) {
     const repo = await this.getRepo(storeId);
     const entity = await repo.findOne({
-      where: { order_id: orderId, is_deleted: true },
+      where: { orderId: orderId, isDeleted: true },
       relations: ['orderItems'],
     });
     if (!entity) {
@@ -295,7 +295,7 @@ export class OrdersService extends TenantBaseService<Order> {
         'Đơn hàng không tồn tại hoặc chưa bị xóa mềm',
       );
     }
-    entity.is_deleted = false;
+    entity.isDeleted = false;
     await repo.save(entity);
     return {
       message: 'Khôi phục đơn hàng thành công',
@@ -314,7 +314,7 @@ export class OrdersService extends TenantBaseService<Order> {
     }
 
     order.status = OrderStatus.CONFIRMED;
-    order.updated_at = new Date();
+    order.updatedAt = new Date();
     await repo.save(order);
 
     return {
@@ -334,7 +334,7 @@ export class OrdersService extends TenantBaseService<Order> {
     }
 
     order.status = OrderStatus.SHIPPED;
-    order.updated_at = new Date();
+    order.updatedAt = new Date();
     await repo.save(order);
 
     return {
@@ -354,7 +354,7 @@ export class OrdersService extends TenantBaseService<Order> {
     }
 
     order.status = OrderStatus.DELIVERED;
-    order.updated_at = new Date();
+    order.updatedAt = new Date();
     await repo.save(order);
 
     return {
@@ -372,7 +372,7 @@ export class OrdersService extends TenantBaseService<Order> {
     }
 
     order.status = OrderStatus.CANCELLED;
-    order.updated_at = new Date();
+    order.updatedAt = new Date();
     await repo.save(order);
 
     return {
@@ -386,7 +386,7 @@ export class OrdersService extends TenantBaseService<Order> {
     return await repo.find({
       where: {
         status,
-        is_deleted: false,
+        isDeleted: false,
       },
       relations: ['orderItems'],
     });
@@ -395,7 +395,7 @@ export class OrdersService extends TenantBaseService<Order> {
   async findByCustomer(storeId: string, customerId: string) {
     const repo = await this.getRepo(storeId);
     return await repo.find({
-      where: { customer_id: customerId, is_deleted: false },
+      where: { customerId: customerId, isDeleted: false },
       relations: ['orderItems'],
     });
   }
@@ -404,8 +404,8 @@ export class OrdersService extends TenantBaseService<Order> {
     const repo = await this.getRepo(storeId);
     // Fetch the original order with items
     const original = await repo.findOne({
-      where: { order_id: orderId, is_deleted: false },
-      relations: ['order_items'],
+      where: { orderId: orderId, isDeleted: false },
+      relations: ['orderItems'],
     });
     if (!original) {
       throw new NotFoundException(
@@ -413,42 +413,42 @@ export class OrdersService extends TenantBaseService<Order> {
       );
     }
     // Generate new order_code (append -COPY + timestamp)
-    const newOrderCode = `${original.order_code}-COPY-${Date.now()}`;
+    const newOrderCode = `${original.orderCode}-COPY-${Date.now()}`;
     // Prepare new order data (omit PKs, timestamps, unique fields)
     const {
-      order_id,
-      created_at,
-      updated_at,
-      invoice_number,
-      order_items,
+      orderId: oldOrderId,
+      createdAt,
+      updatedAt,
+      invoiceNumber,
+      orderItems,
       ...rest
     } = original;
     const newOrder = repo.create({
       ...rest,
-      order_code: newOrderCode,
+      orderCode: newOrderCode,
       status: OrderStatus.PENDING,
-      is_deleted: false,
-      created_at: new Date(),
-      updated_at: new Date(),
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       // order_items will be set below
     });
     // Clone order items
-    if (Array.isArray(order_items)) {
-      newOrder.order_items = order_items.map((item) => {
-        const { order_item_id, created_at, updated_at, ...itemRest } = item;
+    if (Array.isArray(orderItems)) {
+      newOrder.orderItems = orderItems.map((item) => {
+        const { orderItemId, createdAt, updatedAt, ...itemRest } = item;
         return repo.manager.create('OrderItem', {
           ...itemRest,
-          is_deleted: false,
-          created_at: new Date(),
-          updated_at: new Date(),
+          isDeleted: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       });
     }
     // Save new order and items
     const saved = await repo.save(newOrder);
     return await repo.findOne({
-      where: { order_id: saved.order_id, is_deleted: false },
-      relations: ['order_items'],
+      where: { orderId: saved.orderId, isDeleted: false },
+      relations: ['orderItems'],
     });
   }
 
@@ -490,18 +490,18 @@ export class OrdersService extends TenantBaseService<Order> {
 
     // Validate order items
     for (const [index, item] of orderItems.entries()) {
-      const itemLabel = item.product_name ?? `#${index + 1}`;
-      if (!item.product_id) {
+      const itemLabel = (item as any).productName ?? `#${index + 1}`;
+      if (!(item as any).productId) {
         throw new BadRequestException(
           `❌ Sản phẩm "${itemLabel}" thiếu productId`,
         );
       }
-      if (!item.quantity || item.quantity <= 0) {
+      if (!(item as any).quantity || (item as any).quantity <= 0) {
         throw new BadRequestException(
           `❌ Sản phẩm "${itemLabel}" phải có số lượng > 0`,
         );
       }
-      if (!item.unit_price || item.unit_price <= 0) {
+      if (!(item as any).unitPrice || (item as any).unitPrice <= 0) {
         throw new BadRequestException(
           `❌ Sản phẩm "${itemLabel}" phải có giá > 0`,
         );
@@ -523,7 +523,7 @@ export class OrdersService extends TenantBaseService<Order> {
       // Step 1: Validate stock availability (outside transaction for better performance)
       // Giả sử orderItems: Partial<OrderItem>[]
       const stockItems = (orderItems as Partial<OrderItem>[]).map((item) => ({
-        productId: item.product_id as string,
+        productId: item.productId as string,
         quantity: item.quantity as number,
       }));
 
@@ -538,14 +538,14 @@ export class OrdersService extends TenantBaseService<Order> {
       // Step 3: Create order items
       const calculatedItems = (orderItems as Partial<OrderItem>[]).map((item) =>
         plainToInstance(OrderItem, {
-          productId: item.product_id as string,
-          product_name: item.product_name as string,
-          product_unit_id: item.product_unit_id as string,
+          productId: item.productId as string,
+          productName: item.productName as string,
+          productUnitId: item.productUnitId as string,
           quantity: item.quantity as number,
-          unit_price: item.unit_price as number,
-          total_price: Number(item.unit_price) * Number(item.quantity),
-          created_at: new Date(),
-          updated_at: new Date(),
+          unitPrice: item.unitPrice as number,
+          totalPrice: Number(item.unitPrice) * Number(item.quantity),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         }),
       );
 
@@ -569,9 +569,9 @@ export class OrdersService extends TenantBaseService<Order> {
         totalAmount,
         totalPaid,
         status: OrderStatus.PENDING,
-        created_at: new Date(),
-        updated_at: new Date(),
-        is_deleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDeleted: false,
       } as unknown as DeepPartial<Order>);
 
       const savedOrder = await orderRepo.save(order);
@@ -579,7 +579,7 @@ export class OrdersService extends TenantBaseService<Order> {
       // Step 5: Create order items
       const orderItemsWithOrderId = calculatedItems.map((item) => ({
         ...item,
-        order_id: savedOrder.order_id,
+        orderId: savedOrder.orderId,
       }));
 
       await orderItemRepo.save(orderItemsWithOrderId);
@@ -598,7 +598,7 @@ export class OrdersService extends TenantBaseService<Order> {
 
       // Step 7: Create payment record
       const payment = await this.paymentTransactionService.createPayment(
-        savedOrder.order_id,
+        savedOrder.orderId,
         totalPaid,
         paymentMethodId,
         userId,
@@ -608,11 +608,11 @@ export class OrdersService extends TenantBaseService<Order> {
       // Step 8: Create audit logs
       await this.auditTransactionService.logOrderCreation(
         userId,
-        savedOrder.order_id,
+        savedOrder.orderId,
         {
-          orderCode: savedOrder.order_code,
-          totalAmount: savedOrder.total_amount,
-          totalPaid: savedOrder.total_paid,
+          orderCode: savedOrder.orderCode,
+          totalAmount: savedOrder.totalAmount,
+          totalPaid: savedOrder.totalPaid,
           itemCount: orderItems.length,
         },
         manager,
@@ -622,9 +622,9 @@ export class OrdersService extends TenantBaseService<Order> {
       for (const item of orderItems) {
         await this.auditTransactionService.logStockUpdate(
           userId,
-          item.product_id!,
-          -item.quantity!,
-          `Order creation: ${savedOrder.order_code}`,
+          (item as any).productId!,
+          -(item as any).quantity!,
+          `Order creation: ${savedOrder.orderCode}`,
           manager,
         );
       }
@@ -646,7 +646,7 @@ export class OrdersService extends TenantBaseService<Order> {
 
       // Return complete order with relations
       const completeOrder = await orderRepo.findOne({
-        where: { order_id: savedOrder.order_id },
+        where: { orderId: savedOrder.orderId },
         relations: ['orderItems'],
       });
 
@@ -657,7 +657,7 @@ export class OrdersService extends TenantBaseService<Order> {
       }
 
       this.logger.log(
-        `✅ Đơn hàng ${savedOrder.order_code} đã được tạo thành công với transaction`,
+        `✅ Đơn hàng ${savedOrder.orderCode} đã được tạo thành công với transaction`,
       );
 
       return completeOrder;

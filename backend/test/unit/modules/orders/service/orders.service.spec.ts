@@ -26,56 +26,66 @@ describe('OrdersService', () => {
   let mockRepository: jest.Mocked<any>;
 
   const mockOrderItem: OrderItem = {
-    order_item_id: '123e4567-e89b-12d3-a456-426614174000',
-    order_id: '123e4567-e89b-12d3-a456-426614174001',
-    product_id: '123e4567-e89b-12d3-a456-426614174002',
-    product_name: 'Test Product',
-    product_unit_id: '123e4567-e89b-12d3-a456-426614174003',
+    orderItemId: '123e4567-e89b-12d3-a456-426614174000',
+    orderId: '123e4567-e89b-12d3-a456-426614174001',
+    productId: '123e4567-e89b-12d3-a456-426614174002',
+    productName: 'Test Product',
+    productUnitId: '123e4567-e89b-12d3-a456-426614174003',
     quantity: 2,
-    unit_price: 100.0,
-    total_price: 200.0,
-    is_deleted: false,
-    created_at: new Date(),
-    updated_at: new Date(),
+    unitPrice: 100.0,
+    totalPrice: 200.0,
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
     order: undefined as any,
     product: undefined as any,
   };
 
   const mockOrder: Order = {
-    order_id: '123e4567-e89b-12d3-a456-426614174001',
-    order_code: 'ORD001',
-    customer_id: '123e4567-e89b-12d3-a456-426614174004',
-    total_amount: 200.0,
-    total_paid: 200.0,
-    vat_amount: 0,
+    orderId: '123e4567-e89b-12d3-a456-426614174001',
+    orderCode: 'ORD001',
+    customerId: '123e4567-e89b-12d3-a456-426614174004',
+    totalAmount: 200.0,
+    totalPaid: 200.0,
+    vatAmount: 0,
     status: OrderStatus.PENDING,
-    delivery_address: 'Test Address',
-    delivery_status: undefined as any,
-    debt_status: undefined as any,
-    is_credit_order: false,
+    deliveryAddress: 'Test Address',
+    deliveryStatus: undefined as any,
+    debtStatus: undefined as any,
+    isCreditOrder: false,
     note: 'Test Notes',
-    is_deleted: false,
-    created_at: new Date(),
-    updated_at: new Date(),
-    order_items: [mockOrderItem],
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    orderItems: [mockOrderItem],
   };
 
   const mockProduct = {
+    productId: '123e4567-e89b-12d3-a456-426614174002',
     product_id: '123e4567-e89b-12d3-a456-426614174002',
+    productCode: 'TEST-001',
     product_code: 'TEST-001',
     name: 'Test Product',
     slug: 'test-product',
     description: 'This is a test product',
+    priceRetail: 100.0,
     price_retail: 100.0,
+    createdAt: new Date(),
     created_at: new Date(),
+    updatedAt: new Date(),
     updated_at: new Date(),
+    categoryId: '123e4567-e89b-12d3-a456-426614174005',
     category_id: '123e4567-e89b-12d3-a456-426614174005',
     category: undefined as any,
     stock: 10,
+    unitId: '123e4567-e89b-12d3-a456-426614174006',
     unit_id: '123e4567-e89b-12d3-a456-426614174006',
     unit: undefined as any,
+    minStockLevel: 5,
     min_stock_level: 5,
+    isActive: true,
     is_active: true,
+    isDeleted: false,
     is_deleted: false,
     getUnit: jest.fn(),
     getCreatedByUser: jest.fn(),
@@ -172,10 +182,10 @@ describe('OrdersService', () => {
       note: 'Test Notes',
       orderItems: [
         {
-          product_id: '123e4567-e89b-12d3-a456-426614174002',
-          product_name: 'Test Product',
+          productId: '123e4567-e89b-12d3-a456-426614174002',
+          productName: 'Test Product',
           quantity: 2,
-          unit_price: 100.0,
+          unitPrice: 100.0,
           price: 200.0,
         },
       ],
@@ -209,7 +219,7 @@ describe('OrdersService', () => {
       const dtoWithInvalidItem = {
         ...createOrderDto,
         orderItems: [
-          { product_name: 'Test Product', quantity: 2, unit_price: 100.0, price: 200.0 },
+          { productName: 'Test Product', quantity: 2, unitPrice: 100.0, price: 200.0 },
         ],
       };
 
@@ -224,10 +234,10 @@ describe('OrdersService', () => {
         ...createOrderDto,
         orderItems: [
           {
-            product_id: '123e4567-e89b-12d3-a456-426614174002',
-            product_name: 'Test Product',
+            productId: '123e4567-e89b-12d3-a456-426614174002',
+            productName: 'Test Product',
             quantity: 0,
-            unit_price: 100.0,
+            unitPrice: 100.0,
             price: 0,
           },
         ],
@@ -244,10 +254,10 @@ describe('OrdersService', () => {
         ...createOrderDto,
         orderItems: [
           {
-            product_id: '123e4567-e89b-12d3-a456-426614174002',
-            product_name: 'Test Product',
+            productId: '123e4567-e89b-12d3-a456-426614174002',
+            productName: 'Test Product',
             quantity: 2,
-            unit_price: 0,
+            unitPrice: 0,
             price: 0,
           },
         ],
@@ -265,10 +275,10 @@ describe('OrdersService', () => {
         totalAmount: 300.0,
         orderItems: [
           {
-            product_id: '123e4567-e89b-12d3-a456-426614174002',
-            product_name: 'Test Product',
+            productId: '123e4567-e89b-12d3-a456-426614174002',
+            productName: 'Test Product',
             quantity: 3,
-            unit_price: 100.0,
+            unitPrice: 100.0,
             price: 300.0,
           },
         ],
@@ -282,7 +292,7 @@ describe('OrdersService', () => {
 
       expect(mockRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          total_amount: 300.0,
+          totalAmount: 300.0,
         }),
       );
     });
@@ -295,10 +305,10 @@ describe('OrdersService', () => {
         shippingFee: 10.0,
         orderItems: [
           {
-            product_id: '123e4567-e89b-12d3-a456-426614174002',
-            product_name: 'Test Product',
+            productId: '123e4567-e89b-12d3-a456-426614174002',
+            productName: 'Test Product',
             quantity: 2,
-            unit_price: 100.0,
+            unitPrice: 100.0,
             price: 200.0,
           },
         ],
@@ -329,7 +339,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { is_deleted: false },
+        where: { isDeleted: false },
         relations: ['orderItems'],
       });
     });
@@ -346,7 +356,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(mockOrder);
       expect(mockRepository.findOne).toHaveBeenCalledWith({
-        where: { order_id: orderId, is_deleted: false },
+        where: { orderId: orderId, isDeleted: false },
         relations: ['orderItems'],
       });
     });
@@ -406,9 +416,9 @@ describe('OrdersService', () => {
         ...updateOrderDto,
         orderItems: [
           {
-            product_id: '123e4567-e89b-12d3-a456-426614174002',
+            productId: '123e4567-e89b-12d3-a456-426614174002',
             quantity: 3,
-            unit_price: 100.0,
+            unitPrice: 100.0,
             price: 300.0,
           },
         ],
@@ -435,9 +445,9 @@ describe('OrdersService', () => {
         ...updateOrderDto,
         orderItems: [
           {
-            product_id: 'invalid-product-id',
+            productId: 'invalid-product-id',
             quantity: 3,
-            unit_price: 100.0,
+            unitPrice: 100.0,
             price: 300.0,
           },
         ],
@@ -466,7 +476,7 @@ describe('OrdersService', () => {
         message: 'Xóa đơn hàng thành công',
         data: null,
       });
-      expect(mockOrder.is_deleted).toBe(true);
+      expect(mockOrder.isDeleted).toBe(true);
       expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
@@ -475,7 +485,7 @@ describe('OrdersService', () => {
     it('should restore order successfully', async () => {
       const storeId = 'store-123';
       const orderId = '123e4567-e89b-12d3-a456-426614174001';
-      const deletedOrder = { ...mockOrder, is_deleted: true };
+      const deletedOrder = { ...mockOrder, isDeleted: true };
 
       mockRepository.findOne.mockResolvedValue(deletedOrder);
       mockRepository.save.mockResolvedValue(deletedOrder);
@@ -486,7 +496,7 @@ describe('OrdersService', () => {
         message: 'Khôi phục đơn hàng thành công',
         data: deletedOrder,
       });
-      expect(deletedOrder.is_deleted).toBe(false);
+      expect(deletedOrder.isDeleted).toBe(false);
       expect(mockRepository.save).toHaveBeenCalledWith(deletedOrder);
     });
   });
@@ -544,7 +554,7 @@ describe('OrdersService', () => {
         message: 'Hoàn thành đơn hàng thành công',
         data: mockOrder,
       });
-      expect(mockOrder.status).toBe(OrderStatus.CONFIRMED);
+      expect(mockOrder.status).toBe(OrderStatus.DELIVERED);
       expect(mockRepository.save).toHaveBeenCalledWith(mockOrder);
     });
   });
@@ -581,7 +591,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { status, is_deleted: false },
+        where: { status, isDeleted: false },
         relations: ['orderItems'],
       });
     });
@@ -599,7 +609,7 @@ describe('OrdersService', () => {
 
       expect(result).toEqual(orders);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { customer_id: customerId, is_deleted: false },
+        where: { customerId: customerId, isDeleted: false },
         relations: ['orderItems'],
       });
     });

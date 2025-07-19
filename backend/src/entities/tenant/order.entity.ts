@@ -40,14 +40,14 @@ export enum DeliveryStatus {
 @Entity('order')
 export class Order {
   @PrimaryGeneratedColumn('uuid', { name: 'orderId' })
-  order_id!: string;
+  orderId!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'orderCode', unique: true })
-  order_code!: string;
+  orderCode!: string;
 
-  @Index('IDX_order_code', ['order_code'], { unique: true })
+  @Index('IDX_order_code', ['orderCode'], { unique: true })
   @Column({ type: 'uuid', name: 'customerId', nullable: true })
-  customer_id?: string;
+  customerId?: string;
 
   @ManyToOne(() => Customer, (customer: Customer) => customer.orders, {
     onDelete: 'SET NULL',
@@ -57,20 +57,18 @@ export class Order {
   customer?: Customer;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, name: 'totalAmount' })
-  total_amount!: number;
+  totalAmount!: number;
 
-  // --- Tài chính & Kế toán ---
   @Index()
   @Column({ type: 'timestamp', name: 'invoiceIssuedAt', nullable: true })
-  invoice_issued_at?: Date;
+  invoiceIssuedAt?: Date;
 
   @Index()
   @Column({ type: 'timestamp', name: 'accountingExportedAt', nullable: true })
-  accounting_exported_at?: Date;
+  accountingExportedAt?: Date;
 
-  // --- Bán buôn / Công nợ ---
   @Column({ type: 'boolean', name: 'isCreditOrder', default: false })
-  is_credit_order!: boolean;
+  isCreditOrder!: boolean;
 
   @Index()
   @Column({
@@ -79,30 +77,30 @@ export class Order {
     name: 'debtStatus',
     default: DebtStatus.UNPAID,
   })
-  debt_status!: DebtStatus;
+  debtStatus!: DebtStatus;
 
   @Index()
   @Column({ type: 'timestamp', name: 'dueDate', nullable: true })
-  due_date?: Date;
+  dueDate?: Date;
 
   @Column({ type: 'varchar', length: 50, name: 'paymentTerms', nullable: true })
-  payment_terms?: string;
+  paymentTerms?: string;
 
-  // --- POS hiện đại / trực tiếp ---
   @Index()
   @Column({ type: 'uuid', name: 'cashierId', nullable: true })
-  cashier_id?: string;
+  cashierId?: string;
 
   @Index()
   @Column({ type: 'varchar', length: 50, name: 'terminalId', nullable: true })
-  terminal_id?: string;
+  terminalId?: string;
 
   @Index()
   @Column({ type: 'varchar', length: 50, name: 'shiftId', nullable: true })
-  shift_id?: string;
+  shiftId?: string;
 
   @Column({ type: 'varchar', length: 100, name: 'posLocation', nullable: true })
-  pos_location?: string;
+  posLocation?: string;
+
   @Column({
     type: 'decimal',
     precision: 18,
@@ -110,7 +108,7 @@ export class Order {
     name: 'vatAmount',
     default: 0,
   })
-  vat_amount!: number;
+  vatAmount!: number;
 
   @Column({
     type: 'decimal',
@@ -119,7 +117,7 @@ export class Order {
     name: 'totalPaid',
     default: 0,
   })
-  total_paid!: number;
+  totalPaid!: number;
 
   @Column({
     type: 'varchar',
@@ -127,10 +125,10 @@ export class Order {
     name: 'paymentMethodId',
     nullable: true,
   })
-  payment_method_id?: string;
+  paymentMethodId?: string;
 
   @Column({ type: 'text', name: 'paymentDetails', nullable: true })
-  payment_details?: string;
+  paymentDetails?: string;
 
   @Column({
     type: 'enum',
@@ -141,10 +139,10 @@ export class Order {
   status!: OrderStatus;
 
   @Column({ type: 'timestamp', name: 'expectedDeliveryDate', nullable: true })
-  expected_delivery_date?: Date;
+  expectedDeliveryDate?: Date;
 
   @Column({ type: 'varchar', length: 500, name: 'deliveryAddress' })
-  delivery_address!: string;
+  deliveryAddress!: string;
 
   @Column({
     type: 'enum',
@@ -152,7 +150,7 @@ export class Order {
     name: 'deliveryStatus',
     default: DeliveryStatus.PROCESSING,
   })
-  delivery_status!: DeliveryStatus;
+  deliveryStatus!: DeliveryStatus;
 
   @Column({
     type: 'varchar',
@@ -160,35 +158,35 @@ export class Order {
     name: 'invoiceNumber',
     nullable: true,
   })
-  invoice_number?: string;
+  invoiceNumber?: string;
 
   @Column({ type: 'text', name: 'note', nullable: true })
   note?: string;
 
   @Column({ type: 'uuid', name: 'processedByUserId', nullable: true })
-  processed_by_user_id?: string;
+  processedByUserId?: string;
 
   @Column({ type: 'uuid', name: 'createdByUserId', nullable: true })
-  created_by_user_id?: string;
+  createdByUserId?: string;
 
   @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
-  updated_by_user_id?: string;
+  updatedByUserId?: string;
 
   @DeleteDateColumn({ name: 'deletedAt' })
-  deleted_at?: Date;
+  deletedAt?: Date;
 
   @OneToMany(() => OrderItem, (item) => item.order, {
     cascade: ['insert', 'update'],
     eager: false,
   })
-  order_items!: OrderItem[];
+  orderItems!: OrderItem[];
 
   @Column({ type: 'boolean', name: 'isDeleted', default: false })
-  is_deleted!: boolean;
+  isDeleted!: boolean;
 
   @CreateDateColumn({ name: 'createdAt' })
-  created_at!: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updatedAt' })
-  updated_at!: Date;
+  updatedAt!: Date;
 }

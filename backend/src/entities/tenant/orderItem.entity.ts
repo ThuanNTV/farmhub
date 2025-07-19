@@ -17,12 +17,12 @@ import { Exclude } from 'class-transformer';
 @Index(['productId'])
 export class OrderItem {
   @PrimaryGeneratedColumn('uuid', { name: 'orderItemId' })
-  order_item_id!: string;
+  orderItemId!: string;
 
   @Column({ type: 'uuid', name: 'orderId' })
-  order_id!: string;
+  orderId!: string;
 
-  @ManyToOne(() => Order, (order) => order.order_items, {
+  @ManyToOne(() => Order, (order) => order.orderItems, {
     onDelete: 'CASCADE',
     nullable: false,
   })
@@ -30,14 +30,14 @@ export class OrderItem {
   order!: Order;
 
   @Column({ type: 'uuid', name: 'productId' })
-  product_id!: string;
+  productId!: string;
 
   @ManyToOne(() => Product, { nullable: false, eager: false })
   @JoinColumn({ name: 'productId' })
   product!: Product;
 
   @Column({ type: 'varchar', length: 255, name: 'productName' })
-  product_name!: string;
+  productName!: string;
 
   @Column({
     type: 'varchar',
@@ -45,32 +45,32 @@ export class OrderItem {
     name: 'productUnitId',
     nullable: true,
   })
-  product_unit_id?: string;
+  productUnitId?: string;
 
   @Column({ type: 'int', name: 'quantity' })
   quantity!: number;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, name: 'unitPrice' })
-  unit_price!: number;
+  unitPrice!: number;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, name: 'totalPrice' })
-  total_price!: number;
+  totalPrice!: number;
 
   @Column({ type: 'text', name: 'note', nullable: true })
   note?: string;
 
   @Column({ type: 'boolean', name: 'isDeleted', default: false })
-  is_deleted!: boolean;
+  isDeleted!: boolean;
 
   @CreateDateColumn({ name: 'createdAt' })
-  created_at!: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updatedAt' })
-  updated_at!: Date;
+  updatedAt!: Date;
 
   @Column({ type: 'uuid', name: 'createdByUserId', nullable: true })
-  created_by_user_id?: string;
+  createdByUserId?: string;
 
   @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
-  updated_by_user_id?: string;
+  updatedByUserId?: string;
 }
