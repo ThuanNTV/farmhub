@@ -5,13 +5,13 @@ export class OrdersByStatusDto {
     description: 'Trạng thái đơn hàng',
     example: 'completed',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Số lượng đơn hàng',
     example: 125,
   })
-  count: number;
+  count!: number;
 }
 
 export class DashboardOrdersResponseDto {
@@ -19,11 +19,11 @@ export class DashboardOrdersResponseDto {
     description: 'Tổng số đơn hàng',
     example: 245,
   })
-  total: number;
+  total!: number;
 
   @ApiProperty({
     description: 'Đơn hàng theo trạng thái',
     type: [OrdersByStatusDto],
   })
-  byStatus: OrdersByStatusDto[];
+  byStatus!: OrdersByStatusDto[];
 }

@@ -5,13 +5,13 @@ export class BestSellingProductDto {
     description: 'Tên sản phẩm',
     example: 'Gạo ST25',
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'Số lượng bán được',
     example: 150,
   })
-  quantity: number;
+  quantity!: number;
 }
 
 export class DashboardOverviewResponseDto {
@@ -19,23 +19,23 @@ export class DashboardOverviewResponseDto {
     description: 'Tổng doanh thu',
     example: 15000000,
   })
-  totalRevenue: number;
+  totalRevenue!: number;
 
   @ApiProperty({
     description: 'Tổng số đơn hàng',
     example: 245,
   })
-  totalOrders: number;
+  totalOrders!: number;
 
   @ApiProperty({
     description: 'Tổng số khách hàng',
     example: 89,
   })
-  totalCustomers: number;
+  totalCustomers!: number;
 
   @ApiProperty({
     description: 'Danh sách sản phẩm bán chạy',
     type: [BestSellingProductDto],
   })
-  bestSellingProducts: BestSellingProductDto[];
+  bestSellingProducts!: BestSellingProductDto[];
 }

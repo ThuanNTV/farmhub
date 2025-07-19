@@ -8,7 +8,7 @@ export class PrintInvoiceRequestDto {
   })
   @IsNotEmpty()
   @IsString()
-  orderId: string;
+  orderId!: string;
 }
 
 export class PrintInvoiceResponseDto {
@@ -16,25 +16,25 @@ export class PrintInvoiceResponseDto {
     description: 'Trạng thái in',
     example: 'success',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Thông báo',
     example: 'Hóa đơn đã được in thành công',
   })
-  message: string;
+  message!: string;
 
   @ApiProperty({
     description: 'ID hóa đơn',
     example: 'invoice-456',
   })
-  invoiceId: string;
+  invoiceId!: string;
 
   @ApiProperty({
     description: 'URL file PDF hóa đơn',
     example: 'https://example.com/invoices/invoice-456.pdf',
   })
-  pdfUrl: string;
+  pdfUrl!: string;
 
   @ApiProperty({
     description: 'Dữ liệu in',
@@ -42,8 +42,8 @@ export class PrintInvoiceResponseDto {
       orderCode: 'ORD-001',
       customerName: 'Nguyễn Văn A',
       totalAmount: 500000,
-      items: []
+      items: [],
     },
   })
-  data: any;
+  data!: any;
 }

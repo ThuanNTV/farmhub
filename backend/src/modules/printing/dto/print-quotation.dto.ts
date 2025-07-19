@@ -12,16 +12,16 @@ export class PrintQuotationRequestDto {
           productName: 'Gạo ST25',
           quantity: 10,
           unitPrice: 25000,
-          totalPrice: 250000
-        }
+          totalPrice: 250000,
+        },
       ],
       totalAmount: 250000,
-      validUntil: '2024-02-15'
+      validUntil: '2024-02-15',
     },
   })
   @IsNotEmpty()
   @IsObject()
-  quotationData: any;
+  quotationData!: any;
 }
 
 export class PrintQuotationResponseDto {
@@ -29,25 +29,25 @@ export class PrintQuotationResponseDto {
     description: 'Trạng thái in',
     example: 'success',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Thông báo',
     example: 'Báo giá đã được in thành công',
   })
-  message: string;
+  message!: string;
 
   @ApiProperty({
     description: 'ID báo giá',
     example: 'quotation-456',
   })
-  quotationId: string;
+  quotationId!: string;
 
   @ApiProperty({
     description: 'URL file PDF báo giá',
     example: 'https://example.com/quotations/quotation-456.pdf',
   })
-  pdfUrl: string;
+  pdfUrl!: string;
 
   @ApiProperty({
     description: 'Dữ liệu in',
@@ -55,8 +55,8 @@ export class PrintQuotationResponseDto {
       quotationCode: 'QUO-001',
       customerName: 'Nguyễn Văn A',
       totalAmount: 250000,
-      items: []
+      items: [],
     },
   })
-  data: any;
+  data!: any;
 }

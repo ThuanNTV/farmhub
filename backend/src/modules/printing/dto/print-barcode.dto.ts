@@ -8,7 +8,7 @@ export class PrintBarcodeRequestDto {
   })
   @IsNotEmpty()
   @IsString()
-  productId: string;
+  productId!: string;
 }
 
 export class PrintBarcodeResponseDto {
@@ -16,25 +16,25 @@ export class PrintBarcodeResponseDto {
     description: 'Trạng thái in',
     example: 'success',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Thông báo',
     example: 'Mã vạch đã được in thành công',
   })
-  message: string;
+  message!: string;
 
   @ApiProperty({
     description: 'Mã vạch',
     example: '1234567890123',
   })
-  barcode: string;
+  barcode!: string;
 
   @ApiProperty({
     description: 'URL file PDF mã vạch',
     example: 'https://example.com/barcodes/barcode-123.pdf',
   })
-  pdfUrl: string;
+  pdfUrl!: string;
 
   @ApiProperty({
     description: 'Dữ liệu in',
@@ -42,8 +42,8 @@ export class PrintBarcodeResponseDto {
       productCode: 'PROD-001',
       productName: 'Gạo ST25',
       barcode: '1234567890123',
-      price: 25000
+      price: 25000,
     },
   })
-  data: any;
+  data!: any;
 }

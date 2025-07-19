@@ -8,7 +8,7 @@ export class HeatmapQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc (YYYY-MM-DD)',
@@ -16,7 +16,7 @@ export class HeatmapQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  to: string;
+  to!: string;
 }
 
 export class HeatmapDataPointDto {
@@ -24,19 +24,19 @@ export class HeatmapDataPointDto {
     description: 'Tọa độ X (giờ trong ngày)',
     example: 14,
   })
-  x: number;
+  x!: number;
 
   @ApiProperty({
     description: 'Tọa độ Y (ngày trong tuần)',
     example: 2,
   })
-  y: number;
+  y!: number;
 
   @ApiProperty({
     description: 'Giá trị (số lượng giao dịch)',
     example: 25,
   })
-  value: number;
+  value!: number;
 }
 
 export class HeatmapResponseDto {
@@ -44,17 +44,17 @@ export class HeatmapResponseDto {
     description: 'Ngày bắt đầu',
     example: '2024-01-01',
   })
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc',
     example: '2024-01-31',
   })
-  to: string;
+  to!: string;
 
   @ApiProperty({
     description: 'Dữ liệu heatmap',
     type: [HeatmapDataPointDto],
   })
-  heatmap: HeatmapDataPointDto[];
+  heatmap!: HeatmapDataPointDto[];
 }

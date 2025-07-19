@@ -5,13 +5,13 @@ export class TopCustomerDto {
     description: 'ID khách hàng',
     example: 'customer-123',
   })
-  customer_id: string;
+  customer_id!: string;
 
   @ApiProperty({
     description: 'Tên khách hàng',
     example: 'Nguyễn Văn A',
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'Số điện thoại',
@@ -45,7 +45,7 @@ export class TopCustomerDto {
     description: 'Loại khách hàng',
     example: 'individual',
   })
-  customer_type: string;
+  customer_type!: string;
 
   @ApiProperty({
     description: 'Giới tính',
@@ -115,25 +115,25 @@ export class TopCustomerDto {
     description: 'Có hoạt động không',
     example: true,
   })
-  is_active: boolean;
+  is_active!: boolean;
 
   @ApiProperty({
     description: 'Đã bị xóa chưa',
     example: false,
   })
-  is_deleted: boolean;
+  is_deleted!: boolean;
 
   @ApiProperty({
     description: 'Ngày tạo',
     example: '2023-12-01T00:00:00Z',
   })
-  created_at: Date;
+  created_at!: Date;
 
   @ApiProperty({
     description: 'Ngày cập nhật',
     example: '2024-01-20T00:00:00Z',
   })
-  updated_at: Date;
+  updated_at!: Date;
 
   @ApiProperty({
     description: 'ID người tạo',
@@ -153,7 +153,7 @@ export class TopCustomerDto {
     description: 'Tổng số tiền đã chi tiêu',
     example: 15000000,
   })
-  totalSpent: number;
+  totalSpent!: number;
 }
 
 export class DashboardCustomersResponseDto {
@@ -161,17 +161,17 @@ export class DashboardCustomersResponseDto {
     description: 'Tổng số khách hàng',
     example: 89,
   })
-  total: number;
+  total!: number;
 
   @ApiProperty({
     description: 'Số khách hàng mới',
     example: 12,
   })
-  newCustomers: number;
+  newCustomers!: number;
 
   @ApiProperty({
     description: 'Top khách hàng chi tiêu nhiều nhất',
     type: [TopCustomerDto],
   })
-  topCustomers: TopCustomerDto[];
+  topCustomers!: TopCustomerDto[];
 }

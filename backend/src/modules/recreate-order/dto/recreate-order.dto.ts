@@ -8,7 +8,7 @@ export class RecreateOrderRequestDto {
   })
   @IsNotEmpty()
   @IsString()
-  orderId: string;
+  orderId!: string;
 }
 
 export class RecreateOrderResponseDto {
@@ -16,31 +16,31 @@ export class RecreateOrderResponseDto {
     description: 'Trạng thái tạo lại đơn hàng',
     example: 'success',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Thông báo',
     example: 'Đơn hàng đã được tạo lại thành công',
   })
-  message: string;
+  message!: string;
 
   @ApiProperty({
     description: 'ID đơn hàng gốc',
     example: 'order-123',
   })
-  originalOrderId: string;
+  originalOrderId!: string;
 
   @ApiProperty({
     description: 'ID đơn hàng mới được tạo',
     example: 'order-456',
   })
-  newOrderId: string;
+  newOrderId!: string;
 
   @ApiProperty({
     description: 'Mã đơn hàng mới',
     example: 'ORD-2024-001',
   })
-  newOrderCode: string;
+  newOrderCode!: string;
 
   @ApiProperty({
     description: 'Dữ liệu đơn hàng mới',
@@ -50,8 +50,8 @@ export class RecreateOrderResponseDto {
       customerId: 'customer-123',
       totalAmount: 500000,
       status: 'pending',
-      items: []
+      items: [],
     },
   })
-  orderData: any;
+  orderData!: any;
 }

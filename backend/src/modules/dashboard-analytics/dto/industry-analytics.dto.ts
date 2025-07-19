@@ -8,7 +8,7 @@ export class IndustryAnalyticsQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc (YYYY-MM-DD)',
@@ -16,7 +16,7 @@ export class IndustryAnalyticsQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  to: string;
+  to!: string;
 }
 
 export class IndustryDataDto {
@@ -24,19 +24,19 @@ export class IndustryDataDto {
     description: 'Tên ngành nghề',
     example: 'Nông nghiệp',
   })
-  industry: string;
+  industry!: string;
 
   @ApiProperty({
     description: 'Số lượng giao dịch',
     example: 150,
   })
-  count: number;
+  count!: number;
 
   @ApiProperty({
     description: 'Giá trị giao dịch',
     example: 25000000,
   })
-  value: number;
+  value!: number;
 }
 
 export class IndustryAnalyticsResponseDto {
@@ -44,17 +44,17 @@ export class IndustryAnalyticsResponseDto {
     description: 'Ngày bắt đầu',
     example: '2024-01-01',
   })
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc',
     example: '2024-01-31',
   })
-  to: string;
+  to!: string;
 
   @ApiProperty({
     description: 'Dữ liệu phân tích theo ngành nghề',
     type: [IndustryDataDto],
   })
-  industries: IndustryDataDto[];
+  industries!: IndustryDataDto[];
 }

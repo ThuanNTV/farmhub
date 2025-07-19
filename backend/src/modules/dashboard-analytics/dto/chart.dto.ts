@@ -9,7 +9,7 @@ export class ChartQueryDto {
   })
   @IsNotEmpty()
   @IsIn(['sales_by_category', 'sales_by_payment_method', 'daily_sales'])
-  type: 'sales_by_category' | 'sales_by_payment_method' | 'daily_sales';
+  type!: 'sales_by_category' | 'sales_by_payment_method' | 'daily_sales';
 
   @ApiProperty({
     description: 'Ngày bắt đầu (YYYY-MM-DD)',
@@ -17,7 +17,7 @@ export class ChartQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc (YYYY-MM-DD)',
@@ -25,7 +25,7 @@ export class ChartQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  to: string;
+  to!: string;
 }
 
 export class ChartDataPointDto {
@@ -33,13 +33,13 @@ export class ChartDataPointDto {
     description: 'Nhãn (tên danh mục, phương thức thanh toán, ngày)',
     example: 'Thực phẩm',
   })
-  label: string;
+  label!: string;
 
   @ApiProperty({
     description: 'Giá trị (doanh số, số lượng)',
     example: 5000000,
   })
-  value: number;
+  value!: number;
 }
 
 export class ChartResponseDto {
@@ -48,23 +48,23 @@ export class ChartResponseDto {
     enum: ['sales_by_category', 'sales_by_payment_method', 'daily_sales'],
     example: 'sales_by_category',
   })
-  type: 'sales_by_category' | 'sales_by_payment_method' | 'daily_sales';
+  type!: 'sales_by_category' | 'sales_by_payment_method' | 'daily_sales';
 
   @ApiProperty({
     description: 'Ngày bắt đầu',
     example: '2024-01-01',
   })
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc',
     example: '2024-01-31',
   })
-  to: string;
+  to!: string;
 
   @ApiProperty({
     description: 'Dữ liệu biểu đồ',
     type: [ChartDataPointDto],
   })
-  chart: ChartDataPointDto[];
+  chart!: ChartDataPointDto[];
 }

@@ -10,7 +10,7 @@ export class PreviewReportQueryDto {
   @IsNotEmpty()
   @IsString()
   @IsIn(['sales', 'inventory', 'customers', 'financial', 'products'])
-  type: string;
+  type!: string;
 
   @ApiProperty({
     description: 'Ngày bắt đầu (YYYY-MM-DD)',
@@ -18,7 +18,7 @@ export class PreviewReportQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc (YYYY-MM-DD)',
@@ -26,19 +26,10 @@ export class PreviewReportQueryDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  to: string;
+  to!: string;
 }
 
 export class ReportDataRowDto {
-  @ApiProperty({
-    description: 'Dữ liệu hàng trong báo cáo (dynamic)',
-    example: {
-      date: '2024-01-15',
-      revenue: 2500000,
-      orders: 25,
-      customers: 15
-    },
-  })
   [key: string]: any;
 }
 
@@ -47,43 +38,43 @@ export class PreviewReportResponseDto {
     description: 'Loại báo cáo',
     example: 'sales',
   })
-  reportType: string;
+  reportType!: string;
 
   @ApiProperty({
     description: 'Tiêu đề báo cáo',
     example: 'Báo cáo doanh số bán hàng',
   })
-  title: string;
+  title!: string;
 
   @ApiProperty({
     description: 'Ngày bắt đầu',
     example: '2024-01-01',
   })
-  from: string;
+  from!: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc',
     example: '2024-01-31',
   })
-  to: string;
+  to!: string;
 
   @ApiProperty({
     description: 'Tổng số bản ghi',
     example: 31,
   })
-  totalRecords: number;
+  totalRecords!: number;
 
   @ApiProperty({
     description: 'Tên các cột',
     example: ['Ngày', 'Doanh thu', 'Số đơn hàng', 'Số khách hàng'],
   })
-  columns: string[];
+  columns!: string[];
 
   @ApiProperty({
     description: 'Dữ liệu báo cáo (preview 10 dòng đầu)',
     type: [ReportDataRowDto],
   })
-  data: ReportDataRowDto[];
+  data!: ReportDataRowDto[];
 
   @ApiProperty({
     description: 'Thống kê tổng hợp',
@@ -91,8 +82,8 @@ export class PreviewReportResponseDto {
       totalRevenue: 75000000,
       totalOrders: 750,
       totalCustomers: 250,
-      averageOrderValue: 100000
+      averageOrderValue: 100000,
     },
   })
-  summary: any;
+  summary!: any;
 }

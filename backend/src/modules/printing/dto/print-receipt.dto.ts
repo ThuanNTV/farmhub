@@ -8,7 +8,7 @@ export class PrintReceiptRequestDto {
   })
   @IsNotEmpty()
   @IsString()
-  paymentId: string;
+  paymentId!: string;
 }
 
 export class PrintReceiptResponseDto {
@@ -16,25 +16,25 @@ export class PrintReceiptResponseDto {
     description: 'Trạng thái in',
     example: 'success',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Thông báo',
     example: 'Biên lai đã được in thành công',
   })
-  message: string;
+  message!: string;
 
   @ApiProperty({
     description: 'ID biên lai',
     example: 'receipt-456',
   })
-  receiptId: string;
+  receiptId!: string;
 
   @ApiProperty({
     description: 'URL file PDF biên lai',
     example: 'https://example.com/receipts/receipt-456.pdf',
   })
-  pdfUrl: string;
+  pdfUrl!: string;
 
   @ApiProperty({
     description: 'Dữ liệu in',
@@ -42,8 +42,8 @@ export class PrintReceiptResponseDto {
       paymentCode: 'PAY-001',
       customerName: 'Nguyễn Văn A',
       amount: 500000,
-      paymentMethod: 'cash'
+      paymentMethod: 'cash',
     },
   })
-  data: any;
+  data!: any;
 }

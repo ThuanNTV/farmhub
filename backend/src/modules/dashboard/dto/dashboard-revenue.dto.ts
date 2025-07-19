@@ -5,13 +5,13 @@ export class RevenueByDayDto {
     description: 'Ngày (YYYY-MM-DD)',
     example: '2024-01-15',
   })
-  date: string;
+  date!: string;
 
   @ApiProperty({
     description: 'Doanh thu trong ngày',
     example: 2500000,
   })
-  revenue: number;
+  revenue!: number;
 }
 
 export class DashboardRevenueResponseDto {
@@ -19,11 +19,11 @@ export class DashboardRevenueResponseDto {
     description: 'Tổng doanh thu',
     example: 15000000,
   })
-  total: number;
+  total!: number;
 
   @ApiProperty({
     description: 'Doanh thu theo từng ngày',
     type: [RevenueByDayDto],
   })
-  byDay: RevenueByDayDto[];
+  byDay!: RevenueByDayDto[];
 }
