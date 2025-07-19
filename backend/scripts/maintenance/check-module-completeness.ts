@@ -21,16 +21,17 @@ interface ModuleStatus {
 function checkModuleCompleteness(): ModuleStatus[] {
   const modulesPath = path.join(process.cwd(), 'src', 'modules');
   const testPath = path.join(process.cwd(), 'test');
-  
+
   if (!fs.existsSync(modulesPath)) {
     console.error('❌ Modules directory not found:', modulesPath);
     return [];
   }
 
-  const modules = fs.readdirSync(modulesPath, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name)
-    .filter(name => !name.includes('.md'));
+  const modules = fs
+    .readdirSync(modulesPath, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+    .filter((name) => !name.includes('.md'));
 
   const results: ModuleStatus[] = [];
 
@@ -48,7 +49,7 @@ function checkModuleCompleteness(): ModuleStatus[] {
       testFiles: [],
       dtoFiles: [],
       completeness: 0,
-      status: 'Empty'
+      status: 'Empty',
     };
 
     // Check for module file
@@ -60,8 +61,9 @@ function checkModuleCompleteness(): ModuleStatus[] {
     // Check for controller directory and files
     const controllerPath = path.join(modulePath, 'controller');
     if (fs.existsSync(controllerPath)) {
-      const controllerFiles = fs.readdirSync(controllerPath)
-        .filter(file => file.endsWith('.ts') && !file.endsWith('.spec.ts'));
+      const controllerFiles = fs
+        .readdirSync(controllerPath)
+        .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'));
       if (controllerFiles.length > 0) {
         moduleStatus.hasController = true;
         moduleStatus.controllerFiles = controllerFiles;
@@ -71,19 +73,71 @@ function checkModuleCompleteness(): ModuleStatus[] {
     // Check for service directory and files
     const servicePath = path.join(modulePath, 'service');
     if (fs.existsSync(servicePath)) {
-      const serviceFiles = fs.readdirSync(servicePath)
-        .filter(file => file.endsWith('.ts') && !file.endsWith('.spec.ts'));
+      const serviceFiles = fs
+        .readdirSync(servicePath)
+        .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'));
       if (serviceFiles.length > 0) {
         moduleStatus.hasService = true;
         moduleStatus.serviceFiles = serviceFiles;
       }
     }
 
+    // Check for services in alternative locations
+    if (!moduleStatus.hasService) {
+      const alternativeServicePaths = [
+        path.join(
+          process.cwd(),
+          'src',
+          'service',
+          'global',
+          `${moduleName}.service.ts`,
+        ),
+        path.join(
+          process.cwd(),
+          'src',
+          'core',
+          moduleName,
+          'service',
+          `${moduleName}.service.ts`,
+        ),
+        path.join(
+          process.cwd(),
+          'src',
+          'service',
+          'tenant',
+          `${moduleName}.service.ts`,
+        ),
+      ];
+
+      // Special case for users module
+      if (moduleName === 'users') {
+        alternativeServicePaths.push(
+          path.join(
+            process.cwd(),
+            'src',
+            'core',
+            'user',
+            'service',
+            'users.service.ts',
+          ),
+        );
+      }
+
+      for (const altPath of alternativeServicePaths) {
+        if (fs.existsSync(altPath)) {
+          moduleStatus.hasService = true;
+          moduleStatus.serviceFiles = [path.basename(altPath)];
+          break;
+        }
+      }
+    }
+
     // Check for DTO directory and files
     const dtoPath = path.join(modulePath, 'dto');
     if (fs.existsSync(dtoPath)) {
-      const dtoFiles = fs.readdirSync(dtoPath)
-        .filter(file => file.endsWith('.ts'));
+      const dtoFiles = fs
+        .readdirSync(dtoPath)
+        .filter((file) => file.endsWith('.ts'));
       if (dtoFiles.length > 0) {
         moduleStatus.hasDto = true;
         moduleStatus.dtoFiles = dtoFiles;
@@ -100,10 +154,12 @@ function checkModuleCompleteness(): ModuleStatus[] {
             const fullPath = path.join(dir, item.name);
             if (item.isDirectory()) {
               files.push(...findTestFiles(fullPath));
-            } else if (item.isFile() && 
-                      (item.name.includes(moduleName) || 
-                       item.name.includes(moduleName.replace(/-/g, ''))) &&
-                      item.name.endsWith('.spec.ts')) {
+            } else if (
+              item.isFile() &&
+              (item.name.includes(moduleName) ||
+                item.name.includes(moduleName.replace(/-/g, ''))) &&
+              item.name.endsWith('.spec.ts')
+            ) {
               files.push(item.name);
             }
           }
@@ -150,12 +206,12 @@ function checkModuleCompleteness(): ModuleStatus[] {
 
 function displayResults(results: ModuleStatus[]) {
   console.log('\n🔍 MODULE COMPLETENESS ANALYSIS\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
-  const complete = results.filter(r => r.status === 'Complete');
-  const refactored = results.filter(r => r.status === 'Refactored');
-  const partial = results.filter(r => r.status === 'Partial');
-  const empty = results.filter(r => r.status === 'Empty');
+  const complete = results.filter((r) => r.status === 'Complete');
+  const refactored = results.filter((r) => r.status === 'Refactored');
+  const partial = results.filter((r) => r.status === 'Partial');
+  const empty = results.filter((r) => r.status === 'Empty');
 
   console.log(`📊 SUMMARY:`);
   console.log(`  ✅ Complete modules: ${complete.length}`);
@@ -164,23 +220,28 @@ function displayResults(results: ModuleStatus[]) {
   console.log(`  ❌ Empty modules: ${empty.length}`);
   console.log(`  📈 Total modules: ${results.length}`);
 
-  const avgCompleteness = results.reduce((sum, r) => sum + r.completeness, 0) / results.length;
+  const avgCompleteness =
+    results.reduce((sum, r) => sum + r.completeness, 0) / results.length;
   console.log(`  🎯 Average completeness: ${avgCompleteness.toFixed(1)}%\n`);
 
   // Display detailed results
   console.log('📋 DETAILED RESULTS:\n');
-  
+
   for (const module of results) {
     const statusIcon = {
-      'Complete': '✅',
-      'Refactored': '🏆',
-      'Partial': '⚠️',
-      'Empty': '❌'
+      Complete: '✅',
+      Refactored: '🏆',
+      Partial: '⚠️',
+      Empty: '❌',
     }[module.status];
 
-    console.log(`${statusIcon} ${module.name.padEnd(30)} ${module.completeness}%`);
-    console.log(`   Module: ${module.hasModule ? '✓' : '✗'} | Controller: ${module.hasController ? '✓' : '✗'} | Service: ${module.hasService ? '✓' : '✗'} | DTO: ${module.hasDto ? '✓' : '✗'} | Test: ${module.hasTest ? '✓' : '✗'}`);
-    
+    console.log(
+      `${statusIcon} ${module.name.padEnd(30)} ${module.completeness}%`,
+    );
+    console.log(
+      `   Module: ${module.hasModule ? '✓' : '✗'} | Controller: ${module.hasController ? '✓' : '✗'} | Service: ${module.hasService ? '✓' : '✗'} | DTO: ${module.hasDto ? '✓' : '✗'} | Test: ${module.hasTest ? '✓' : '✗'}`,
+    );
+
     if (module.controllerFiles.length > 0) {
       console.log(`   Controllers: ${module.controllerFiles.join(', ')}`);
     }
