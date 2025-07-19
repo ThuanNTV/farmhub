@@ -19,6 +19,11 @@ export class CreateStockTransferItemDto {
   @IsNumber()
   unitPrice?: number;
 
+  @ApiProperty({ description: 'Total price', required: false })
+  @IsOptional()
+  @IsNumber()
+  totalPrice?: number;
+
   @ApiProperty({ description: 'Notes about this item', required: false })
   @IsOptional()
   @IsString()

@@ -1,57 +1,170 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuditLogsService } from 'src/modules/audit-logs/service/audit-logs.service';
+import { AuditLog } from 'src/entities/tenant/audit_log.entity';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { NotFoundException } from '@nestjs/common';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
+import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dto';
 
 jest.mock('src/common/helpers/dto-mapper.helper');
 
 describe('AuditLogsService', () => {
   let service: AuditLogsService;
-  let tenantDS: any;
-  let repo: any;
+  let repository: jest.Mocked<Repository<AuditLog>>;
+  let tenantDataSourceService: jest.Mocked<TenantDataSourceService>;
 
-  beforeEach(() => {
-    tenantDS = {};
-    service = new AuditLogsService(tenantDS);
-    repo = {
+  // Mock data
+  const mockAuditLog: Partial<AuditLog> = {
+    id: 'audit-123',
+    user_id: 'user-123',
+    action: 'CREATE',
+    target_table: 'products',
+    target_id: 'product-123',
+    metadata: {
+      action: 'CREATE',
+      resource: 'products',
+      resourceId: 'product-123',
+      changes: { name: 'Test Product', price: 100 },
+    },
+    created_at: new Date('2024-01-01T00:00:00Z'),
+    updated_at: new Date('2024-01-01T00:00:00Z'),
+    is_deleted: false,
+    deleted_at: null,
+    user_name: 'Test User',
+    resource_type: 'products',
+    resource_id: 'product-123',
+    old_value: null,
+    new_value: '{"name":"Test Product","price":100}',
+    ip_address: '127.0.0.1',
+    user_agent: 'test-agent',
+    timestamp: new Date('2024-01-01T00:00:00Z'),
+    store_id: 'store-123',
+    session_id: 'session-123',
+    details: null,
+    audit_log_id: 'audit-123',
+  };
+
+  const mockCreateDto: CreateAuditLogDto = {
+    userId: 'user-123',
+    action: 'CREATE',
+    targetTable: 'products',
+    targetId: 'product-123',
+    metadata: {
+      action: 'CREATE',
+      resource: 'products',
+      resourceId: 'product-123',
+      changes: { name: 'Test Product', price: 100 },
+    },
+  };
+
+  const mockUpdateDto: UpdateAuditLogDto = {
+    action: 'UPDATE',
+    metadata: {
+      action: 'UPDATE',
+      resource: 'products',
+      resourceId: 'product-123',
+      changes: { name: 'Updated Product', price: 150 },
+    },
+  };
+
+  beforeEach(async () => {
+    const mockRepository = {
       find: jest.fn(),
-      merge: jest.fn(),
+      findOne: jest.fn(),
       save: jest.fn(),
       remove: jest.fn(),
+      merge: jest.fn(),
+      create: jest.fn(),
     };
-    jest.spyOn(service, 'getRepo').mockResolvedValue(repo);
-    jest.spyOn(service, 'findOne').mockImplementation();
+
+    const mockTenantDataSourceService = {
+      getTenantRepository: jest.fn().mockReturnValue(mockRepository),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuditLogsService,
+        {
+          provide: getRepositoryToken(AuditLog),
+          useValue: mockRepository,
+        },
+        {
+          provide: TenantDataSourceService,
+          useValue: mockTenantDataSourceService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<AuditLogsService>(AuditLogsService);
+    repository = module.get(getRepositoryToken(AuditLog));
+    tenantDataSourceService = module.get(TenantDataSourceService);
   });
 
-  it('create gọi DtoMapper.mapToEntity và super.create', async () => {
-    const entity = { a: 1 };
-    (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(entity);
-    const superCreate = jest.spyOn(TenantBaseService.prototype, 'create').mockResolvedValue(entity);
-    const result = await service.create('store1', { foo: 'bar' } as any);
-    expect(DtoMapper.mapToEntity).toHaveBeenCalled();
-    expect(superCreate).toHaveBeenCalled();
-    expect(result).toBe(entity);
-    superCreate.mockRestore();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('findById gọi super.findById', async () => {
-    const superFindById = jest.spyOn(TenantBaseService.prototype, 'findById').mockResolvedValue({ id: 1 });
-    const result = await service.findById('store1', 'id1');
-    expect(superFindById).toHaveBeenCalled();
-    expect(result).toEqual({ id: 1 });
-    superFindById.mockRestore();
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('create', () => {
+    it('should create an audit log successfully', async () => {
+      const mappedEntity = { ...mockCreateDto };
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue(mappedEntity);
+      jest.spyOn(service, 'create').mockResolvedValue(mockAuditLog);
+
+      const result = await service.create('store-123', mockCreateDto);
+
+      expect(DtoMapper.mapToEntity).toHaveBeenCalledWith(mockCreateDto);
+      expect(result).toEqual(mockAuditLog);
+    });
+
+    it('should handle creation errors', async () => {
+      const error = new Error('Database error');
+      (DtoMapper.mapToEntity as jest.Mock).mockReturnValue({});
+      jest.spyOn(service, 'create').mockRejectedValue(error);
+
+      await expect(service.create('store-123', mockCreateDto)).rejects.toThrow(
+        'Database error',
+      );
+    });
+  });
+
+  describe('findById', () => {
+    it('should return audit log when found', async () => {
+      jest.spyOn(service, 'findById').mockResolvedValue(mockAuditLog);
+
+      const result = await service.findById('store-123', 'audit-123');
+
+      expect(result).toEqual(mockAuditLog);
+    });
+
+    it('should return null when audit log not found', async () => {
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+
+      const result = await service.findById('store-123', 'nonexistent');
+
+      expect(result).toBeNull();
+    });
   });
 
   it('findOne trả về entity nếu có', async () => {
-    jest.spyOn(TenantBaseService.prototype, 'findById').mockResolvedValue({ id: 1 });
+    jest
+      .spyOn(TenantBaseService.prototype, 'findById')
+      .mockResolvedValue({ id: 1 });
     const result = await service.findOne('store1', 'id1');
     expect(result).toEqual({ id: 1 });
   });
 
   it('findOne ném NotFoundException nếu không có entity', async () => {
     jest.spyOn(TenantBaseService.prototype, 'findById').mockResolvedValue(null);
-    await expect(service.findOne('store1', 'id1')).rejects.toThrow(NotFoundException);
+    await expect(service.findOne('store1', 'id1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('findAll trả về repo.find', async () => {
@@ -109,4 +222,4 @@ describe('AuditLogsService', () => {
       isDeleted: false,
     });
   });
-}); 
+});

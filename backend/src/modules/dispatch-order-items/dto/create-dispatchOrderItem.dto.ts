@@ -17,4 +17,7 @@ export class CreateDispatchOrderItemDto {
   @ApiProperty()
   @IsNumberString()
   unitPrice!: string;
+
+  @ApiProperty({ required: false })
+  totalPrice?: string;
 }
