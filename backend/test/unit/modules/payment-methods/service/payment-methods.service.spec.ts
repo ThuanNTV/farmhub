@@ -109,7 +109,9 @@ describe('PaymentMethodsService', () => {
       repository.create.mockReturnValue(mockPaymentMethod);
       repository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -158,7 +160,9 @@ describe('PaymentMethodsService', () => {
     it('should throw NotFoundException when method not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -168,7 +172,11 @@ describe('PaymentMethodsService', () => {
       const updatedMethod = { ...mockPaymentMethod, ...mockUpdateDto };
       repository.save.mockResolvedValue(updatedMethod);
 
-      const result = await service.update('method-123', mockUpdateDto, mockUser);
+      const result = await service.update(
+        'method-123',
+        mockUpdateDto,
+        mockUser,
+      );
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { payment_method_id: 'method-123', is_deleted: false },
@@ -180,14 +188,19 @@ describe('PaymentMethodsService', () => {
     it('should throw NotFoundException when method not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
     it('should soft delete a payment method successfully', async () => {
       repository.findOne.mockResolvedValue(mockPaymentMethod);
-      repository.save.mockResolvedValue({ ...mockPaymentMethod, is_deleted: true });
+      repository.save.mockResolvedValue({
+        ...mockPaymentMethod,
+        is_deleted: true,
+      });
 
       await service.remove('method-123', mockUser);
 
@@ -203,7 +216,9 @@ describe('PaymentMethodsService', () => {
     it('should throw NotFoundException when method not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -218,7 +233,7 @@ describe('PaymentMethodsService', () => {
 
       expect(repository.update).toHaveBeenCalledWith(
         { is_deleted: false },
-        { is_default: false }
+        { is_default: false },
       );
       expect(repository.save).toHaveBeenCalledWith({
         ...mockPaymentMethod,
@@ -230,7 +245,9 @@ describe('PaymentMethodsService', () => {
     it('should throw NotFoundException when method not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.setDefault('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.setDefault('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

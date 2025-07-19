@@ -93,7 +93,9 @@ describe('AuditLogsController', () => {
       const error = new Error('Database error');
       service.create.mockRejectedValue(error);
 
-      await expect(controller.create('store-123', mockCreateDto)).rejects.toThrow('Database error');
+      await expect(
+        controller.create('store-123', mockCreateDto),
+      ).rejects.toThrow('Database error');
       expect(service.create).toHaveBeenCalledWith('store-123', mockCreateDto);
       expect(service.mapToResponseDto).not.toHaveBeenCalled();
     });
@@ -103,7 +105,7 @@ describe('AuditLogsController', () => {
     it('should return all audit logs', async () => {
       const mockAuditLogs = [mockAuditLog];
       const mockResponses = [mockAuditLogResponse];
-      
+
       service.findAll.mockResolvedValue(mockAuditLogs);
       service.mapToResponseDto.mockReturnValue(mockAuditLogResponse);
 
@@ -129,7 +131,9 @@ describe('AuditLogsController', () => {
       const error = new Error('Database connection error');
       service.findAll.mockRejectedValue(error);
 
-      await expect(controller.findAll('store-123')).rejects.toThrow('Database connection error');
+      await expect(controller.findAll('store-123')).rejects.toThrow(
+        'Database connection error',
+      );
       expect(service.findAll).toHaveBeenCalledWith('store-123');
     });
   });
@@ -150,7 +154,9 @@ describe('AuditLogsController', () => {
       const error = new Error('Audit log not found');
       service.findOne.mockRejectedValue(error);
 
-      await expect(controller.findById('store-123', 'nonexistent')).rejects.toThrow('Audit log not found');
+      await expect(
+        controller.findById('store-123', 'nonexistent'),
+      ).rejects.toThrow('Audit log not found');
       expect(service.findOne).toHaveBeenCalledWith('store-123', 'nonexistent');
       expect(service.mapToResponseDto).not.toHaveBeenCalled();
     });
@@ -160,13 +166,21 @@ describe('AuditLogsController', () => {
     it('should update audit log successfully', async () => {
       const updatedAuditLog = { ...mockAuditLog, action: 'UPDATE' };
       const updatedResponse = { ...mockAuditLogResponse, action: 'UPDATE' };
-      
+
       service.update.mockResolvedValue(updatedAuditLog);
       service.mapToResponseDto.mockReturnValue(updatedResponse);
 
-      const result = await controller.update('store-123', 'audit-123', mockUpdateDto);
+      const result = await controller.update(
+        'store-123',
+        'audit-123',
+        mockUpdateDto,
+      );
 
-      expect(service.update).toHaveBeenCalledWith('store-123', 'audit-123', mockUpdateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        'store-123',
+        'audit-123',
+        mockUpdateDto,
+      );
       expect(service.mapToResponseDto).toHaveBeenCalledWith(updatedAuditLog);
       expect(result).toEqual(updatedResponse);
     });
@@ -175,8 +189,14 @@ describe('AuditLogsController', () => {
       const error = new Error('Update failed');
       service.update.mockRejectedValue(error);
 
-      await expect(controller.update('store-123', 'audit-123', mockUpdateDto)).rejects.toThrow('Update failed');
-      expect(service.update).toHaveBeenCalledWith('store-123', 'audit-123', mockUpdateDto);
+      await expect(
+        controller.update('store-123', 'audit-123', mockUpdateDto),
+      ).rejects.toThrow('Update failed');
+      expect(service.update).toHaveBeenCalledWith(
+        'store-123',
+        'audit-123',
+        mockUpdateDto,
+      );
       expect(service.mapToResponseDto).not.toHaveBeenCalled();
     });
   });
@@ -187,7 +207,7 @@ describe('AuditLogsController', () => {
         message: '✅ AuditLog với ID "audit-123" đã được xóa',
         data: null,
       };
-      
+
       service.remove.mockResolvedValue(mockRemoveResponse);
 
       const result = await controller.remove('store-123', 'audit-123');
@@ -200,7 +220,9 @@ describe('AuditLogsController', () => {
       const error = new Error('Removal failed');
       service.remove.mockRejectedValue(error);
 
-      await expect(controller.remove('store-123', 'audit-123')).rejects.toThrow('Removal failed');
+      await expect(controller.remove('store-123', 'audit-123')).rejects.toThrow(
+        'Removal failed',
+      );
       expect(service.remove).toHaveBeenCalledWith('store-123', 'audit-123');
     });
   });
@@ -215,7 +237,7 @@ describe('AuditLogsController', () => {
         mockAuditLogResponse,
         { ...mockAuditLogResponse, id: 'audit-456', action: 'DELETE' },
       ];
-      
+
       service.findAll.mockResolvedValue(mockAuditLogs);
       service.mapToResponseDto
         .mockReturnValueOnce(mockResponses[0])

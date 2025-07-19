@@ -43,8 +43,16 @@ describe('StockTransferItemsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StockTransferItemsService,
-        { provide: getRepositoryToken(StockTransferItem), useValue: mockRepository },
-        { provide: TenantDataSourceService, useValue: { getTenantRepository: jest.fn().mockReturnValue(mockRepository) } },
+        {
+          provide: getRepositoryToken(StockTransferItem),
+          useValue: mockRepository,
+        },
+        {
+          provide: TenantDataSourceService,
+          useValue: {
+            getTenantRepository: jest.fn().mockReturnValue(mockRepository),
+          },
+        },
       ],
     }).compile();
 
@@ -107,7 +115,9 @@ describe('StockTransferItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -131,7 +141,10 @@ describe('StockTransferItemsService', () => {
   describe('remove', () => {
     it('should soft delete a stock transfer item successfully', async () => {
       repository.findOne.mockResolvedValue(mockStockTransferItem);
-      repository.save.mockResolvedValue({ ...mockStockTransferItem, is_deleted: true });
+      repository.save.mockResolvedValue({
+        ...mockStockTransferItem,
+        is_deleted: true,
+      });
 
       await service.remove('item-123', mockUser);
 
@@ -146,7 +159,10 @@ describe('StockTransferItemsService', () => {
     it('should return items by stock transfer id', async () => {
       repository.find.mockResolvedValue([mockStockTransferItem]);
 
-      const result = await service.findByStockTransferId('transfer-123', mockUser);
+      const result = await service.findByStockTransferId(
+        'transfer-123',
+        mockUser,
+      );
 
       expect(repository.find).toHaveBeenCalledWith({
         where: { stock_transfer_id: 'transfer-123', is_deleted: false },

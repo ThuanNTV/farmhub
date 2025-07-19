@@ -110,7 +110,9 @@ describe('OrderItemsService', () => {
       repository.create.mockReturnValue(mockOrderItem);
       repository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -144,7 +146,9 @@ describe('OrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -166,7 +170,9 @@ describe('OrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -189,7 +195,9 @@ describe('OrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -211,8 +219,18 @@ describe('OrderItemsService', () => {
   describe('calculateTotals', () => {
     it('should calculate order totals correctly', async () => {
       const mockItems = [
-        { ...mockOrderItem, total_price: 500000, discount_amount: 50000, tax_amount: 45000 },
-        { ...mockOrderItem, total_price: 300000, discount_amount: 30000, tax_amount: 27000 },
+        {
+          ...mockOrderItem,
+          total_price: 500000,
+          discount_amount: 50000,
+          tax_amount: 45000,
+        },
+        {
+          ...mockOrderItem,
+          total_price: 300000,
+          discount_amount: 30000,
+          tax_amount: 27000,
+        },
       ];
       repository.find.mockResolvedValue(mockItems);
 

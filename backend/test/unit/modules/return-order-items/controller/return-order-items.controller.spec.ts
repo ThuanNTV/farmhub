@@ -53,7 +53,9 @@ describe('ReturnOrderItemsController', () => {
       providers: [{ provide: ReturnOrderItemsService, useValue: mockService }],
     }).compile();
 
-    controller = module.get<ReturnOrderItemsController>(ReturnOrderItemsController);
+    controller = module.get<ReturnOrderItemsController>(
+      ReturnOrderItemsController,
+    );
     service = module.get(ReturnOrderItemsService);
   });
 
@@ -102,7 +104,11 @@ describe('ReturnOrderItemsController', () => {
 
       const result = await controller.update('item-123', updateDto, mockUser);
 
-      expect(service.update).toHaveBeenCalledWith('item-123', updateDto, mockUser);
+      expect(service.update).toHaveBeenCalledWith(
+        'item-123',
+        updateDto,
+        mockUser,
+      );
       expect(result).toEqual(updatedItem);
     });
   });
@@ -121,9 +127,15 @@ describe('ReturnOrderItemsController', () => {
     it('should return items by return order id', async () => {
       service.findByReturnOrderId.mockResolvedValue([mockReturnOrderItem]);
 
-      const result = await controller.findByReturnOrderId('return-123', mockUser);
+      const result = await controller.findByReturnOrderId(
+        'return-123',
+        mockUser,
+      );
 
-      expect(service.findByReturnOrderId).toHaveBeenCalledWith('return-123', mockUser);
+      expect(service.findByReturnOrderId).toHaveBeenCalledWith(
+        'return-123',
+        mockUser,
+      );
       expect(result).toEqual([mockReturnOrderItem]);
     });
   });

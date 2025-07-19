@@ -156,12 +156,18 @@ describe('TenantDataSourceService', () => {
 
   it('getValidatedStore ném NotFoundException nếu không có store', async () => {
     globalDataSource.getRepository().findOne.mockResolvedValue(null);
-    await expect((service as any).getValidatedStore('store1')).rejects.toThrow(NotFoundException);
+    await expect((service as any).getValidatedStore('store1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('getValidatedStore ném Error nếu store không có schema_name', async () => {
-    globalDataSource.getRepository().findOne.mockResolvedValue({ schema_name: '   ' });
-    await expect((service as any).getValidatedStore('store1')).rejects.toThrow(Error);
+    globalDataSource
+      .getRepository()
+      .findOne.mockResolvedValue({ schema_name: '   ' });
+    await expect((service as any).getValidatedStore('store1')).rejects.toThrow(
+      Error,
+    );
   });
 
   it('getValidatedStore trả về store hợp lệ', async () => {
@@ -174,27 +180,38 @@ describe('TenantDataSourceService', () => {
   it('initializeNewDataSource gọi cleanupOldestConnections nếu vượt MAX_CACHED_CONNECTIONS', async () => {
     (service as any).MAX_CACHED_CONNECTIONS = 1;
     (service as any).tenantDataSources.set('db1', {});
-    const cleanupSpy = jest.spyOn(service as any, 'cleanupOldestConnections').mockResolvedValue(undefined);
-    jest.spyOn(service as any, 'createDataSourceInitPromise').mockResolvedValue({ isInitialized: true });
+    const cleanupSpy = jest
+      .spyOn(service as any, 'cleanupOldestConnections')
+      .mockResolvedValue(undefined);
+    jest
+      .spyOn(service as any, 'createDataSourceInitPromise')
+      .mockResolvedValue({ isInitialized: true });
     await (service as any).initializeNewDataSource('store1', 'db2');
     expect(cleanupSpy).toHaveBeenCalled();
   });
 
   it('initializeNewDataSource log lỗi nếu initPromise reject', async () => {
-    jest.spyOn(service as any, 'createDataSourceInitPromise').mockRejectedValue(new Error('fail'));
+    jest
+      .spyOn(service as any, 'createDataSourceInitPromise')
+      .mockRejectedValue(new Error('fail'));
     try {
       await (service as any).initializeNewDataSource('store1', 'db2');
     } catch {}
   });
 
   it('updateAccessInfo tăng accessCount', () => {
-    (service as any).tenantDataSources.set('db', { lastAccessed: new Date(), accessCount: 1 });
+    (service as any).tenantDataSources.set('db', {
+      lastAccessed: new Date(),
+      accessCount: 1,
+    });
     (service as any).updateAccessInfo('db');
     expect((service as any).tenantDataSources.get('db').accessCount).toBe(2);
   });
 
   it('createDataSourceInitPromise khởi tạo thành công', async () => {
-    jest.spyOn(service as any, 'ensureSchemaExists').mockResolvedValue(undefined);
+    jest
+      .spyOn(service as any, 'ensureSchemaExists')
+      .mockResolvedValue(undefined);
     const mockDs = {
       initialize: jest.fn().mockResolvedValue(undefined),
       isInitialized: true,
@@ -202,20 +219,31 @@ describe('TenantDataSourceService', () => {
       query: jest.fn().mockResolvedValue([{ count: '1' }]),
       destroy: jest.fn(),
     };
-    jest.spyOn(require('typeorm'), 'DataSource').mockImplementation(() => mockDs as any);
-    const result = await (service as any).createDataSourceInitPromise('store1', 'db1');
+    jest
+      .spyOn(require('typeorm'), 'DataSource')
+      .mockImplementation(() => mockDs as any);
+    const result = await (service as any).createDataSourceInitPromise(
+      'store1',
+      'db1',
+    );
     expect(mockDs.initialize).toHaveBeenCalled();
   });
 
   it('createDataSourceInitPromise lỗi khi initialize, gọi destroy', async () => {
-    jest.spyOn(service as any, 'ensureSchemaExists').mockResolvedValue(undefined);
+    jest
+      .spyOn(service as any, 'ensureSchemaExists')
+      .mockResolvedValue(undefined);
     const mockDs = {
       initialize: jest.fn().mockRejectedValue(new Error('fail')),
       isInitialized: true,
       destroy: jest.fn().mockResolvedValue(undefined),
     };
-    jest.spyOn(require('typeorm'), 'DataSource').mockImplementation(() => mockDs as any);
-    await expect((service as any).createDataSourceInitPromise('store1', 'db1')).rejects.toThrow('fail');
+    jest
+      .spyOn(require('typeorm'), 'DataSource')
+      .mockImplementation(() => mockDs as any);
+    await expect(
+      (service as any).createDataSourceInitPromise('store1', 'db1'),
+    ).rejects.toThrow('fail');
     expect(mockDs.destroy).toHaveBeenCalled();
   });
 
@@ -239,8 +267,15 @@ describe('TenantDataSourceService', () => {
   });
 
   it('cleanupOldestConnections destroy các connection cũ', async () => {
-    const ds = { isInitialized: true, destroy: jest.fn().mockResolvedValue(undefined) };
-    (service as any).tenantDataSources.set('db', { dataSource: ds, lastAccessed: new Date(Date.now() - 1000000), accessCount: 1 });
+    const ds = {
+      isInitialized: true,
+      destroy: jest.fn().mockResolvedValue(undefined),
+    };
+    (service as any).tenantDataSources.set('db', {
+      dataSource: ds,
+      lastAccessed: new Date(Date.now() - 1000000),
+      accessCount: 1,
+    });
     await (service as any).cleanupOldestConnections();
     expect(ds.destroy).toHaveBeenCalled();
   });
@@ -253,8 +288,14 @@ describe('TenantDataSourceService', () => {
       isInitialized: true,
       initialize: jest.fn().mockResolvedValue(undefined),
     };
-    (service as any).tenantDataSources.set('db', { dataSource: ds, lastAccessed: new Date(), accessCount: 1 });
-    jest.spyOn(require('typeorm'), 'DataSource').mockImplementation(() => ds as any);
+    (service as any).tenantDataSources.set('db', {
+      dataSource: ds,
+      lastAccessed: new Date(),
+      accessCount: 1,
+    });
+    jest
+      .spyOn(require('typeorm'), 'DataSource')
+      .mockImplementation(() => ds as any);
     await (service as any).dropObsoleteIndexes('db');
     expect(ds.query).toHaveBeenCalled();
   });

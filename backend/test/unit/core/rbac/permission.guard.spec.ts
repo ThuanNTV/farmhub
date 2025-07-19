@@ -1,4 +1,7 @@
-import { PermissionGuard, Permission } from 'src/core/rbac/permission/permission.guard';
+import {
+  PermissionGuard,
+  Permission,
+} from 'src/core/rbac/permission/permission.guard';
 import { Reflector } from '@nestjs/core';
 import { ForbiddenException, ExecutionContext } from '@nestjs/common';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
@@ -72,9 +75,7 @@ describe('PermissionGuard', () => {
       {
         resource: 'products',
         action: 'read',
-        conditions: [
-          { field: 'user.id', operator: 'eq', value: 1 },
-        ],
+        conditions: [{ field: 'user.id', operator: 'eq', value: 1 }],
       },
     ]);
     const ctx = mockContext(mockUser({ id: 1 }));
@@ -86,9 +87,7 @@ describe('PermissionGuard', () => {
       {
         resource: 'products',
         action: 'read',
-        conditions: [
-          { field: 'user.id', operator: 'eq', value: 2 },
-        ],
+        conditions: [{ field: 'user.id', operator: 'eq', value: 2 }],
       },
     ]);
     const ctx = mockContext(mockUser({ id: 1 }));
@@ -101,8 +100,16 @@ describe('PermissionGuard', () => {
       action: 'read',
       conditions: [
         { field: 'user.id', operator: 'ne', value: 2 },
-        { field: 'user.role', operator: 'in', value: [UserRole.ADMIN_STORE, UserRole.VIEWER] },
-        { field: 'user.role', operator: 'not_in', value: [UserRole.STORE_MANAGER] },
+        {
+          field: 'user.role',
+          operator: 'in',
+          value: [UserRole.ADMIN_STORE, UserRole.VIEWER],
+        },
+        {
+          field: 'user.role',
+          operator: 'not_in',
+          value: [UserRole.STORE_MANAGER],
+        },
       ],
     };
     (reflector.getAllAndOverride as jest.Mock).mockReturnValue([permission]);

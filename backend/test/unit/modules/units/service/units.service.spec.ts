@@ -46,7 +46,12 @@ describe('UnitsService', () => {
       providers: [
         UnitsService,
         { provide: getRepositoryToken(Unit), useValue: mockRepository },
-        { provide: TenantDataSourceService, useValue: { getTenantRepository: jest.fn().mockReturnValue(mockRepository) } },
+        {
+          provide: TenantDataSourceService,
+          useValue: {
+            getTenantRepository: jest.fn().mockReturnValue(mockRepository),
+          },
+        },
       ],
     }).compile();
 
@@ -96,7 +101,9 @@ describe('UnitsService', () => {
         is_active: true,
       };
 
-      await expect(service.create(createDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(createDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -159,7 +166,9 @@ describe('UnitsService', () => {
     it('should throw NotFoundException when unit not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -197,13 +206,22 @@ describe('UnitsService', () => {
   describe('convertUnits', () => {
     it('should convert units successfully', async () => {
       const fromUnit = { ...mockUnit, conversion_factor: 1 };
-      const toUnit = { ...mockUnit, unit_id: 'unit-456', conversion_factor: 1000 };
-      
+      const toUnit = {
+        ...mockUnit,
+        unit_id: 'unit-456',
+        conversion_factor: 1000,
+      };
+
       repository.findOne
         .mockResolvedValueOnce(fromUnit)
         .mockResolvedValueOnce(toUnit);
 
-      const result = await service.convertUnits('unit-123', 'unit-456', 1, mockUser);
+      const result = await service.convertUnits(
+        'unit-123',
+        'unit-456',
+        1,
+        mockUser,
+      );
 
       expect(result).toEqual({
         convertedValue: 1000,
@@ -215,7 +233,9 @@ describe('UnitsService', () => {
     it('should throw NotFoundException when units not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.convertUnits('unit-123', 'unit-456', 1, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.convertUnits('unit-123', 'unit-456', 1, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

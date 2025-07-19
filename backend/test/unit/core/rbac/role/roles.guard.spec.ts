@@ -33,7 +33,10 @@ describe('RolesGuard', () => {
   });
 
   it('trả về true nếu user có role phù hợp', () => {
-    reflector.getAllAndOverride.mockReturnValue([UserRole.ADMIN_GLOBAL, UserRole.STORE_STAFF]);
+    reflector.getAllAndOverride.mockReturnValue([
+      UserRole.ADMIN_GLOBAL,
+      UserRole.STORE_STAFF,
+    ]);
     const user = { isSuperadmin: false, role: UserRole.STORE_STAFF };
     context.switchToHttp.mockReturnValue({
       getRequest: () => ({ user }),
@@ -49,4 +52,4 @@ describe('RolesGuard', () => {
     } as any);
     expect(guard.canActivate(context)).toBe(false);
   });
-}); 
+});

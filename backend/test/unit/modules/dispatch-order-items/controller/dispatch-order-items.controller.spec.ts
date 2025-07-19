@@ -69,7 +69,9 @@ describe('DispatchOrderItemsController', () => {
       ],
     }).compile();
 
-    controller = module.get<DispatchOrderItemsController>(DispatchOrderItemsController);
+    controller = module.get<DispatchOrderItemsController>(
+      DispatchOrderItemsController,
+    );
     service = module.get(DispatchOrderItemsService);
   });
 
@@ -90,7 +92,9 @@ describe('DispatchOrderItemsController', () => {
     it('should throw BadRequestException when creation fails', async () => {
       service.create.mockRejectedValue(new BadRequestException('Invalid data'));
 
-      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -116,9 +120,13 @@ describe('DispatchOrderItemsController', () => {
     });
 
     it('should throw NotFoundException when item not found', async () => {
-      service.findOne.mockRejectedValue(new NotFoundException('Item not found'));
+      service.findOne.mockRejectedValue(
+        new NotFoundException('Item not found'),
+      );
 
-      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -127,16 +135,26 @@ describe('DispatchOrderItemsController', () => {
       const updatedItem = { ...mockDispatchOrderItem, ...mockUpdateDto };
       service.update.mockResolvedValue(updatedItem);
 
-      const result = await controller.update('item-123', mockUpdateDto, mockUser);
+      const result = await controller.update(
+        'item-123',
+        mockUpdateDto,
+        mockUser,
+      );
 
-      expect(service.update).toHaveBeenCalledWith('item-123', mockUpdateDto, mockUser);
+      expect(service.update).toHaveBeenCalledWith(
+        'item-123',
+        mockUpdateDto,
+        mockUser,
+      );
       expect(result).toEqual(updatedItem);
     });
 
     it('should throw NotFoundException when updating non-existent item', async () => {
       service.update.mockRejectedValue(new NotFoundException('Item not found'));
 
-      await expect(controller.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        controller.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -152,7 +170,9 @@ describe('DispatchOrderItemsController', () => {
     it('should throw NotFoundException when removing non-existent item', async () => {
       service.remove.mockRejectedValue(new NotFoundException('Item not found'));
 
-      await expect(controller.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(controller.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -160,9 +180,15 @@ describe('DispatchOrderItemsController', () => {
     it('should return items by dispatch order id', async () => {
       service.findByDispatchOrderId.mockResolvedValue(mockDispatchOrderItems);
 
-      const result = await controller.findByDispatchOrderId('dispatch-123', mockUser);
+      const result = await controller.findByDispatchOrderId(
+        'dispatch-123',
+        mockUser,
+      );
 
-      expect(service.findByDispatchOrderId).toHaveBeenCalledWith('dispatch-123', mockUser);
+      expect(service.findByDispatchOrderId).toHaveBeenCalledWith(
+        'dispatch-123',
+        mockUser,
+      );
       expect(result).toEqual(mockDispatchOrderItems);
     });
   });

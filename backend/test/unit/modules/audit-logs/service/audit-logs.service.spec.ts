@@ -8,16 +8,16 @@ import { NotFoundException } from '@nestjs/common';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
 import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dto';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 
 jest.mock('src/common/helpers/dto-mapper.helper');
 
 describe('AuditLogsService', () => {
   let service: AuditLogsService;
-  let repository: jest.Mocked<Repository<AuditLog>>;
-  let tenantDataSourceService: jest.Mocked<TenantDataSourceService>;
+  let mockRepo: any;
 
   // Mock data
-  const mockAuditLog: Partial<AuditLog> = {
+  const mockAuditLog = {
     id: 'audit-123',
     user_id: 'user-123',
     action: 'CREATE',
@@ -33,18 +33,6 @@ describe('AuditLogsService', () => {
     updated_at: new Date('2024-01-01T00:00:00Z'),
     is_deleted: false,
     deleted_at: null,
-    user_name: 'Test User',
-    resource_type: 'products',
-    resource_id: 'product-123',
-    old_value: null,
-    new_value: '{"name":"Test Product","price":100}',
-    ip_address: '127.0.0.1',
-    user_agent: 'test-agent',
-    timestamp: new Date('2024-01-01T00:00:00Z'),
-    store_id: 'store-123',
-    session_id: 'session-123',
-    details: null,
-    audit_log_id: 'audit-123',
   };
 
   const mockCreateDto: CreateAuditLogDto = {
@@ -70,41 +58,16 @@ describe('AuditLogsService', () => {
     },
   };
 
-  beforeEach(async () => {
-    const mockRepository = {
+  beforeEach(() => {
+    const tenantDS = {};
+    service = new AuditLogsService(tenantDS as any);
+    mockRepo = {
       find: jest.fn(),
-      findOne: jest.fn(),
+      merge: jest.fn(),
       save: jest.fn(),
       remove: jest.fn(),
-      merge: jest.fn(),
-      create: jest.fn(),
     };
-
-    const mockTenantDataSourceService = {
-      getTenantRepository: jest.fn().mockReturnValue(mockRepository),
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuditLogsService,
-        {
-          provide: getRepositoryToken(AuditLog),
-          useValue: mockRepository,
-        },
-        {
-          provide: TenantDataSourceService,
-          useValue: mockTenantDataSourceService,
-        },
-      ],
-    }).compile();
-
-    service = module.get<AuditLogsService>(AuditLogsService);
-    repository = module.get(getRepositoryToken(AuditLog));
-    tenantDataSourceService = module.get(TenantDataSourceService);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    jest.spyOn(service, 'getRepo').mockResolvedValue(mockRepo);
   });
 
   it('should be defined', () => {

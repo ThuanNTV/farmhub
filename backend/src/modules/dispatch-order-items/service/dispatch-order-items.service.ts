@@ -47,7 +47,8 @@ export class DispatchOrderItemsService extends TenantBaseService<DispatchOrderIt
       // Calculate total price if not provided
       const calculatedDto = {
         ...dto,
-        totalPrice: dto.totalPrice ?? (dto.quantity * Number(dto.unitPrice)).toString(),
+        totalPrice:
+          dto.totalPrice ?? (dto.quantity * Number(dto.unitPrice)).toString(),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -58,15 +59,11 @@ export class DispatchOrderItemsService extends TenantBaseService<DispatchOrderIt
 
       const result = await super.create(storeId, entityData);
 
-      this.logger.log(
-        `Dispatch order item created successfully: ${result.id}`,
-      );
+      this.logger.log(`Dispatch order item created successfully: ${result.id}`);
       return result;
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(
-        `Failed to create dispatch order item: ${errMsg}`,
-      );
+      this.logger.error(`Failed to create dispatch order item: ${errMsg}`);
       throw error;
     }
   }
@@ -198,7 +195,10 @@ export class DispatchOrderItemsService extends TenantBaseService<DispatchOrderIt
 
     // Calculate and validate total price
     const calculatedTotal = dto.quantity * Number(dto.unitPrice);
-    if (dto.totalPrice && Math.abs(Number(dto.totalPrice) - calculatedTotal) > 0.01) {
+    if (
+      dto.totalPrice &&
+      Math.abs(Number(dto.totalPrice) - calculatedTotal) > 0.01
+    ) {
       throw new BadRequestException(
         'Total price does not match quantity × unit price',
       );
@@ -209,7 +209,8 @@ export class DispatchOrderItemsService extends TenantBaseService<DispatchOrderIt
     storeId: string,
     dispatchOrderId: string,
   ): Promise<void> {
-    const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
     const dispatchOrderRepo = dataSource.getRepository(DispatchOrder);
 
     const dispatchOrder = await dispatchOrderRepo.findOne({
@@ -227,7 +228,8 @@ export class DispatchOrderItemsService extends TenantBaseService<DispatchOrderIt
     storeId: string,
     productId: string,
   ): Promise<void> {
-    const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
     const productRepo = dataSource.getRepository(Product);
 
     const product = await productRepo.findOne({

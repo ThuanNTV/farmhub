@@ -78,7 +78,9 @@ describe('UnitsController', () => {
     it('should throw BadRequestException when creation fails', async () => {
       service.create.mockRejectedValue(new BadRequestException('Invalid data'));
 
-      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -128,9 +130,13 @@ describe('UnitsController', () => {
     });
 
     it('should throw NotFoundException when unit not found', async () => {
-      service.findOne.mockRejectedValue(new NotFoundException('Unit not found'));
+      service.findOne.mockRejectedValue(
+        new NotFoundException('Unit not found'),
+      );
 
-      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -142,7 +148,11 @@ describe('UnitsController', () => {
 
       const result = await controller.update('unit-123', updateDto, mockUser);
 
-      expect(service.update).toHaveBeenCalledWith('unit-123', updateDto, mockUser);
+      expect(service.update).toHaveBeenCalledWith(
+        'unit-123',
+        updateDto,
+        mockUser,
+      );
       expect(result).toEqual(updatedUnit);
     });
   });
@@ -159,12 +169,26 @@ describe('UnitsController', () => {
 
   describe('convertUnits', () => {
     it('should convert units successfully', async () => {
-      const conversionResult = { convertedValue: 1000, fromUnit: 'kg', toUnit: 'g' };
+      const conversionResult = {
+        convertedValue: 1000,
+        fromUnit: 'kg',
+        toUnit: 'g',
+      };
       service.convertUnits.mockResolvedValue(conversionResult);
 
-      const result = await controller.convertUnits('unit-123', 'unit-456', 1, mockUser);
+      const result = await controller.convertUnits(
+        'unit-123',
+        'unit-456',
+        1,
+        mockUser,
+      );
 
-      expect(service.convertUnits).toHaveBeenCalledWith('unit-123', 'unit-456', 1, mockUser);
+      expect(service.convertUnits).toHaveBeenCalledWith(
+        'unit-123',
+        'unit-456',
+        1,
+        mockUser,
+      );
       expect(result).toEqual(conversionResult);
     });
   });

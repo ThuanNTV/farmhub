@@ -48,10 +48,14 @@ describe('StockTransferItemsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StockTransferItemsController],
-      providers: [{ provide: StockTransferItemsService, useValue: mockService }],
+      providers: [
+        { provide: StockTransferItemsService, useValue: mockService },
+      ],
     }).compile();
 
-    controller = module.get<StockTransferItemsController>(StockTransferItemsController);
+    controller = module.get<StockTransferItemsController>(
+      StockTransferItemsController,
+    );
     service = module.get(StockTransferItemsService);
   });
 
@@ -100,7 +104,11 @@ describe('StockTransferItemsController', () => {
 
       const result = await controller.update('item-123', updateDto, mockUser);
 
-      expect(service.update).toHaveBeenCalledWith('item-123', updateDto, mockUser);
+      expect(service.update).toHaveBeenCalledWith(
+        'item-123',
+        updateDto,
+        mockUser,
+      );
       expect(result).toEqual(updatedItem);
     });
   });
@@ -119,9 +127,15 @@ describe('StockTransferItemsController', () => {
     it('should return items by stock transfer id', async () => {
       service.findByStockTransferId.mockResolvedValue([mockStockTransferItem]);
 
-      const result = await controller.findByStockTransferId('transfer-123', mockUser);
+      const result = await controller.findByStockTransferId(
+        'transfer-123',
+        mockUser,
+      );
 
-      expect(service.findByStockTransferId).toHaveBeenCalledWith('transfer-123', mockUser);
+      expect(service.findByStockTransferId).toHaveBeenCalledWith(
+        'transfer-123',
+        mockUser,
+      );
       expect(result).toEqual([mockStockTransferItem]);
     });
   });

@@ -44,8 +44,16 @@ describe('ReturnOrderItemsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ReturnOrderItemsService,
-        { provide: getRepositoryToken(ReturnOrderItem), useValue: mockRepository },
-        { provide: TenantDataSourceService, useValue: { getTenantRepository: jest.fn().mockReturnValue(mockRepository) } },
+        {
+          provide: getRepositoryToken(ReturnOrderItem),
+          useValue: mockRepository,
+        },
+        {
+          provide: TenantDataSourceService,
+          useValue: {
+            getTenantRepository: jest.fn().mockReturnValue(mockRepository),
+          },
+        },
       ],
     }).compile();
 
@@ -109,7 +117,9 @@ describe('ReturnOrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -133,7 +143,10 @@ describe('ReturnOrderItemsService', () => {
   describe('remove', () => {
     it('should soft delete a return order item successfully', async () => {
       repository.findOne.mockResolvedValue(mockReturnOrderItem);
-      repository.save.mockResolvedValue({ ...mockReturnOrderItem, is_deleted: true });
+      repository.save.mockResolvedValue({
+        ...mockReturnOrderItem,
+        is_deleted: true,
+      });
 
       await service.remove('item-123', mockUser);
 

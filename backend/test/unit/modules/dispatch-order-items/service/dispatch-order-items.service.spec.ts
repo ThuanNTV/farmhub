@@ -105,7 +105,9 @@ describe('DispatchOrderItemsService', () => {
       repository.create.mockReturnValue(mockDispatchOrderItem);
       repository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -139,7 +141,9 @@ describe('DispatchOrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -161,14 +165,19 @@ describe('DispatchOrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
     it('should soft delete a dispatch order item successfully', async () => {
       repository.findOne.mockResolvedValue(mockDispatchOrderItem);
-      repository.save.mockResolvedValue({ ...mockDispatchOrderItem, is_deleted: true });
+      repository.save.mockResolvedValue({
+        ...mockDispatchOrderItem,
+        is_deleted: true,
+      });
 
       await service.remove('item-123', mockUser);
 
@@ -184,7 +193,9 @@ describe('DispatchOrderItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -193,7 +204,10 @@ describe('DispatchOrderItemsService', () => {
       const mockItems = [mockDispatchOrderItem];
       repository.find.mockResolvedValue(mockItems);
 
-      const result = await service.findByDispatchOrderId('dispatch-123', mockUser);
+      const result = await service.findByDispatchOrderId(
+        'dispatch-123',
+        mockUser,
+      );
 
       expect(repository.find).toHaveBeenCalledWith({
         where: { dispatch_order_id: 'dispatch-123', is_deleted: false },

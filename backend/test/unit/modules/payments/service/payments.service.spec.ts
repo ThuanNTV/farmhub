@@ -33,9 +33,15 @@ describe('PaymentsService', () => {
       paymentTransactionService,
       paymentGatewayService,
     );
-    superCreate = jest.spyOn(PaymentsService.prototype, 'create').mockImplementation();
-    superFindById = jest.spyOn(PaymentsService.prototype, 'findById').mockImplementation();
-    superGetRepo = jest.spyOn(PaymentsService.prototype, 'getRepo').mockResolvedValue(repo);
+    superCreate = jest
+      .spyOn(PaymentsService.prototype, 'create')
+      .mockImplementation();
+    superFindById = jest
+      .spyOn(PaymentsService.prototype, 'findById')
+      .mockImplementation();
+    superGetRepo = jest
+      .spyOn(PaymentsService.prototype, 'getRepo')
+      .mockResolvedValue(repo);
     jest.spyOn(service as any, 'mapToResponseDto').mockImplementation((x) => x);
   });
 
@@ -45,26 +51,42 @@ describe('PaymentsService', () => {
 
   // createPayment
   it('createPayment throw nếu amount <= 0', async () => {
-    await expect(service.createPayment('store1', { amount: '0' } as any)).rejects.toThrow(BadRequestException);
-    await expect(service.createPayment('store1', { amount: '-1' } as any)).rejects.toThrow(BadRequestException);
-    await expect(service.createPayment('store1', { amount: 'abc' } as any)).rejects.toThrow(BadRequestException);
+    await expect(
+      service.createPayment('store1', { amount: '0' } as any),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      service.createPayment('store1', { amount: '-1' } as any),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      service.createPayment('store1', { amount: 'abc' } as any),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('createPayment trả về đúng response khi hợp lệ', async () => {
     superCreate.mockResolvedValue({ id: 'p1' });
-    const result = await service.createPayment('store1', { amount: '10' } as any);
+    const result = await service.createPayment('store1', {
+      amount: '10',
+    } as any);
     expect(result.id).toBe('p1');
   });
 
   it('createPayment throw nếu super.create lỗi', async () => {
     superCreate.mockRejectedValue(new Error('fail'));
-    await expect(service.createPayment('store1', { amount: '10' } as any)).rejects.toThrow('fail');
+    await expect(
+      service.createPayment('store1', { amount: '10' } as any),
+    ).rejects.toThrow('fail');
   });
 
   // createPaymentInTransaction
   it('createPaymentInTransaction gọi paymentTransactionService', async () => {
     paymentTransactionService.createPayment.mockResolvedValue('ok');
-    const result = await service.createPaymentInTransaction('o1', 10, 'pm1', 'u1', {} as any);
+    const result = await service.createPaymentInTransaction(
+      'o1',
+      10,
+      'pm1',
+      'u1',
+      {} as any,
+    );
     expect(result).toBe('ok');
   });
 
@@ -77,7 +99,10 @@ describe('PaymentsService', () => {
 
   // verifyPaymentGateway
   it('verifyPaymentGateway gọi paymentGatewayService', async () => {
-    paymentGatewayService.verifyPayment.mockResolvedValue({ success: true, status: 'PAID' });
+    paymentGatewayService.verifyPayment.mockResolvedValue({
+      success: true,
+      status: 'PAID',
+    });
     const result = await service.verifyPaymentGateway('tx1');
     expect(result.status).toBe('PAID');
   });
@@ -97,13 +122,17 @@ describe('PaymentsService', () => {
 
   it('findPaymentById throw nếu super.findById lỗi', async () => {
     superFindById.mockRejectedValue(new Error('fail'));
-    await expect(service.findPaymentById('store1', 'id1')).rejects.toThrow('fail');
+    await expect(service.findPaymentById('store1', 'id1')).rejects.toThrow(
+      'fail',
+    );
   });
 
   // findOne
   it('findOne throw nếu không tìm thấy', async () => {
     superFindById.mockResolvedValue(null);
-    await expect(service.findOne('store1', 'id1')).rejects.toThrow(NotFoundException);
+    await expect(service.findOne('store1', 'id1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('findOne trả về đúng response nếu có entity', async () => {
@@ -132,21 +161,31 @@ describe('PaymentsService', () => {
   // updatePayment
   it('updatePayment throw nếu không tìm thấy', async () => {
     superFindById.mockResolvedValue(null);
-    await expect(service.updatePayment('store1', 'id1', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.updatePayment('store1', 'id1', {} as any),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('updatePayment throw nếu amount <= 0', async () => {
     superFindById.mockResolvedValue({ id: 'p1' });
-    await expect(service.updatePayment('store1', 'id1', { amount: '0' } as any)).rejects.toThrow(BadRequestException);
-    await expect(service.updatePayment('store1', 'id1', { amount: '-1' } as any)).rejects.toThrow(BadRequestException);
-    await expect(service.updatePayment('store1', 'id1', { amount: 'abc' } as any)).rejects.toThrow(BadRequestException);
+    await expect(
+      service.updatePayment('store1', 'id1', { amount: '0' } as any),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      service.updatePayment('store1', 'id1', { amount: '-1' } as any),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      service.updatePayment('store1', 'id1', { amount: 'abc' } as any),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('updatePayment trả về đúng response khi hợp lệ', async () => {
     superFindById.mockResolvedValue({ id: 'p1' });
     repo.merge.mockReturnValue({ id: 'p1', amount: 10 });
     repo.save.mockResolvedValue({ id: 'p1', amount: 10 });
-    const result = await service.updatePayment('store1', 'id1', { amount: '10' } as any);
+    const result = await service.updatePayment('store1', 'id1', {
+      amount: '10',
+    } as any);
     expect(result.id).toBe('p1');
   });
 
@@ -154,6 +193,8 @@ describe('PaymentsService', () => {
     superFindById.mockResolvedValue({ id: 'p1' });
     repo.merge.mockReturnValue({ id: 'p1', amount: 10 });
     repo.save.mockRejectedValue(new Error('fail'));
-    await expect(service.updatePayment('store1', 'id1', { amount: '10' } as any)).rejects.toThrow('fail');
+    await expect(
+      service.updatePayment('store1', 'id1', { amount: '10' } as any),
+    ).rejects.toThrow('fail');
   });
-}); 
+});

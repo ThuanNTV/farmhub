@@ -8,32 +8,26 @@ describe('LogLevelController', () => {
 
   beforeEach(() => {
     service = {
-      getLogLevelInfo: jest
-        .fn()
-        .mockReturnValue({
-          current: 'info',
-          environment: 'dev',
-          recommended: 'warn',
-          available: ['error', 'warn', 'info', 'debug'],
-        }),
-      setLogLevel: jest
-        .fn()
-        .mockReturnValue({
-          success: true,
-          message: 'Changed',
-          previousLevel: 'info',
-        }),
+      getLogLevelInfo: jest.fn().mockReturnValue({
+        current: 'info',
+        environment: 'dev',
+        recommended: 'warn',
+        available: ['error', 'warn', 'info', 'debug'],
+      }),
+      setLogLevel: jest.fn().mockReturnValue({
+        success: true,
+        message: 'Changed',
+        previousLevel: 'info',
+      }),
       resetLogLevel: jest
         .fn()
         .mockReturnValue({ success: true, message: 'Reset', newLevel: 'info' }),
-      getLogLevelStats: jest
-        .fn()
-        .mockReturnValue({
-          current: 'info',
-          enabledLevels: ['info'],
-          disabledLevels: ['debug'],
-          totalLevels: 2,
-        }),
+      getLogLevelStats: jest.fn().mockReturnValue({
+        current: 'info',
+        enabledLevels: ['info'],
+        disabledLevels: ['debug'],
+        totalLevels: 2,
+      }),
       getCurrentLogLevel: jest.fn().mockReturnValue('info'),
     } as any;
     controller = new LogLevelController(service);

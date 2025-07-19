@@ -69,4 +69,4 @@ describe('getTenantDbConfig', () => {
       expect((config.cache as any).options.port).toBe(6380);
     }
   });
-}); 
+});

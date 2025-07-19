@@ -80,7 +80,9 @@ describe('InventoryTransferItemsService', () => {
       ],
     }).compile();
 
-    service = module.get<InventoryTransferItemsService>(InventoryTransferItemsService);
+    service = module.get<InventoryTransferItemsService>(
+      InventoryTransferItemsService,
+    );
     repository = module.get(getRepositoryToken(InventoryTransferItem));
     tenantDataSourceService = module.get(TenantDataSourceService);
   });
@@ -105,7 +107,9 @@ describe('InventoryTransferItemsService', () => {
       repository.create.mockReturnValue(mockInventoryTransferItem);
       repository.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(service.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -139,7 +143,9 @@ describe('InventoryTransferItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -161,14 +167,19 @@ describe('InventoryTransferItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
     it('should soft delete an inventory transfer item successfully', async () => {
       repository.findOne.mockResolvedValue(mockInventoryTransferItem);
-      repository.save.mockResolvedValue({ ...mockInventoryTransferItem, is_deleted: true });
+      repository.save.mockResolvedValue({
+        ...mockInventoryTransferItem,
+        is_deleted: true,
+      });
 
       await service.remove('item-123', mockUser);
 
@@ -184,7 +195,9 @@ describe('InventoryTransferItemsService', () => {
     it('should throw NotFoundException when item not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(service.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -193,7 +206,10 @@ describe('InventoryTransferItemsService', () => {
       const mockItems = [mockInventoryTransferItem];
       repository.find.mockResolvedValue(mockItems);
 
-      const result = await service.findByInventoryTransferId('transfer-123', mockUser);
+      const result = await service.findByInventoryTransferId(
+        'transfer-123',
+        mockUser,
+      );
 
       expect(repository.find).toHaveBeenCalledWith({
         where: { inventory_transfer_id: 'transfer-123', is_deleted: false },

@@ -51,8 +51,10 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
         ...createStockTransferItemDto,
         totalPrice:
           createStockTransferItemDto.totalPrice ??
-          (createStockTransferItemDto.quantity && createStockTransferItemDto.unitPrice
-            ? createStockTransferItemDto.quantity * createStockTransferItemDto.unitPrice
+          (createStockTransferItemDto.quantity &&
+          createStockTransferItemDto.unitPrice
+            ? createStockTransferItemDto.quantity *
+              createStockTransferItemDto.unitPrice
             : undefined),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -61,15 +63,11 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
       const repo = await this.getRepo(storeId);
       const result = await repo.save({ ...calculatedDto, storeId });
 
-      this.logger.log(
-        `Stock transfer item created successfully: ${result.id}`,
-      );
+      this.logger.log(`Stock transfer item created successfully: ${result.id}`);
       return DtoMapper.mapToDto<StockTransferItem>({ ...result });
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(
-        `Failed to create stock transfer item: ${errMsg}`,
-      );
+      this.logger.error(`Failed to create stock transfer item: ${errMsg}`);
       throw error;
     }
   }
@@ -187,7 +185,11 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
     }
 
     // Calculate and validate total price
-    if (dto.totalPrice && dto.quantity !== undefined && dto.unitPrice !== undefined) {
+    if (
+      dto.totalPrice &&
+      dto.quantity !== undefined &&
+      dto.unitPrice !== undefined
+    ) {
       const calculatedTotal = dto.quantity * dto.unitPrice;
       if (Math.abs(dto.totalPrice - calculatedTotal) > 0.01) {
         throw new BadRequestException(
@@ -214,7 +216,8 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
     storeId: string,
     stockTransferId: string,
   ): Promise<void> {
-    const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
     const stockTransferRepo = dataSource.getRepository(StockTransfer);
 
     const stockTransfer = await stockTransferRepo.findOne({
@@ -242,7 +245,8 @@ export class StockTransferItemsService extends TenantBaseService<StockTransferIt
     storeId: string,
     productId: string,
   ): Promise<void> {
-    const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
     const productRepo = dataSource.getRepository(Product);
 
     const product = await productRepo.findOne({

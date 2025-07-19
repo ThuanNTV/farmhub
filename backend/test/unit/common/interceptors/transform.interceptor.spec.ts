@@ -3,7 +3,6 @@ import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { of } from 'rxjs';
 import { classToPlain } from 'class-transformer';
 
-
 describe('TransformInterceptor', () => {
   let interceptor: TransformInterceptor<any>;
   let context: Partial<ExecutionContext>;

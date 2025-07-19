@@ -95,7 +95,9 @@ describe('PaymentMethodsController', () => {
     it('should throw BadRequestException when creation fails', async () => {
       service.create.mockRejectedValue(new BadRequestException('Invalid data'));
 
-      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(BadRequestException);
+      await expect(controller.create(mockCreateDto, mockUser)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -133,9 +135,13 @@ describe('PaymentMethodsController', () => {
     });
 
     it('should throw NotFoundException when method not found', async () => {
-      service.findOne.mockRejectedValue(new NotFoundException('Payment method not found'));
+      service.findOne.mockRejectedValue(
+        new NotFoundException('Payment method not found'),
+      );
 
-      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOne('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -144,16 +150,28 @@ describe('PaymentMethodsController', () => {
       const updatedMethod = { ...mockPaymentMethod, ...mockUpdateDto };
       service.update.mockResolvedValue(updatedMethod);
 
-      const result = await controller.update('method-123', mockUpdateDto, mockUser);
+      const result = await controller.update(
+        'method-123',
+        mockUpdateDto,
+        mockUser,
+      );
 
-      expect(service.update).toHaveBeenCalledWith('method-123', mockUpdateDto, mockUser);
+      expect(service.update).toHaveBeenCalledWith(
+        'method-123',
+        mockUpdateDto,
+        mockUser,
+      );
       expect(result).toEqual(updatedMethod);
     });
 
     it('should throw NotFoundException when updating non-existent method', async () => {
-      service.update.mockRejectedValue(new NotFoundException('Payment method not found'));
+      service.update.mockRejectedValue(
+        new NotFoundException('Payment method not found'),
+      );
 
-      await expect(controller.update('nonexistent', mockUpdateDto, mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        controller.update('nonexistent', mockUpdateDto, mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -167,9 +185,13 @@ describe('PaymentMethodsController', () => {
     });
 
     it('should throw NotFoundException when removing non-existent method', async () => {
-      service.remove.mockRejectedValue(new NotFoundException('Payment method not found'));
+      service.remove.mockRejectedValue(
+        new NotFoundException('Payment method not found'),
+      );
 
-      await expect(controller.remove('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(controller.remove('nonexistent', mockUser)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -185,9 +207,13 @@ describe('PaymentMethodsController', () => {
     });
 
     it('should throw NotFoundException when setting non-existent method as default', async () => {
-      service.setDefault.mockRejectedValue(new NotFoundException('Payment method not found'));
+      service.setDefault.mockRejectedValue(
+        new NotFoundException('Payment method not found'),
+      );
 
-      await expect(controller.setDefault('nonexistent', mockUser)).rejects.toThrow(NotFoundException);
+      await expect(
+        controller.setDefault('nonexistent', mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
