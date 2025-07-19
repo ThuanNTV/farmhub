@@ -26,6 +26,16 @@ class TestEntity {
   }
 }
 
+// Mock TenantDataSourceService
+const mockTenantDataSourceService = {
+  getTenantDataSource: jest.fn(),
+  closeTenantDataSource: jest.fn(),
+  dropObsoleteIndexes: jest.fn(),
+  dropObsoleteIndexesWithGlobalConnection: jest.fn(),
+  getConnectionStats: jest.fn(),
+  onModuleDestroy: jest.fn(),
+};
+
 // Concrete implementation for testing
 class TestTenantService extends TenantBaseService<TestEntity> {
   close() {
@@ -115,25 +125,37 @@ describe('TestTenantService', () => {
     mockDataSource = {
       isInitialized: true,
       getRepository: jest.fn().mockReturnValue(mockRepository),
-      close: jest.fn(),
-    } as any;
-
-    // Create mock tenant data source service
-    tenantDataSourceService = {
-      getTenantDataSource: jest.fn().mockResolvedValue(mockDataSource),
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TestTenantService,
+        {
+          provide: TestTenantService,
+          useFactory: (tenantDataSourceService: TenantDataSourceService) => {
+            return new TestTenantService(tenantDataSourceService);
+          },
+          inject: [TenantDataSourceService],
+        },
         {
           provide: TenantDataSourceService,
-          useValue: tenantDataSourceService,
+          useFactory: () => {
+            console.log(
+              'Creating mock TenantDataSourceService:',
+              mockTenantDataSourceService,
+            );
+            return mockTenantDataSourceService;
+          },
         },
       ],
     }).compile();
 
     service = module.get<TestTenantService>(TestTenantService);
+    tenantDataSourceService = mockTenantDataSourceService as any;
+
+    // Gán mock implementation cho getTenantDataSource
+    tenantDataSourceService.getTenantDataSource.mockResolvedValue(
+      mockDataSource,
+    );
 
     // Verify mock setup
     expect(tenantDataSourceService.getTenantDataSource).toBeDefined();
@@ -144,10 +166,9 @@ describe('TestTenantService', () => {
     );
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
-    await service.close();
   });
 
   beforeEach(() => {
