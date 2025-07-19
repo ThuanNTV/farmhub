@@ -28,7 +28,6 @@ const mockBank = {
   is_deleted: false,
 };
 
-
 const mockBanks = [mockBank];
 
 const mockService = {
@@ -112,7 +111,9 @@ describe('BankController', () => {
   it('should create a bank', async () => {
     const dto = { name: 'Test Bank' };
     jest.spyOn(service, 'create').mockResolvedValue(createMockBank());
-    await expect(controller.create(dto, req as any)).resolves.toEqual(createMockBank());
+    await expect(controller.create(dto, req as any)).resolves.toEqual(
+      createMockBank(),
+    );
     expect(service.create).toHaveBeenCalledWith(dto, 'user1');
   });
 
@@ -133,9 +134,7 @@ describe('BankController', () => {
   it('should update a bank', async () => {
     const dto = { name: 'Updated Bank' };
     const mockBank = createMockBank({ name: 'Updated Bank' });
-    jest
-      .spyOn(service, 'update')
-      .mockResolvedValue(mockBank);
+    jest.spyOn(service, 'update').mockResolvedValue(mockBank);
     await expect(
       controller.update('BANK001', dto, req as any),
     ).resolves.toEqual(mockBank);

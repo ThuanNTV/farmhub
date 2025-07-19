@@ -9,6 +9,14 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { AuthService } from 'src/core/auth/service/auth.service';
 import { AuthModule } from 'src/core/auth/auth.module';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import { AuditLogQueueService } from 'src/common/audit/audit-log-queue.service';
+import { SecurityService } from 'src/service/global/security.service';
+import {
+  mockAuditLogAsyncService,
+  mockAuditLogQueueService,
+  mockSecurityService,
+} from '../../utils/mock-dependencies';
 
 describe('AuthService Integration', () => {
   let app: INestApplication;
@@ -29,7 +37,19 @@ describe('AuthService Integration', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [GlobalDatabaseModule, AuthModule],
-    }).compile();
+      providers: [
+        { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },
+        { provide: AuditLogQueueService, useValue: mockAuditLogQueueService },
+        { provide: SecurityService, useValue: mockSecurityService },
+      ],
+    })
+      .overrideProvider(AuditLogAsyncService)
+      .useValue(mockAuditLogAsyncService)
+      .overrideProvider(AuditLogQueueService)
+      .useValue(mockAuditLogQueueService)
+      .overrideProvider(SecurityService)
+      .useValue(mockSecurityService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();

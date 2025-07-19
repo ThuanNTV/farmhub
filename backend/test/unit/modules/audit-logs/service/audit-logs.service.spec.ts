@@ -108,13 +108,17 @@ describe('AuditLogsService', () => {
 
   describe('findOne', () => {
     it('should return audit log if found', async () => {
-      jest.spyOn(AuditLogsService.prototype, 'findById').mockResolvedValue(mockAuditLog);
+      jest
+        .spyOn(AuditLogsService.prototype, 'findById')
+        .mockResolvedValue(mockAuditLog);
       const result = await service.findOne('store1', '1');
       expect(result).toBe(mockAuditLog);
     });
     it('should throw NotFoundException if not found', async () => {
       jest.spyOn(service, 'findById').mockResolvedValue(null);
-      await expect(service.findOne('store1', '2')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('store1', '2')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -153,7 +157,9 @@ describe('AuditLogsService', () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(mockAuditLog);
       mockRepository.merge.mockReturnValue({ ...mockAuditLog, ...dto });
       mockRepository.save.mockRejectedValue(new Error('fail-save'));
-      await expect(service.update(storeId, id, dto)).rejects.toThrow('fail-save');
+      await expect(service.update(storeId, id, dto)).rejects.toThrow(
+        'fail-save',
+      );
     });
   });
 
@@ -167,7 +173,9 @@ describe('AuditLogsService', () => {
     it('should throw if remove fails', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(mockAuditLog);
       mockRepository.remove.mockRejectedValue(new Error('fail-remove'));
-      await expect(service.remove('store1', '1')).rejects.toThrow('fail-remove');
+      await expect(service.remove('store1', '1')).rejects.toThrow(
+        'fail-remove',
+      );
     });
   });
 

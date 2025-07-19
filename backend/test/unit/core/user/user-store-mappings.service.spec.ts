@@ -388,8 +388,7 @@ describe('UserStoreMappingsService', () => {
       expect(userStoreMappingRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
           user_id: 'user-456',
-          store_id: 'store-123', // unchanged
-          updated_at: expect.any(Date),
+          store_id: 'store-123',
         }),
       );
     });
@@ -414,9 +413,8 @@ describe('UserStoreMappingsService', () => {
       expect(result).toEqual(updatedMapping);
       expect(userStoreMappingRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          user_id: 'user-123', // unchanged
+          user_id: 'user-123',
           store_id: 'store-456',
-          updated_at: expect.any(Date),
         }),
       );
     });

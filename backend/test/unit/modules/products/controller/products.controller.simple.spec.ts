@@ -1,11 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Reflector } from '@nestjs/core';
 import { ProductsController } from '@modules/products/controller/products.controller';
 import { ProductsService } from '@modules/products/service/products.service';
+import { SecurityService } from 'src/service/global/security.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import {
   BadRequestException,
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import {
+  mockSecurityService,
+  mockAuditLogAsyncService,
+  mockReflector,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockAuditInterceptor,
+} from '../../../../utils/mock-dependencies';
 // Simple mock data without helpers
 const createMockProduct = () => ({
   productId: '123e4567-e89b-12d3-a456-426614174000',
@@ -62,8 +76,21 @@ describe('ProductsController', () => {
           provide: ProductsService,
           useValue: mockService,
         },
+        { provide: SecurityService, useValue: mockSecurityService },
+        { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },
+        { provide: Reflector, useValue: mockReflector },
+        { provide: EnhancedAuthGuard, useValue: mockEnhancedAuthGuard },
+        { provide: PermissionGuard, useValue: mockPermissionGuard },
+        { provide: AuditInterceptor, useValue: mockAuditInterceptor },
       ],
-    }).compile();
+    })
+      .overrideGuard(EnhancedAuthGuard)
+      .useValue(mockEnhancedAuthGuard)
+      .overrideGuard(PermissionGuard)
+      .useValue(mockPermissionGuard)
+      .overrideInterceptor(AuditInterceptor)
+      .useValue(mockAuditInterceptor)
+      .compile();
 
     controller = module.get<ProductsController>(ProductsController);
     service = module.get<jest.Mocked<ProductsService>>(ProductsService);

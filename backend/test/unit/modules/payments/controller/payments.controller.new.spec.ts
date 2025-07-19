@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Reflector } from '@nestjs/core';
 import { PaymentsController } from '@modules/payments/controller/payments.controller';
 import { PaymentsService } from '@modules/payments/service/payments.service';
 import { CreatePaymentDto } from '@modules/payments/dto/create-payment.dto';
@@ -10,6 +11,19 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PaymentStatus } from 'src/entities/tenant/payment.entity';
+import { SecurityService } from 'src/service/global/security.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import {
+  mockSecurityService,
+  mockAuditLogAsyncService,
+  mockReflector,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockAuditInterceptor,
+} from '../../../../utils/mock-dependencies';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -46,8 +60,21 @@ describe('PaymentsController', () => {
           provide: PaymentsService,
           useValue: mockPaymentsService,
         },
+        { provide: SecurityService, useValue: mockSecurityService },
+        { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },
+        { provide: Reflector, useValue: mockReflector },
+        { provide: EnhancedAuthGuard, useValue: mockEnhancedAuthGuard },
+        { provide: PermissionGuard, useValue: mockPermissionGuard },
+        { provide: AuditInterceptor, useValue: mockAuditInterceptor },
       ],
-    }).compile();
+    })
+      .overrideGuard(EnhancedAuthGuard)
+      .useValue(mockEnhancedAuthGuard)
+      .overrideGuard(PermissionGuard)
+      .useValue(mockPermissionGuard)
+      .overrideInterceptor(AuditInterceptor)
+      .useValue(mockAuditInterceptor)
+      .compile();
 
     controller = module.get<PaymentsController>(PaymentsController);
   });
