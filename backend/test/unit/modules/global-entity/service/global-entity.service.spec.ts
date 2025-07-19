@@ -92,18 +92,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       userRepository.findOne.mockRejectedValue(new Error('Database error'));
 
       const user = await service.getUserById('u1');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching user u1:',
         expect.any(Error),
       );
       expect(user).toBeNull();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -136,18 +138,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       bankRepository.findOne.mockRejectedValue(new Error('Database error'));
 
       const bank = await service.getBankById('b1');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching bank b1:',
         expect.any(Error),
       );
       expect(bank).toBeNull();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -180,18 +184,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       unitRepository.findOne.mockRejectedValue(new Error('Database error'));
 
       const unit = await service.getUnitById('unit1');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching unit unit1:',
         expect.any(Error),
       );
       expect(unit).toBeNull();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -224,20 +230,22 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       paymentMethodRepository.findOne.mockRejectedValue(
         new Error('Database error'),
       );
 
       const paymentMethod = await service.getPaymentMethodById('pm1');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching payment method pm1:',
         expect.any(Error),
       );
       expect(paymentMethod).toBeNull();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -270,18 +278,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       storeRepository.findOne.mockRejectedValue(new Error('Database error'));
 
       const store = await service.getStoreById('s1');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching store s1:',
         expect.any(Error),
       );
       expect(store).toBeNull();
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -390,18 +400,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       bankRepository.find.mockRejectedValue(new Error('Database error'));
 
       const banks = await service.getAllBanks();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching all banks:',
         expect.any(Error),
       );
       expect(banks).toEqual([]);
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -430,18 +442,20 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       unitRepository.find.mockRejectedValue(new Error('Database error'));
 
       const units = await service.getAllUnits();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching all units:',
         expect.any(Error),
       );
       expect(units).toEqual([]);
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
@@ -470,20 +484,22 @@ describe('GlobalEntityService', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
       paymentMethodRepository.find.mockRejectedValue(
         new Error('Database error'),
       );
 
       const paymentMethods = await service.getAllPaymentMethods();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error fetching all payment methods:',
         expect.any(Error),
       );
       expect(paymentMethods).toEqual([]);
 
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 });
