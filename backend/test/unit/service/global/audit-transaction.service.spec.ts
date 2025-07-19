@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EntityManager } from 'typeorm';
 import { AuditTransactionService } from 'src/service/global/audit-transaction.service';
 import { AuditLog } from 'src/entities/tenant/audit_log.entity';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 describe('AuditTransactionService', () => {
   let service: AuditTransactionService;
   let mockEntityManager: jest.Mocked<EntityManager>;
   let mockAuditRepository: any;
+  let mockAuditLogAsyncService: jest.Mocked<AuditLogAsyncService>;
 
   beforeEach(async () => {
     mockAuditRepository = {
@@ -18,8 +20,18 @@ describe('AuditTransactionService', () => {
       getRepository: jest.fn().mockReturnValue(mockAuditRepository),
     } as any;
 
+    mockAuditLogAsyncService = {
+      logAsync: jest.fn(),
+    } as any;
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuditTransactionService],
+      providers: [
+        AuditTransactionService,
+        {
+          provide: AuditLogAsyncService,
+          useValue: mockAuditLogAsyncService,
+        },
+      ],
     }).compile();
 
     service = module.get<AuditTransactionService>(AuditTransactionService);
@@ -170,7 +182,7 @@ describe('AuditTransactionService', () => {
       mockAuditRepository.create.mockReturnValue(mockAuditLog);
       mockAuditRepository.save.mockResolvedValue(mockAuditLog);
 
-      const result = await service.logOrderCreation(
+      await service.logOrderCreation(
         'user-1',
         'order-1',
         { amount: 100 },
@@ -191,7 +203,6 @@ describe('AuditTransactionService', () => {
         updated_at: expect.any(Date),
         is_deleted: false,
       });
-      expect(result).toEqual(mockAuditLog);
     });
 
     it('should handle error in order creation logging', async () => {

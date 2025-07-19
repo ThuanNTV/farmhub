@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersService } from '@modules/orders/service/orders.service';
-import { ProductsService } from '@modules/products/service/products.service';
-import { InventoryTransfersService } from '@modules/inventory-transfers/service/inventory-transfers.service';
-import { CreateOrderDto } from '@modules/orders/dto/create-order.dto';
+import { OrdersService } from '../../../../../src/modules/orders/service/orders.service';
+import { ProductsService } from '../../../../../src/modules/products/service/products.service';
+import { InventoryTransfersService } from '../../../../../src/modules/inventory-transfers/service/inventory-transfers.service';
+import { CreateOrderDto } from '../../../../../src/modules/orders/dto/create-order.dto';
 import { UpdateOrderDto } from '@modules/orders/dto/update-order.dto';
 import {
   BadRequestException,
@@ -77,6 +77,9 @@ describe('OrdersService', () => {
     min_stock_level: 5,
     is_active: true,
     is_deleted: false,
+    getUnit: jest.fn(),
+    getCreatedByUser: jest.fn(),
+    getUpdatedByUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -173,6 +176,7 @@ describe('OrdersService', () => {
           product_name: 'Test Product',
           quantity: 2,
           unit_price: 100.0,
+          price: 200.0,
         },
       ],
     };
@@ -205,7 +209,7 @@ describe('OrdersService', () => {
       const dtoWithInvalidItem = {
         ...createOrderDto,
         orderItems: [
-          { product_name: 'Test Product', quantity: 2, unit_price: 100.0 },
+          { product_name: 'Test Product', quantity: 2, unit_price: 100.0, price: 200.0 },
         ],
       };
 
@@ -224,6 +228,7 @@ describe('OrdersService', () => {
             product_name: 'Test Product',
             quantity: 0,
             unit_price: 100.0,
+            price: 0,
           },
         ],
       };
@@ -243,6 +248,7 @@ describe('OrdersService', () => {
             product_name: 'Test Product',
             quantity: 2,
             unit_price: 0,
+            price: 0,
           },
         ],
       };
@@ -263,6 +269,7 @@ describe('OrdersService', () => {
             product_name: 'Test Product',
             quantity: 3,
             unit_price: 100.0,
+            price: 300.0,
           },
         ],
       };
@@ -292,6 +299,7 @@ describe('OrdersService', () => {
             product_name: 'Test Product',
             quantity: 2,
             unit_price: 100.0,
+            price: 200.0,
           },
         ],
       };
@@ -400,7 +408,8 @@ describe('OrdersService', () => {
           {
             product_id: '123e4567-e89b-12d3-a456-426614174002',
             quantity: 3,
-            price: 100.0,
+            unit_price: 100.0,
+            price: 300.0,
           },
         ],
       };
@@ -428,7 +437,8 @@ describe('OrdersService', () => {
           {
             product_id: 'invalid-product-id',
             quantity: 3,
-            price: 100.0,
+            unit_price: 100.0,
+            price: 300.0,
           },
         ],
       };
@@ -524,6 +534,7 @@ describe('OrdersService', () => {
       const storeId = 'store-123';
       const orderId = '123e4567-e89b-12d3-a456-426614174001';
 
+      mockOrder.status = OrderStatus.SHIPPED;
       mockRepository.findOne.mockResolvedValue(mockOrder);
       mockRepository.save.mockResolvedValue(mockOrder);
 
