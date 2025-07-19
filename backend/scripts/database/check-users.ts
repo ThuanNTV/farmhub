@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
-import { User } from '../src/entities/global/user.entity';
-import { dbConfig } from '../src/config/db/dbglobal/dbConfig';
+import { User } from 'src/entities/global/user.entity';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 async function checkUsers() {
   const dataSource = new DataSource({

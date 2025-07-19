@@ -33,7 +33,7 @@
     "check-sync": "ts-node -r tsconfig-paths/register scripts/sync-checker.ts",
     "monitor-db": "ts-node -r tsconfig-paths/register scripts/monitor-db-connection.ts",
     "test-singleton": "ts-node -r tsconfig-paths/register scripts/test-singleton.ts",
-    "openapi:yaml": "node scripts/convert-openapi-to-yaml.js"
+    "openapi:yaml": "node scripts/utils/convert-openapi-to-yaml.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",

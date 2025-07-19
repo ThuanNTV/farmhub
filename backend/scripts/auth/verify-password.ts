@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { User } from '../src/entities/global/user.entity';
-import { dbConfig } from '../src/config/db/dbglobal/dbConfig';
 import * as bcrypt from 'bcryptjs';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
+import { User } from 'src/entities/global/user.entity';
 
 async function verifyPassword() {
   const dataSource = new DataSource({

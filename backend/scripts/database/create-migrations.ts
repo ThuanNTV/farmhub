@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
-import { TenantDataSourceService } from '../src/config/db/dbtenant/tenant-datasource.service';
+import { AppModule } from 'src/app.module';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { DataSource } from 'typeorm';
 
 async function createMigrations() {

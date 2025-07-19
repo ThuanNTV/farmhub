@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
-import { TenantDataSourceService } from '../src/config/db/dbtenant/tenant-datasource.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { AppModule } from 'src/app.module';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 interface ServiceCheck {
   serviceName: string;

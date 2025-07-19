@@ -1,7 +1,13 @@
 import { DataSource } from 'typeorm';
-import { User } from '../src/entities/global/user.entity';
-import { dbConfig } from '../src/config/db/dbglobal/dbConfig';
+import { User } from 'src/entities/global/user.entity';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 import * as bcrypt from 'bcryptjs';
+import { Logger } from 'winston';
+
+import winston from 'winston';
+const logger: Logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+});
 
 async function createUserExample() {
   const dataSource = new DataSource({
@@ -10,10 +16,8 @@ async function createUserExample() {
   });
 
   try {
-    console.log('🔄 Connecting to database...');
+    logger.info('🔄 Connecting to database...');
     await dataSource.initialize();
-    console.log('✅ Connected to database successfully!');
-
     const userRepository = dataSource.getRepository(User);
 
     // Check if user already exists
@@ -22,10 +26,10 @@ async function createUserExample() {
     });
 
     if (existingUser) {
-      console.log('⚠️  User with email user@example.com already exists!');
-      console.log('Username:', existingUser.user_name);
-      console.log('Email:', existingUser.email);
-      console.log('Password: admin123');
+      logger.warn('⚠️  User with email user@example.com already exists!');
+      logger.info(`Username: ${existingUser.user_name}`);
+      logger.info(`Email: ${existingUser.email}`);
+      logger.info('Password: admin123');
       return;
     }
 
@@ -45,17 +49,17 @@ async function createUserExample() {
     });
 
     const savedUser = await userRepository.save(testUser);
-    console.log('✅ User created successfully!');
-    console.log('📋 Login credentials:');
-    console.log('Username: user');
-    console.log('Email: user@example.com');
-    console.log('Password: admin123');
-    console.log('User ID:', savedUser.user_id);
+    logger.info('✅ User created successfully!');
+    logger.info('📋 Login credentials:');
+    logger.info('Username: user');
+    logger.info('Email: user@example.com');
+    logger.info('Password: admin123');
+    logger.info(`User ID: ${savedUser.user_id}`);
   } catch (error) {
-    console.error('❌ Error creating user:', error);
+    logger.error('❌ Error creating user:', error);
     if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
+      logger.error(`Error message: ${error.message}`);
+      logger.error(`Error stack: ${error.stack}`);
     }
   } finally {
     if (dataSource.isInitialized) {
@@ -63,14 +67,12 @@ async function createUserExample() {
     }
   }
 }
-
-// Run the script
 createUserExample()
   .then(() => {
-    console.log('🎉 Script completed!');
+    logger.info('🎉 Script completed!');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('💥 Script failed:', error);
+    logger.error('💥 Script failed:', error);
     process.exit(1);
   });
