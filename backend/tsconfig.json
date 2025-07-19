@@ -13,8 +13,19 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-    "src/*": ["src/*"]
-  },
+      "src/*": ["src/*"],
+      "@/*": ["src/*"],
+      "@modules/*": ["src/modules/*"],
+      "@core/*": ["src/core/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@entities/*": ["src/entities/*"],
+      "@dto/*": ["src/dto/*"],
+      "@service/*": ["src/service/*"],
+      "@utils/*": ["src/utils/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@migration/*": ["src/migration/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
