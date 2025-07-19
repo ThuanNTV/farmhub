@@ -1,6 +1,6 @@
 // Transaction-related services
-export { PaymentTransactionService } from './transaction/payment-transaction.service';
-export { PaymentGatewayService } from './transaction/payment-gateway.service';
+export { PaymentTransactionService } from 'src/modules/payments/service/transaction/payment-transaction.service';
+export { PaymentGatewayService } from 'src/modules/payments/service/transaction/payment-gateway.service';
 
 // Main payment service
-export { PaymentsService } from './payments.service';
+export { PaymentsService } from 'src/modules/payments/service/payments.service';

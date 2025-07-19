@@ -5,12 +5,12 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { LogLevelService } from '../utils/log-level.service';
-import { EnhancedAuthGuard } from '../common/auth/enhanced-auth.guard';
-import { Roles } from '../core/rbac/role/roles.decorator';
-import { UserRole } from '../modules/users/dto/create-user.dto';
+import { LogLevelService } from 'src/utils/log-level.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { Roles } from 'src/core/rbac/role/roles.decorator';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
 
-class ChangeLogLevelDto {
+export class ChangeLogLevelDto {
   level!: 'error' | 'warn' | 'info' | 'debug';
 }
 

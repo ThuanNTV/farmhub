@@ -4,13 +4,13 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Installment } from 'src/entities/tenant/installment.entity';
 import { CreateInstallmentDto } from 'src/modules/installments/dto/create-installment.dto';
 import { UpdateInstallmentDto } from 'src/modules/installments/dto/update-installment.dto';
 import { InstallmentResponseDto } from 'src/modules/installments/dto/installment-response.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 
 @Injectable()
 export class InstallmentsService extends TenantBaseService<Installment> {

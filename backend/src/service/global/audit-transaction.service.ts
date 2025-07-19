@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AuditLog } from 'src/entities/tenant/audit_log.entity';
 import { EntityManager } from 'typeorm';
+import { AuditLog } from 'src/entities/tenant/audit_log.entity';
 import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 /**

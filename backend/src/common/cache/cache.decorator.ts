@@ -1,5 +1,4 @@
 import { SetMetadata } from '@nestjs/common';
-import { PropertyDescriptor } from 'src/common/types/common.types';
 
 export const CACHE_KEY_METADATA = 'cache_key_metadata';
 export const CACHE_TTL_METADATA = 'cache_ttl_metadata';

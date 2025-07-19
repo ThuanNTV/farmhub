@@ -8,8 +8,8 @@ import {
   JoinColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Voucher } from './voucher.entity';
-import { Order } from './order.entity';
+import { Voucher } from 'src/entities/tenant/voucher.entity';
+import { Order } from 'src/entities/tenant/order.entity';
 
 @Entity('voucher_usage_log')
 export class VoucherUsageLog {

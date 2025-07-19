@@ -4,13 +4,13 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { LoyaltyPointLog } from 'src/entities/tenant/loyalty_point_log.entity';
 import { CreateLoyaltyPointLogDto } from 'src/modules/loyalty-point-logs/dto/create-loyaltyPointLog.dto';
 import { UpdateLoyaltyPointLogDto } from 'src/modules/loyalty-point-logs/dto/update-loyaltyPointLog.dto';
 import { LoyaltyPointLogResponseDto } from 'src/modules/loyalty-point-logs/dto/loyaltyPointLog-response.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 
 @Injectable()
 export class LoyaltyPointLogsService extends TenantBaseService<LoyaltyPointLog> {

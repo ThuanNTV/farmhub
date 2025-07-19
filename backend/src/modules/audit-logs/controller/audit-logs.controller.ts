@@ -15,17 +15,18 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
-import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dto';
+
 import { AuditLogsService } from 'src/modules/audit-logs/service/audit-logs.service';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { Roles } from 'src/core/rbac/role/roles.decorator';
 import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
 import { AuditLogResponseDto } from 'src/modules/audit-logs/dto/audit-log-response.dto';
-import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dto';
 
 @ApiTags('Audit Logs')
 @ApiBearerAuth('access-token')

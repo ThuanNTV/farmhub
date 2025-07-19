@@ -4,12 +4,12 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { FileAttachment } from 'src/entities/tenant/file_attachment.entity';
 import { CreateFileAttachmentDto } from 'src/modules/file-attachments/dto/create-fileAttachment.dto';
 import { UpdateFileAttachmentDto } from 'src/modules/file-attachments/dto/update-fileAttachment.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { FileAttachmentResponseDto } from 'src/modules/file-attachments/dto/fileAttachment-response.dto';
 
 @Injectable()

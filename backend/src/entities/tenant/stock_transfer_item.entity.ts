@@ -7,8 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { StockTransfer } from './stock_transfer.entity';
-import { Product } from './product.entity';
+import { StockTransfer } from 'src/entities/tenant/stock_transfer.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 
 @Entity('stock_transfer_item')
 export class StockTransferItem {

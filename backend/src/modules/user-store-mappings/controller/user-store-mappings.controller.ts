@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,7 +16,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UserStoreMappingsService } from 'src/core/user/service/user-store-mappings.service';
+import { UserStoreMappingsService } from 'src/modules/user-store-mappings/service/user-store-mappings.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { Roles } from 'src/core/rbac/role/roles.decorator';
@@ -103,7 +104,7 @@ export class UserStoreMappingsController {
       storeId,
     );
     if (!mapping) {
-      throw new Error('User store mapping not found');
+      throw new NotFoundException('User store mapping not found');
     }
     return this.userStoreMappingsService.mapToResponseDto(mapping);
   }

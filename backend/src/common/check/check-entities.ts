@@ -1,6 +1,6 @@
 // src/check-entities.ts
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { Store } from '../../entities/global/store.entity'; // Đường dẫn chính xác đến entity
+import { Store } from 'src/entities/global/store.entity'; // Đường dẫn chính xác đến entity
 import { Logger } from '@nestjs/common';
 import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 
@@ -12,9 +12,7 @@ const configWithDirectImport: DataSourceOptions = {
   entities: [Store], // Import trực tiếp thay vì dùng pattern
 };
 
-export async function checkEntities() {
-  const dataSource = new DataSource(configWithDirectImport);
-
+export async function checkEntities(dataSource: DataSource) {
   try {
     Logger.log('🔄 Initializing DataSource...');
     await dataSource.initialize();
@@ -58,6 +56,3 @@ export async function checkEntities() {
     }
   }
 }
-
-// Chạy kiểm tra
-void checkEntities();

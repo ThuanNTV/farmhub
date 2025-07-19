@@ -10,8 +10,8 @@ import {
   JoinColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Customer } from './customer.entity';
-import { OrderItem } from './orderItem.entity';
+import { Customer } from 'src/entities/tenant/customer.entity';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 
 export enum DebtStatus {
   UNPAID = 'unpaid',

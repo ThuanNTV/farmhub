@@ -26,8 +26,8 @@ import {
 } from 'src/common/decorator/rate-limit.decorator';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
-import { CreateNotificationDto } from '../dto/create-notification.dto';
-import { UpdateNotificationDto } from '../dto/update-notification.dto';
+import { CreateNotificationDto } from 'src/modules/notification/dto/create-notification.dto';
+import { UpdateNotificationDto } from 'src/modules/notification/dto/update-notification.dto';
 import { NotificationService } from 'src/service/global/notification.service';
 
 @ApiTags('Notifications')

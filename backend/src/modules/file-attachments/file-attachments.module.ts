@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
+import { FileAttachmentsController } from 'src/modules/file-attachments/controller/file-attachments.controller';
+import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
+import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
 import { SecurityModule } from 'src/common/auth/security.module';
 import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
-import { FileAttachmentsController } from './controller/file-attachments.controller';
-import { FileAttachmentsService } from 'src/modules/file-attachments/service/file-attachments.service';
-import { AuditLogsModule } from '../audit-logs/audit-logs.module';
-import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
+import { FileAttachmentsService } from './service/file-attachments.service';
 
 @Module({
   imports: [TenantModule, AuditLogsModule, SecurityModule, AuditLogAsyncModule],

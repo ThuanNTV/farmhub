@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
-import { CreateTagDto } from './create-tag.dto';
+import { CreateTagDto } from 'src/modules/tag/dto/create-tag.dto';
 
 export class UpdateTagDto extends PartialType(CreateTagDto) {
   @ApiProperty({ description: 'Tên nhãn', required: false })

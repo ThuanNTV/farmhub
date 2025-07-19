@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Exclude } from 'class-transformer';
-import { JobScheduleStatus } from '../../../entities/tenant/job_schedule.entity';
+import { JobScheduleStatus } from 'src/entities/tenant/job_schedule.entity';
 
 export class JobScheduleResponseDto {
   @ApiProperty({ description: 'Job schedule ID' })

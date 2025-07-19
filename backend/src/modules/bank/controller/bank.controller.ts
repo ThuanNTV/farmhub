@@ -16,17 +16,17 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
-import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
-import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
-import { Roles } from 'src/core/rbac/role/roles.decorator';
-import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
-import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
-import { BankService } from 'src/modules/bank/service/bank.service';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { Roles } from 'src/core/rbac/role/roles.decorator';
 import { BankResponseDto } from 'src/modules/bank/dto/bank-response.dto';
 import { CreateBankDto } from 'src/modules/bank/dto/create-bank.dto';
 import { UpdateBankDto } from 'src/modules/bank/dto/update-bank.dto';
+import { BankService } from 'src/modules/bank/service/bank.service';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
 
 @ApiTags('Banks')
 @Controller('banks')

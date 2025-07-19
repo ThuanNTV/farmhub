@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import { InventoryTransferStatus } from './create-inventoryTransfer.dto';
+import { InventoryTransferStatus } from 'src/modules/inventory-transfers/dto/create-inventoryTransfer.dto';
 
 export class InventoryTransferResponseDto {
   @ApiProperty({ description: 'ID của phiếu chuyển kho' })

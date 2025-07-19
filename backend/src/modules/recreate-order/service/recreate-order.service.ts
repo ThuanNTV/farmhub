@@ -130,7 +130,7 @@ export class RecreateOrderService extends TenantBaseService<Order> {
         `Found ${recreatedOrders.length} recreated orders for order ${orderId}`,
       );
 
-      return recreatedOrders as Order[];
+      return recreatedOrders;
     } catch (error) {
       const err = error as Error;
       this.logger.error(

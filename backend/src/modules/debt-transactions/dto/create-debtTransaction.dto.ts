@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsDateString,
 } from 'class-validator';
-import { DebtTransactionStatus } from '../../../entities/tenant/debt_transaction.entity';
+import { DebtTransactionStatus } from 'src/entities/tenant/debt_transaction.entity';
 
 export class CreateDebtTransactionDto {
   @ApiProperty({ description: 'Customer ID' })

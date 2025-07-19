@@ -1,15 +1,26 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
 import { AppController } from 'src/app.controller';
-import { RedisCacheModule } from './common/cache/redis-cache.module';
+import { RedisCacheModule } from 'src/common/cache/redis-cache.module';
+import { WinstonLoggerModule } from 'src/utils/logger';
+import { GlobalEntityService } from 'src/service/global-entity.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/core/auth/auth.module';
 import { StoresModule } from 'src/modules/stores/stores.module';
 import { UsersModule } from 'src/modules/users/users.module';
 import { ProductsModule } from 'src/modules/products/products.module';
 import { CategoriesModule } from 'src/modules/categories/categories.module';
 import { CustomersModule } from 'src/modules/customers/customers.module';
+import { LogLevelControllerModule } from 'src/controllers/log-level.controller.module';
+import { BullModule } from '@nestjs/bull';
+import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { User } from 'src/entities/global/user.entity';
+import { Bank } from 'src/entities/global/bank.entity';
+import { Unit } from 'src/entities/global/unit.entity';
+import { PaymentMethod } from 'src/entities/global/payment_method.entity';
+import { Store } from 'src/entities/global/store.entity';
+import { AuditLogQueueModule } from 'src/common/queue/audit-log-queue.module';
 import { OrdersModule } from 'src/modules/orders/orders.module';
 import { PaymentsModule } from 'src/modules/payments/payments.module';
 import { VouchersModule } from 'src/modules/vouchers/vouchers.module';
@@ -38,22 +49,11 @@ import { NotificationModule } from 'src/modules/notification/notification.module
 import { DashboardAnalyticsModule } from 'src/modules/dashboard-analytics/dashboard-analytics.module';
 import { TagModule } from 'src/modules/tag/tag.module';
 import { BankModule } from 'src/modules/bank/bank.module';
-import { WinstonLoggerModule } from 'src/utils/logger';
 import { VoucherUsageLogModule } from 'src/modules/voucher-usage-log/voucher-usage-log.module';
 import { PaymentMethodsModule } from 'src/modules/payment-methods/payment-methods.module';
-import { UnitsModule } from 'src/modules/units/units.module';
 import { UserStoreMappingsModule } from 'src/modules/user-store-mappings/user-store-mappings.module';
 import { ReturnOrderItemsModule } from 'src/modules/return-order-items/return-order-items.module';
-import { GlobalEntityService } from 'src/service/global-entity.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/entities/global/user.entity';
-import { Bank } from 'src/entities/global/bank.entity';
-import { Unit } from 'src/entities/global/unit.entity';
-import { PaymentMethod } from 'src/entities/global/payment_method.entity';
-import { Store } from 'src/entities/global/store.entity';
-import { AuditLogQueueModule } from 'src/common/queue/audit-log-queue.module';
-import { LogLevelControllerModule } from 'src/controllers/log-level.controller.module';
-import { BullModule } from '@nestjs/bull';
+import { UnitsModule } from 'src/modules/units/units.module';
 
 @Module({
   imports: [

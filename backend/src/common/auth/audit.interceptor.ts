@@ -8,9 +8,8 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Request } from 'express';
-import { AuditLogAsyncService } from '../audit/audit-log-async.service';
-import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
 import { SafeUser } from 'src/dto/auth/auth.dto';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 interface RequestWithUser extends Request {
   user?: SafeUser;

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { StockTransferItem } from 'src/entities/tenant/stock_transfer_item.entity';
-import { CreateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/create-stockTransferItem.dto';
-import { UpdateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/update-stockTransferItem.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { StockTransferItem } from 'src/entities/tenant/stock_transfer_item.entity';
+import { CreateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/create-stockTransferItem.dto';
+import { UpdateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/update-stockTransferItem.dto';
 
 @Injectable()
 export class StockTransferItemsService extends TenantBaseService<StockTransferItem> {

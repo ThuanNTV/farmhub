@@ -1,3 +1,4 @@
+import { Order } from 'src/entities/tenant/order.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,7 +9,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
 
 export enum InstallmentStatus {
   UNPAID = 'unpaid',

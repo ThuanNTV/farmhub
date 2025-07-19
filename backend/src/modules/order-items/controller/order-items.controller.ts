@@ -17,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
+import { OrderItemsService } from 'src/modules/order-items/service';
 import { CreateOrderItemDto } from 'src/modules/order-items/dto/create-orderItem.dto';
 import { UpdateOrderItemDto } from 'src/modules/order-items/dto/update-orderItem.dto';
 import { OrderItemResponseDto } from 'src/modules/order-items/dto/orderItem-response.dto';
@@ -25,7 +26,6 @@ import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequestWithUser } from 'src/common/types/common.types';
-import { OrderItemsService } from '../service';
 
 @ApiTags('Order Items')
 @Controller('tenant/:storeId/order-items')

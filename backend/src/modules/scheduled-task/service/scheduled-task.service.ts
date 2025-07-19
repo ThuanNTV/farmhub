@@ -3,9 +3,9 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { ScheduledTask } from 'src/entities/tenant/scheduled_task.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class ScheduledTaskService {

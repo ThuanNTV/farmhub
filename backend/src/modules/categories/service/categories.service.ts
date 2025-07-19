@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Category } from 'src/entities/tenant/category.entity';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { CreateCategoryDto } from 'src/modules/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from 'src/modules/categories/dto/update-category.dto';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 
 @Injectable()
 export class CategoriesService extends TenantBaseService<Category> {

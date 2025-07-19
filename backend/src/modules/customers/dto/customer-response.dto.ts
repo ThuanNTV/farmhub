@@ -1,7 +1,10 @@
 import { Expose } from 'class-transformer';
 import { Exclude } from 'class-transformer';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateCustomerDto, CustomerType } from './create-customer.dto';
+import {
+  CreateCustomerDto,
+  CustomerType,
+} from 'src/modules/customers/dto/create-customer.dto';
 
 export class CustomerResponseDto extends PartialType(CreateCustomerDto) {
   @ApiProperty({ description: 'ID khách hàng' })

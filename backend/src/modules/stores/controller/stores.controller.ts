@@ -20,9 +20,9 @@ import { CreateStoreDto } from 'src/modules/stores/dto/create-store.dto';
 import { UpdateStoreDto } from 'src/modules/stores/dto/update-store.dto';
 import { StoreResponseDto } from 'src/modules/stores/dto/store-response.dto';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
-import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { RequireStorePermission } from 'src/core/rbac/permission/permissions.decorator';
 
 @ApiTags('Stores')

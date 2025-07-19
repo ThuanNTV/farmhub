@@ -50,7 +50,11 @@ describe('ProductsService', () => {
   });
 
   it('should create product successfully', async () => {
-    const dto: CreateProductDto = { productId: 'p1', productCode: 'C1', createdByUserId: 'u1' } as any;
+    const dto: CreateProductDto = {
+      productId: 'p1',
+      productCode: 'C1',
+      createdByUserId: 'u1',
+    } as any;
     repo.findOneBy.mockResolvedValueOnce(null); // findById
     repo.findOneBy.mockResolvedValueOnce(null); // findByproductCode
     repo.create.mockReturnValue(dto);
@@ -77,7 +81,10 @@ describe('ProductsService', () => {
   });
 
   it('should update product successfully', async () => {
-    const dto: UpdateProductDto = { productCode: 'C2', updatedByUserId: 'u2' } as any;
+    const dto: UpdateProductDto = {
+      productCode: 'C2',
+      updatedByUserId: 'u2',
+    } as any;
     const product = { product_id: 'p1', productCode: 'C1' };
     repo.findOneBy.mockResolvedValueOnce(product); // findByproductCode
     repo.findOneBy.mockResolvedValueOnce(null); // findByproductCode (no duplicate)
@@ -105,7 +112,11 @@ describe('ProductsService', () => {
   });
 
   it('should restore product successfully', async () => {
-    const entity = { product_id: 'p1', is_deleted: true, updated_by_user_id: 'u2' };
+    const entity = {
+      product_id: 'p1',
+      is_deleted: true,
+      updated_by_user_id: 'u2',
+    };
     repo.findOne.mockResolvedValue(entity);
     repo.save.mockResolvedValue({ ...entity, is_deleted: false });
     auditLogsService.create.mockResolvedValue({});

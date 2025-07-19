@@ -1,11 +1,9 @@
 import { Process, Processor, OnQueueFailed } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { AuditLog } from 'src/entities/tenant/audit_log.entity';
-import { AuditLogJobData } from './audit-log-queue.service';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { AuditLogJobData } from 'src/common/queue/audit-log-queue.service';
 
 @Processor('audit-log')
 export class AuditLogProcessor {

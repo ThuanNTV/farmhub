@@ -47,9 +47,7 @@ export class VouchersController {
   ) {
     const entityData = {
       ...dto,
-      type: VoucherType[
-        (dto.type as string).toUpperCase() as keyof typeof VoucherType
-      ],
+      type: VoucherType[dto.type.toUpperCase() as keyof typeof VoucherType],
       points_cost: dto.pointsCost,
       created_by_user_id: dto.createdByUserId,
       updated_by_user_id: dto.updatedByUserId,

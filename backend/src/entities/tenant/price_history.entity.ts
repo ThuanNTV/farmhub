@@ -9,7 +9,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { Product } from './product.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 
 @Entity('price_history')
 @Index('IDX_product_id', ['product_id'])

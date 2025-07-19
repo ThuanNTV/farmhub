@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
-import { Customer } from './customer.entity';
+import { Order } from 'src/entities/tenant/order.entity';
+import { Customer } from 'src/entities/tenant/customer.entity';
 
 export enum ReturnOrderStatus {
   PENDING = 'pending',

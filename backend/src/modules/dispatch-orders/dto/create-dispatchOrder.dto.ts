@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID, IsEnum, IsOptional } from 'class-validator';
-import { DispatchOrderStatus } from '../../../entities/tenant/dispatch_order.entity';
+import { DispatchOrderStatus } from 'src/entities/tenant/dispatch_order.entity';
 
 export class CreateDispatchOrderDto {
   @ApiProperty()

@@ -127,7 +127,11 @@ describe('AuthService', () => {
       securityService.isSuspiciousIP.mockReturnValue(false);
       securityService.isLoginBlocked.mockReturnValue(false);
 
-      const result = await service.validateUser('testuser', 'password123', '192.168.1.1');
+      const result = await service.validateUser(
+        'testuser',
+        'password123',
+        '192.168.1.1',
+      );
 
       expect(result).toMatchObject(mockSafeUser);
       expect(usersService.findOneUsernameOrEmail).toHaveBeenCalledWith(
@@ -144,7 +148,11 @@ describe('AuthService', () => {
       securityService.isSuspiciousIP.mockReturnValue(false);
       securityService.isLoginBlocked.mockReturnValue(false);
 
-      const result = await service.validateUser('nonexistent', 'password123', '192.168.1.1');
+      const result = await service.validateUser(
+        'nonexistent',
+        'password123',
+        '192.168.1.1',
+      );
 
       expect(result).toBeNull();
       expect(securityService.recordFailedLoginAttempt).toHaveBeenCalledWith(
@@ -199,7 +207,11 @@ describe('AuthService', () => {
     securityService.isSuspiciousIP.mockReturnValue(false);
     securityService.isLoginBlocked.mockReturnValue(false);
 
-    const result = await service.validateUser('testuser', 'wrongpassword', '192.168.1.1');
+    const result = await service.validateUser(
+      'testuser',
+      'wrongpassword',
+      '192.168.1.1',
+    );
 
     expect(result).toBeNull();
     expect(securityService.recordFailedLoginAttempt).toHaveBeenCalledWith(

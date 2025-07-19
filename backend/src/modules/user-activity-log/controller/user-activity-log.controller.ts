@@ -17,14 +17,14 @@ import {
 import { UserActivityLogService } from 'src/modules/user-activity-log/service/user-activity-log.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
-import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
-import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { Roles } from 'src/core/rbac/role/roles.decorator';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
 import { RolesGuard } from 'src/core/rbac/role/roles.guard';
-import { UserActivityLogResponseDto } from 'src/modules/user-activity-log/dto/userActivityLog-response.dto';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
 import { RequestWithUser } from 'src/common/types/common.types';
+import { UserActivityLogResponseDto } from 'src/modules/user-activity-log/dto/userActivityLog-response.dto';
 
 @ApiTags('UserActivityLogs')
 @Controller('user-activity-logs')

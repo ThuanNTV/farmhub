@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { StockAdjustmentStatus } from '../../../entities/tenant/stock_adjustment.entity';
+import { StockAdjustmentStatus } from 'src/entities/tenant/stock_adjustment.entity';
 
 export class StockAdjustmentResponseDto {
   @ApiProperty({ description: 'Stock adjustment ID' })

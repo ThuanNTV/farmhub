@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import { TenantDataSourceService } from '../../../../config/db/dbtenant/tenant-datasource.service';
-import { Product } from '../../../../entities/tenant/product.entity';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { Product } from 'src/entities/tenant/product.entity';
 import { EntityManager } from 'typeorm';
 
 /**

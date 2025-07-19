@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ScheduledTaskController } from './controller/scheduled-task.controller';
-import { AuditLogsModule } from '../audit-logs/audit-logs.module';
+import { ScheduledTaskController } from 'src/modules/scheduled-task/controller/scheduled-task.controller';
+import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
+import { ScheduledTaskService } from 'src/modules/scheduled-task/service/scheduled-task.service';
 import { SecurityModule } from 'src/common/auth/security.module';
-import { ScheduledTaskService } from './service/scheduled-task.service';
 
 @Module({
   imports: [AuditLogsModule, SecurityModule],

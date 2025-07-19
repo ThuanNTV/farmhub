@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Product } from './product.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 
 export enum StockAdjustmentStatus {
   PENDING = 'pending',

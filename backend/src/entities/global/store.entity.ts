@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Bank } from './bank.entity';
-import { User } from './user.entity';
+import { Bank } from 'src/entities/global/bank.entity';
+import { User } from 'src/entities/global/user.entity';
 import { PaperSize } from 'src/modules/stores/dto/create-store.dto';
 
 @Entity('store')

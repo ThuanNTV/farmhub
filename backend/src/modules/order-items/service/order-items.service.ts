@@ -4,16 +4,16 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { Not } from 'typeorm';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
+import { Order } from 'src/entities/tenant/order.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 import { CreateOrderItemDto } from 'src/modules/order-items/dto/create-orderItem.dto';
 import { OrderItemResponseDto } from 'src/modules/order-items/dto/orderItem-response.dto';
 import { UpdateOrderItemDto } from 'src/modules/order-items/dto/update-orderItem.dto';
-import { Order } from 'src/entities/tenant/order.entity';
-import { OrderItem } from 'src/entities/tenant/orderItem.entity';
-import { Product } from 'src/entities/tenant/product.entity';
-import { Not } from 'typeorm';
 
 @Injectable()
 export class OrderItemsService extends TenantBaseService<OrderItem> {

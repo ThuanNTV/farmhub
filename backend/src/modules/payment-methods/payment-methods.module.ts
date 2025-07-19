@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PaymentMethodsController } from './controller/payment-methods.controller';
-import { SecurityModule } from 'src/common/auth/security.module';
-import { AuditLogsModule } from '../audit-logs/audit-logs.module';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { PaymentMethodsController } from 'src/modules/payment-methods/controller/payment-methods.controller';
+import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
+import { PaymentMethodsService } from 'src/modules/payment-methods/service/payment-methods.service';
 import { PaymentMethod } from 'src/entities/global/payment_method.entity';
-import { PaymentMethodsService } from './service/payment-methods.service';
+import { SecurityModule } from 'src/common/auth/security.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
 import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
 
 @Module({

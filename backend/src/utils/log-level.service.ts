@@ -13,7 +13,7 @@ export class LogLevelService {
 
   constructor(private configService: ConfigService) {
     this.currentLogLevel =
-      this.configService.get<string>('LOG_LEVEL') || 'info';
+      this.configService.get<string>('LOG_LEVEL') ?? 'info';
   }
 
   /**
@@ -47,16 +47,14 @@ export class LogLevelService {
     try {
       // Cập nhật log level cho Winston logger
       const winstonLogger = winston.loggers.get('default');
-      if (winstonLogger) {
-        winstonLogger.level = level;
+      winstonLogger.level = level;
 
-        // Cập nhật level cho từng transport
-        winstonLogger.transports.forEach((transport) => {
-          if (transport instanceof winston.transports.Console) {
-            transport.level = level;
-          }
-        });
-      }
+      // Cập nhật level cho từng transport
+      winstonLogger.transports.forEach((transport) => {
+        if (transport instanceof winston.transports.Console) {
+          transport.level = level;
+        }
+      });
 
       this.logger.log(`Log level changed from ${previousLevel} to ${level}`);
 
@@ -89,7 +87,7 @@ export class LogLevelService {
     available: string[];
   } {
     const environment =
-      this.configService.get<string>('NODE_ENV') || 'development';
+      this.configService.get<string>('NODE_ENV') ?? 'development';
     const recommended = environment === 'production' ? 'info' : 'debug';
 
     return {
@@ -105,7 +103,7 @@ export class LogLevelService {
    */
   resetLogLevel(): { success: boolean; message: string; newLevel: string } {
     const environment =
-      this.configService.get<string>('NODE_ENV') || 'development';
+      this.configService.get<string>('NODE_ENV') ?? 'development';
     const defaultLevel = environment === 'production' ? 'info' : 'debug';
 
     const result = this.setLogLevel(defaultLevel);

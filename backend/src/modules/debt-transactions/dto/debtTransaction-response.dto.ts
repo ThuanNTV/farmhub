@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { DebtTransactionStatus } from '../../../entities/tenant/debt_transaction.entity';
+import { DebtTransactionStatus } from 'src/entities/tenant/debt_transaction.entity';
 
 export class DebtTransactionResponseDto {
   @ApiProperty({ description: 'Debt transaction ID' })

@@ -1,3 +1,4 @@
+import { WebhookPayload } from 'src/common/types/common.types';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,7 +7,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { WebhookPayload } from 'src/common/types/common.types';
 
 export enum WebhookType {
   OUTGOING = 'outgoing',

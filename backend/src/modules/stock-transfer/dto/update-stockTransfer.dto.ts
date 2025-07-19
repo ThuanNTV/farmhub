@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateStockTransferDto } from './create-stockTransfer.dto';
+import { CreateStockTransferDto } from 'src/modules/stock-transfer/dto/create-stockTransfer.dto';
 import { IsOptional, IsUUID, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 

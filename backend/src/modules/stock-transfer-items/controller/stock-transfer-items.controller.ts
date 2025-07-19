@@ -15,12 +15,12 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CreateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/create-stockTransferItem.dto';
-import { UpdateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/update-stockTransferItem.dto';
+import { StockTransferItemsService } from 'src/modules/stock-transfer-items/service/stock-transfer-items.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
-import { StockTransferItemsService } from '../service/stock-transfer-items.service';
+import { CreateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/create-stockTransferItem.dto';
+import { UpdateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/update-stockTransferItem.dto';
 
 @ApiTags('Stock Transfer Items')
 @ApiBearerAuth('access-token')

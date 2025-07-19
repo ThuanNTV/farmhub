@@ -7,8 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { DispatchOrder } from './dispatch_order.entity';
-import { Product } from './product.entity';
+import { DispatchOrder } from 'src/entities/tenant/dispatch_order.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 
 @Entity('dispatch_order_item')
 export class DispatchOrderItem {

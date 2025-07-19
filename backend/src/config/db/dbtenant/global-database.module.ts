@@ -1,13 +1,13 @@
 // src/global-database/global-database.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Store } from '../../../entities/global/store.entity';
+import { Store } from 'src/entities/global/store.entity';
 import { User } from 'src/entities/global/user.entity';
-import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 import { Bank } from 'src/entities/global/bank.entity';
 import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
 import { Unit } from 'src/entities/global/unit.entity';
 import { PaymentMethod } from 'src/entities/global/payment_method.entity';
+import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
 
 @Module({
   imports: [

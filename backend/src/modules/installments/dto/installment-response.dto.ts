@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Exclude } from 'class-transformer';
-import { InstallmentStatus } from '../../../entities/tenant/installment.entity';
+import { InstallmentStatus } from 'src/entities/tenant/installment.entity';
 
 export class InstallmentResponseDto {
   @ApiProperty({ description: 'Installment ID' })

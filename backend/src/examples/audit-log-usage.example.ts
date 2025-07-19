@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuditLogAsyncService } from '../common/audit/audit-log-async.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 /**
  * Ví dụ về cách sử dụng AuditLogAsyncService trong một service thực tế

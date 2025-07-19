@@ -6,7 +6,7 @@ import {
   IsDateString,
   IsEnum,
 } from 'class-validator';
-import { JobScheduleStatus } from '../../../entities/tenant/job_schedule.entity';
+import { JobScheduleStatus } from 'src/entities/tenant/job_schedule.entity';
 
 export class CreateJobScheduleDto {
   @ApiProperty({ description: 'Store ID' })

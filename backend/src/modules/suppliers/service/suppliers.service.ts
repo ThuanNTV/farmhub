@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { Supplier } from 'src/entities/tenant/supplier.entity';
-import { CreateSupplierDto } from 'src/modules/suppliers/dto/create-supplier.dto';
-import { UpdateSupplierDto } from 'src/modules/suppliers/dto/update-supplier.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { Supplier } from 'src/entities/tenant/supplier.entity';
+import { CreateSupplierDto } from 'src/modules/suppliers/dto/create-supplier.dto';
+import { UpdateSupplierDto } from 'src/modules/suppliers/dto/update-supplier.dto';
 
 @Injectable()
 export class SuppliersService extends TenantBaseService<Supplier> {

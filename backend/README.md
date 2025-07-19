@@ -1,213 +1,191 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
 </p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 # 🚀 FARMHUB - NESTJS BACKEND
 
-## Description
+## 1. Giới thiệu tổng quan
 
-FarmHub là hệ thống quản lý nông nghiệp toàn diện được xây dựng trên [NestJS](https://github.com/nestjs/nest) framework với TypeScript. Hệ thống hỗ trợ quản lý đơn hàng, sản phẩm, khách hàng, thanh toán và nhiều tính năng khác.
+FarmHub là hệ thống quản lý nông nghiệp toàn diện, xây dựng trên [NestJS](https://nestjs.com/) với TypeScript. Hệ thống hỗ trợ quản lý đa cửa hàng, đơn hàng, sản phẩm, khách hàng, thanh toán, báo cáo, tối ưu hiệu năng, bảo mật, audit log, và nhiều tính năng mở rộng khác.
 
-## 🎯 Tính năng chính
+- **Đối tượng sử dụng:** Doanh nghiệp nông nghiệp, chuỗi cửa hàng, nhà quản lý, nhân viên bán hàng, kế toán, quản trị hệ thống.
+- **Mục tiêu:** Tối ưu vận hành, minh bạch dữ liệu, mở rộng linh hoạt, dễ tích hợp.
 
-- **Quản lý đơn hàng** - Tạo, theo dõi và quản lý đơn hàng
-- **Quản lý sản phẩm** - Catalog sản phẩm với inventory tracking
-- **Quản lý khách hàng** - CRM và customer management
-- **Hệ thống thanh toán** - Multiple payment methods
-- **Audit logging** - Theo dõi hoạt động hệ thống
-- **Multi-tenant** - Hỗ trợ nhiều store/cửa hàng
-- **Performance optimization** - Caching, partitioning, indexing
+## 2. Tính năng chính
 
-## 🚀 Performance Features
+- Quản lý đơn hàng, sản phẩm, khách hàng, nhà cung cấp, kho, giao nhận, thanh toán, khuyến mãi, báo cáo.
+- Hệ thống phân quyền đa cấp (multi-tenant, RBAC).
+- Audit log, user activity log, external system log.
+- Tối ưu hiệu năng: Redis cache, partitioning, indexing, query tuning.
+- Hỗ trợ backup, DR, kiểm thử, CI/CD, DevOps.
+- Hệ thống API chuẩn RESTful, tài liệu OpenAPI.
+- Hỗ trợ mở rộng module, tích hợp hệ thống ngoài.
 
-- **Redis Caching** - Cache products, configs, reports
-- **Database Partitioning** - Monthly partitions cho large tables
-- **Query Optimization** - Indexes và query tuning
-- **Atomic Transactions** - ACID compliance cho critical operations
+## 3. Kiến trúc hệ thống
 
-## 🛠️ Project setup
+- **Backend:** NestJS, TypeScript, PostgreSQL, Redis, TypeORM.
+- **Kiến trúc module hóa:** src/modules (mỗi module 1 domain nghiệp vụ).
+- **Tiện ích chung:** src/common (auth, guard, cache, audit, queue, helper, decorator, types...).
+- **Tầng service/controller/dto/entity tách biệt rõ ràng.**
+- **Tài liệu chi tiết:** [docs/03_architecture.md](./docs/03_architecture.md)
 
-### Prerequisites
+## 4. Cấu trúc thư mục
+
+```
+src/
+  modules/         # Các module nghiệp vụ (orders, products, payments, ...)
+  common/          # Tiện ích chung (auth, guard, cache, audit, ...)
+  controllers/     # Controller dùng chung
+  service/         # Service dùng chung
+  dto/             # Định nghĩa DTO
+  entities/        # Định nghĩa entity
+  config/          # Cấu hình hệ thống
+  utils/           # Tiện ích, helper
+  middleware/      # Middleware
+  migration/       # Migration DB
+docs/              # Tài liệu dự án
+scripts/           # Script hỗ trợ (health check, seed, migration, ...)
+test/              # Test (unit, e2e, integration)
+.env.example       # Mẫu cấu hình môi trường
+```
+
+## 5. Yêu cầu hệ thống
 
 - Node.js >= 18.0.0
 - PostgreSQL >= 13.0
-- Redis >= 6.0 (for caching)
+- Redis >= 6.0
 
-### Installation
-
-```bash
-# Install dependencies
-$ npm install
-
-# Install Redis dependencies
-$ npm install cache-manager ioredis cache-manager-ioredis
-```
-
-### Environment Configuration
-
-Tạo file `.env` với các cấu hình sau:
-
-```env
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-DB_DATABASE=farmhub
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-REDIS_TTL=600
-
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=24h
-```
-
-## 🚀 Compile and run the project
+## 6. Cài đặt & cấu hình
 
 ```bash
-# development
-$ npm run start
+# Clone project
+git clone <repo-url>
+cd backend
 
-# watch mode
-$ npm run start:dev
+# Cài đặt package
+npm install
 
-# production mode
-$ npm run start:prod
+# Cài thêm Redis cache dependencies
+npm install cache-manager ioredis cache-manager-ioredis
+
+# Tạo file .env từ mẫu
+cp env.example .env
+# Chỉnh sửa thông tin DB, Redis, JWT trong .env
 ```
 
-## 🧪 Performance Testing
+## 7. Hướng dẫn chạy
 
 ```bash
-# Run performance tests
-$ npm run test:performance
+# Chạy dev
+npm run start:dev
 
-# Or run directly
-$ npx ts-node scripts/test-performance.ts
+# Chạy production
+npm run start:prod
+
+# Chạy với PM2 (production)
+npm install -g pm2
+pm2 start ecosystem.config.js --env production
+pm2 monit
 ```
 
-## 🗄️ Database Setup
+## 8. Hướng dẫn test
 
 ```bash
-# Run partition and index script
-$ psql -h localhost -U postgres -d farmhub -f scripts/partition_and_index.sql
+# Unit test
+npm run test
 
-# Check partitions
-$ psql -h localhost -U postgres -d farmhub -c "\dt audit_log*"
+# E2E test
+npm run test:e2e
+
+# Coverage
+npm run test:cov
+
+# Performance test
+npm run test:performance
 ```
 
-## 🧪 Run tests
+## 9. Database & Migration
 
 ```bash
-# unit tests
-$ npm run test
+# Tạo partition, index cho DB
+psql -h localhost -U postgres -d farmhub -f scripts/partition_and_index.sql
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-
-# performance tests
-$ npm run test:performance
+# Kiểm tra partition
+psql -h localhost -U postgres -d farmhub -c "\dt audit_log*"
 ```
+- Hướng dẫn chi tiết: [docs/13_deployment_guide.md](./docs/13_deployment_guide.md), [docs/07_database_architecture_refactor.md](./docs/07_database_architecture_refactor.md)
 
-## 🚀 Deployment
+## 10. Tối ưu hiệu năng
 
-### Performance Optimization
+- Redis caching: cache sản phẩm, config, báo cáo.
+- Partitioning: chia nhỏ bảng lớn theo tháng.
+- Indexing, query tuning: tối ưu truy vấn.
+- Transaction: đảm bảo ACID cho nghiệp vụ quan trọng.
+- Xem thêm: [docs/12_performance_optimization.md](./docs/12_performance_optimization.md)
 
-Hệ thống FarmHub đã được tối ưu hiệu năng với:
+## 11. Module & API chính
 
-- **Database Partitioning** - Chia nhỏ bảng lớn theo tháng
-- **Redis Caching** - Cache dữ liệu thường xuyên truy cập
-- **Query Optimization** - Indexes và query tuning
-- **Atomic Transactions** - Đảm bảo tính nhất quán dữ liệu
+- **products:** Quản lý sản phẩm (CRUD, soft delete, restore, phân quyền).
+- **orders:** Quản lý đơn hàng, trạng thái, thanh toán, giao nhận.
+- **customers:** Quản lý khách hàng, lịch sử mua hàng.
+- **payments:** Quản lý thanh toán, phương thức, đối soát.
+- **audit-logs:** Ghi nhận hoạt động hệ thống.
+- **user-activity-log:** Theo dõi thao tác người dùng.
+- **external-system-logs:** Ghi nhận log tích hợp hệ thống ngoài.
+- **...** (xem chi tiết từng module trong `src/modules/` và tài liệu [docs/checklist/](./docs/checklist/))
 
-### Production Deployment
+## 12. Tiện ích chung (common)
 
-Xem hướng dẫn chi tiết tại: [Deployment Guide](./docs/13_deployment_guide.md)
+- **Auth & Guard:** JWT, Local, EnhancedAuthGuard, PermissionGuard, RateLimitGuard.
+- **Cache:** RedisCacheService, CacheDecorator.
+- **Audit:** AuditLogAsyncService, AuditInterceptor.
+- **Queue:** AuditLogQueueService, processor.
+- **Helper:** DtoMapperHelper.
+- **Decorator:** RateLimitDecorator.
+- **Interceptor:** AllExceptionsFilter, TransformInterceptor.
+- **Type:** CommonTypes.
+- **Check:** DatabaseTest, CheckEntities, TypeOfPg.
 
-```bash
-# Install PM2 for production
-$ npm install -g pm2
+## 13. Checklist & Best Practice
 
-# Start application
-$ pm2 start ecosystem.config.js --env production
+- [Checklist phát triển](./docs/09_development_checklist.md)
+- [Checklist logging, performance, backup, DR, CI/CD, ...](./docs/checklist/)
+- [Logging best practice](./docs/04_logging_best_practices_nestjs.md)
+- [Atomic transaction guide](./docs/10_atomic_transaction_guide.md)
 
-# Monitor application
-$ pm2 monit
-```
+## 14. Tài liệu chi tiết
 
-### Performance Monitoring
+- [Tổng quan dự án](./docs/01_project_overview.md)
+- [Yêu cầu chức năng](./docs/02_functional_requirements.md)
+- [Kiến trúc hệ thống](./docs/03_architecture.md)
+- [API Contract (OpenAPI)](./docs/05_api_contract.yaml)
+- [Tối ưu hiệu năng](./docs/12_performance_optimization.md)
+- [Hướng dẫn triển khai](./docs/13_deployment_guide.md)
+- [Hướng dẫn transaction](./docs/10_atomic_transaction_guide.md)
+- [Kiến trúc database](./docs/07_database_architecture_refactor.md)
+- [Troubleshooting](./docs/troubleshooting/)
 
-```bash
-# Check cache statistics
-$ redis-cli info memory
+## 15. Đóng góp & phát triển
 
-# Monitor database performance
-$ psql -c "SELECT * FROM pg_stat_statements ORDER BY mean_time DESC LIMIT 10;"
+- Quy trình phát triển, code style, review, CI/CD: [docs/09_development_checklist.md](./docs/09_development_checklist.md)
+- Checklist module: [docs/checklist/99_template_module_checklist.md](./docs/checklist/99_template_module_checklist.md)
+- Đóng góp vui lòng tạo PR, báo lỗi qua Github Issue hoặc liên hệ team core.
 
-# Run health checks
-$ ./scripts/health-check.sh
-```
+## 16. Liên hệ & Hỗ trợ
 
-## 📚 Documentation
+- **Báo lỗi, hỗ trợ:** Xem [docs/troubleshooting/](./docs/troubleshooting/)
+- **Tài liệu tham khảo:** [NestJS](https://docs.nestjs.com), [TypeORM](https://typeorm.io/), [Redis](https://redis.io/documentation), [PostgreSQL](https://www.postgresql.org/docs/)
+- **Liên hệ team phát triển:** ThuanNguyen (Developer)
+    - Email: thuanntv721@gmail.com
+    - GitHub: [https://github.com/ThuanNTV](https://github.com/ThuanNTV)
 
-### Core Documentation
-
-- [Project Overview](./docs/01_project_overview.md) - Tổng quan dự án
-- [Functional Requirements](./docs/02_functional_requirements.md) - Yêu cầu chức năng
-- [Architecture](./docs/03_architecture.md) - Kiến trúc hệ thống
-- [API Contract](./docs/05_api_contract.yaml) - Định nghĩa API
-- [Performance Optimization](./docs/12_performance_optimization.md) - Tối ưu hiệu năng
-- [Deployment Guide](./docs/13_deployment_guide.md) - Hướng dẫn triển khai
-
-### Development Guides
-
-- [Development Checklist](./docs/09_development_checklist.md) - Checklist phát triển
-- [Atomic Transaction Guide](./docs/10_atomic_transaction_guide.md) - Hướng dẫn transaction
-- [Database Architecture](./docs/06_database_architecture_refactor.md) - Kiến trúc database
-
-## 🔗 Resources
-
-- [NestJS Documentation](https://docs.nestjs.com) - Framework documentation
-- [TypeORM Documentation](https://typeorm.io/) - Database ORM
-- [Redis Documentation](https://redis.io/documentation) - Caching solution
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/) - Database
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
+## 17. License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+---
+
+**Lưu ý:**  
+- Mọi thay đổi lớn cần cập nhật lại tài liệu và checklist liên quan.
+- Đọc kỹ các hướng dẫn, checklist trước khi phát triển hoặc triển khai.
+- Đảm bảo bảo mật, backup, DR, kiểm thử đầy đủ trước khi đưa vào production.

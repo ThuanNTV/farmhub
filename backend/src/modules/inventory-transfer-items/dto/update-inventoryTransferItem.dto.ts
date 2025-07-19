@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateInventoryTransferItemDto } from './create-inventoryTransferItem.dto';
+import { CreateInventoryTransferItemDto } from 'src/modules/inventory-transfer-items/dto/create-inventoryTransferItem.dto';
 
 export class UpdateInventoryTransferItemDto extends PartialType(
   CreateInventoryTransferItemDto,

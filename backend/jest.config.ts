@@ -12,4 +12,9 @@ module.exports = {
   testRegex: '.*\\.spec\\.ts$',
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: './coverage',
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    'src/config/redis/test/',
+    'src/examples'
+  ],
 }; 

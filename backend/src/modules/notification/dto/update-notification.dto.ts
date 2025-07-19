@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
-import { CreateNotificationDto } from './create-notification.dto';
+import { CreateNotificationDto } from 'src/modules/notification/dto/create-notification.dto';
 
 export class UpdateNotificationDto extends PartialType(CreateNotificationDto) {
   @ApiProperty({ description: 'Loại thông báo', required: false })

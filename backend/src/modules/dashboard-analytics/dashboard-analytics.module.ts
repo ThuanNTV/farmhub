@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { DashboardAnalyticsController } from './controller/dashboard-analytics.controller';
+import { DashboardAnalyticsController } from 'src/modules/dashboard-analytics/controller/dashboard-analytics.controller';
+import { DashboardAnalyticsService } from 'src/modules/dashboard-analytics/service/dashboard-analytics.service';
 import { SecurityModule } from 'src/common/auth/security.module';
 import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
-import { DashboardAnalyticsService } from './service/dashboard-analytics.service';
 
 @Module({
   imports: [SecurityModule, TenantModule],

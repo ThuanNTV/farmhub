@@ -4,9 +4,9 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UserActivityLog } from 'src/entities/tenant/user_activity_log.entity';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { UserActivityLog } from 'src/entities/tenant/user_activity_log.entity';
 
 @Injectable()
 export class UserActivityLogService extends TenantBaseService<UserActivityLog> {

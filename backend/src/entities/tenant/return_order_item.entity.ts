@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { ReturnOrder } from './return_order.entity';
-import { Product } from './product.entity';
+import { ReturnOrder } from 'src/entities/tenant/return_order.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 
 @Entity('return_order_item')
 export class ReturnOrderItem {

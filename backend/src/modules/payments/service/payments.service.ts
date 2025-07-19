@@ -4,15 +4,15 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Payment } from 'src/entities/tenant/payment.entity';
 import { CreatePaymentDto } from 'src/modules/payments/dto/create-payment.dto';
 import { UpdatePaymentDto } from 'src/modules/payments/dto/update-payment.dto';
 import { PaymentResponseDto } from 'src/modules/payments/dto/payment-response.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { PaymentTransactionService } from './transaction/payment-transaction.service';
-import { PaymentGatewayService } from './transaction/payment-gateway.service';
+import { PaymentTransactionService } from 'src/modules/payments/service/transaction/payment-transaction.service';
+import { PaymentGatewayService } from 'src/modules/payments/service/transaction/payment-gateway.service';
 import { EntityManager } from 'typeorm';
 
 @Injectable()

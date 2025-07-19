@@ -7,7 +7,7 @@ import {
   IsString,
   IsEnum,
 } from 'class-validator';
-import { PaymentStatus } from '../../../entities/tenant/payment.entity';
+import { PaymentStatus } from 'src/entities/tenant/payment.entity';
 
 export class CreatePaymentDto {
   @ApiProperty({ description: 'ID đơn hàng' })

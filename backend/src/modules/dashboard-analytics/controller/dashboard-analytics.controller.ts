@@ -5,9 +5,9 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
-import { DashboardAnalyticsService } from 'src/modules/dashboard-analytics/service/dashboard-analytics.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { DashboardAnalyticsService } from 'src/modules/dashboard-analytics/service/dashboard-analytics.service';
 
 @ApiTags('DashboardAnalytics')
 @Controller('tenant/:storeId/dashboard-analytics')

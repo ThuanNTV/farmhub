@@ -3,12 +3,12 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { DebtTransaction } from 'src/entities/tenant/debt_transaction.entity';
-import { CreateDebtTransactionDto } from 'src/modules/debt-transactions/dto/create-debtTransaction.dto';
-import { UpdateDebtTransactionDto } from 'src/modules/debt-transactions/dto/update-debtTransaction.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
+import { CreateDebtTransactionDto } from 'src/modules/debt-transactions/dto/create-debtTransaction.dto';
+import { UpdateDebtTransactionDto } from 'src/modules/debt-transactions/dto/update-debtTransaction.dto';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { DebtTransaction } from 'src/entities/tenant/debt_transaction.entity';
 
 @Injectable()
 export class DebtTransactionsService extends TenantBaseService<DebtTransaction> {

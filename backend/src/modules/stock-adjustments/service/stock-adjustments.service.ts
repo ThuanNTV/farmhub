@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { StockAdjustment } from 'src/entities/tenant/stock_adjustment.entity';
-import { CreateStockAdjustmentDto } from 'src/modules/stock-adjustments/dto/create-stockAdjustment.dto';
-import { UpdateStockAdjustmentDto } from 'src/modules/stock-adjustments/dto/update-stockAdjustment.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { StockAdjustment } from 'src/entities/tenant/stock_adjustment.entity';
+import { CreateStockAdjustmentDto } from 'src/modules/stock-adjustments/dto/create-stockAdjustment.dto';
+import { UpdateStockAdjustmentDto } from 'src/modules/stock-adjustments/dto/update-stockAdjustment.dto';
 
 @Injectable()
 export class StockAdjustmentsService extends TenantBaseService<StockAdjustment> {

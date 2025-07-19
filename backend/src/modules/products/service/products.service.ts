@@ -9,8 +9,8 @@ import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service';
-import { CreateProductDto } from '../dto/create-product.dto';
-import { UpdateProductDto } from '../dto/update-product.dto';
+import { CreateProductDto } from 'src/modules/products/dto/create-product.dto';
+import { UpdateProductDto } from 'src/modules/products/dto/update-product.dto';
 
 @Injectable()
 export class ProductsService extends TenantBaseService<Product> {

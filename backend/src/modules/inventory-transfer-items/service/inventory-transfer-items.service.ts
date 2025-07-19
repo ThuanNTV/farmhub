@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { InventoryTransferItem } from 'src/entities/tenant/inventory_transfer_item.entity';
 import { CreateInventoryTransferItemDto } from 'src/modules/inventory-transfer-items/dto/create-inventoryTransferItem.dto';
 import { UpdateInventoryTransferItemDto } from 'src/modules/inventory-transfer-items/dto/update-inventoryTransferItem.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 
 @Injectable()
 export class InventoryTransferItemsService extends TenantBaseService<InventoryTransferItem> {

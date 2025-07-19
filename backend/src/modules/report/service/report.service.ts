@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ReportData } from 'src/common/types/common.types';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { ReportData } from 'src/common/types/common.types';
 
 // Interface cho từng loại kết quả trả về từ getRawOne/getRawMany
 interface RevenueTotalRow {

@@ -6,20 +6,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { Order, OrderStatus } from 'src/entities/tenant/order.entity';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { UpdateOrderDto } from 'src/modules/orders/dto/update-order.dto';
 import { DeepPartial } from 'typeorm';
-import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 import { plainToInstance } from 'class-transformer';
-import { ProductsService } from 'src/modules/products/service/products.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { CreateOrderDto } from 'src/modules/orders/dto/create-order.dto';
-import { CreateOrderAtomicDto } from 'src/modules/orders/dto/create-order-atomic.dto';
-import { OrderItemData } from 'src/common/types/common.types';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { Order } from 'src/entities/tenant/order.entity';
+import { OrderItem } from 'src/entities/tenant/orderItem.entity';
+import { ProductsService } from 'src/modules/products/service/products.service';
 import { InventoryTransfersService } from 'src/modules/inventory-transfers/service/inventory-transfers.service';
 import { PaymentTransactionService } from 'src/modules/payments/service';
 import { AuditTransactionService } from 'src/modules/audit-logs/service';
+import { CreateOrderDto } from 'src/modules/orders/dto/create-order.dto';
+import { CreateOrderAtomicDto } from 'src/modules/orders/dto/create-order-atomic.dto';
+import { UpdateOrderDto } from 'src/modules/orders/dto/update-order.dto';
+import { OrderStatus } from 'src/entities/tenant/order.entity';
+import { OrderItemData } from 'src/common/types/common.types';
 
 export function calculateOrderTotal(items: OrderItem[]): number {
   return items.reduce((sum, item) => sum + item.total_price, 0);
@@ -367,9 +368,7 @@ export class OrdersService extends TenantBaseService<Order> {
     const order = await this.findOne(storeId, orderId);
 
     if (order.status === OrderStatus.DELIVERED) {
-      throw new BadRequestException(
-        'Không thể hủy đơn hàng đã hoàn thành',
-      );
+      throw new BadRequestException('Không thể hủy đơn hàng đã hoàn thành');
     }
 
     order.status = OrderStatus.CANCELLED;

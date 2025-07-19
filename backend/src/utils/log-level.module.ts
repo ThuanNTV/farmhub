@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { LogLevelService } from './log-level.service';
+import { LogLevelService } from 'src/utils/log-level.service';
 
 @Module({
   imports: [ConfigModule],

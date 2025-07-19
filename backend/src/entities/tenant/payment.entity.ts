@@ -8,7 +8,7 @@ import {
   JoinColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
+import { Order } from 'src/entities/tenant/order.entity';
 
 export enum PaymentStatus {
   UNPAID = 'unpaid',

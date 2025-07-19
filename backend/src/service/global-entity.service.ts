@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/global/user.entity';
-import { Bank } from '../entities/global/bank.entity';
-import { Unit } from '../entities/global/unit.entity';
-import { PaymentMethod } from '../entities/global/payment_method.entity';
-import { Store } from '../entities/global/store.entity';
+import { User } from 'src/entities/global/user.entity';
+import { Bank } from 'src/entities/global/bank.entity';
+import { Unit } from 'src/entities/global/unit.entity';
+import { PaymentMethod } from 'src/entities/global/payment_method.entity';
+import { Store } from 'src/entities/global/store.entity';
 
 /**
  * Service để truy cập các global entities từ tenant context
@@ -13,6 +13,8 @@ import { Store } from '../entities/global/store.entity';
  */
 @Injectable()
 export class GlobalEntityService {
+  private readonly logger = new Logger(GlobalEntityService.name);
+
   constructor(
     @InjectRepository(User, 'globalConnection')
     private userRepository: Repository<User>,
@@ -43,7 +45,7 @@ export class GlobalEntityService {
         where: { user_id: userId },
       });
     } catch (error) {
-      console.error(`Error fetching user ${userId}:`, error);
+      this.logger.error(`Error fetching user ${userId}:`, error);
       return null;
     }
   }
@@ -61,7 +63,7 @@ export class GlobalEntityService {
         where: { id: bankId },
       });
     } catch (error) {
-      console.error(`Error fetching bank ${bankId}:`, error);
+      this.logger.error(`Error fetching bank ${bankId}:`, error);
       return null;
     }
   }
@@ -79,7 +81,7 @@ export class GlobalEntityService {
         where: { id: unitId },
       });
     } catch (error) {
-      console.error(`Error fetching unit ${unitId}:`, error);
+      this.logger.error(`Error fetching unit ${unitId}:`, error);
       return null;
     }
   }
@@ -99,7 +101,10 @@ export class GlobalEntityService {
         where: { id: paymentMethodId },
       });
     } catch (error) {
-      console.error(`Error fetching payment method ${paymentMethodId}:`, error);
+      this.logger.error(
+        `Error fetching payment method ${paymentMethodId}:`,
+        error,
+      );
       return null;
     }
   }
@@ -117,7 +122,7 @@ export class GlobalEntityService {
         where: { store_id: storeId },
       });
     } catch (error) {
-      console.error(`Error fetching store ${storeId}:`, error);
+      this.logger.error(`Error fetching store ${storeId}:`, error);
       return null;
     }
   }
@@ -201,7 +206,7 @@ export class GlobalEntityService {
         order: { name: 'ASC' },
       });
     } catch (error) {
-      console.error('Error fetching all banks:', error);
+      this.logger.error('Error fetching all banks:', error);
       return [];
     }
   }
@@ -216,7 +221,7 @@ export class GlobalEntityService {
         order: { name: 'ASC' },
       });
     } catch (error) {
-      console.error('Error fetching all units:', error);
+      this.logger.error('Error fetching all units:', error);
       return [];
     }
   }
@@ -231,7 +236,7 @@ export class GlobalEntityService {
         order: { name: 'ASC' },
       });
     } catch (error) {
-      console.error('Error fetching all payment methods:', error);
+      this.logger.error('Error fetching all payment methods:', error);
       return [];
     }
   }

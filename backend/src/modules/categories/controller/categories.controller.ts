@@ -20,9 +20,9 @@ import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequireCategoryPermission } from 'src/core/rbac/permission/permissions.decorator';
-import { CategoriesService } from 'src/modules/categories/service/categories.service';
 import { CategoryResponseDto } from 'src/modules/categories/dto/category-response.dto';
 import { CreateCategoryDto } from 'src/modules/categories/dto/create-category.dto';
+import { CategoriesService } from 'src/modules/categories/service/categories.service';
 import { UpdateCategoryDto } from 'src/modules/categories/dto/update-category.dto';
 
 @ApiTags('Categories')

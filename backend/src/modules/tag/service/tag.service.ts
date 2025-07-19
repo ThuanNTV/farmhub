@@ -5,11 +5,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Tag } from 'src/entities/tenant/tag.entity';
-import { CreateTagDto } from '../dto/create-tag.dto';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { UpdateTagDto } from '../dto/update-tag.dto';
+import { CreateTagDto } from 'src/modules/tag/dto/create-tag.dto';
+import { UpdateTagDto } from 'src/modules/tag/dto/update-tag.dto';
 
 @Injectable()
 export class TagService extends TenantBaseService<Tag> {

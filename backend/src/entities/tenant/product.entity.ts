@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Category } from './category.entity';
+import { Category } from 'src/entities/tenant/category.entity';
 import { GlobalEntityService } from 'src/service/global-entity.service';
 import { Unit } from 'src/entities/global/unit.entity';
 

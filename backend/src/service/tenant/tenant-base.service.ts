@@ -5,7 +5,6 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import {
   ObjectLiteral,
   Repository,
@@ -14,6 +13,7 @@ import {
   UpdateResult,
   DeleteResult,
 } from 'typeorm';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 export abstract class TenantBaseService<T extends ObjectLiteral> {
   protected readonly logger = new Logger(this.constructor.name);

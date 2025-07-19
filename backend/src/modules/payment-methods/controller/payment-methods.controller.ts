@@ -19,15 +19,15 @@ import {
 import { CreatePaymentMethodDto } from 'src/modules/payment-methods/dto/create-paymentMethod.dto';
 import { UpdatePaymentMethodDto } from 'src/modules/payment-methods/dto/update-paymentMethod.dto';
 import { PaymentMethodResponseDto } from 'src/modules/payment-methods/dto/paymentMethod-response.dto';
+import { PaymentMethodsService } from 'src/modules/payment-methods/service/payment-methods.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { Roles } from 'src/core/rbac/role/roles.decorator';
 import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
-import { RequestWithUser } from 'src/common/types/common.types';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
-import { PaymentMethodsService } from '../service/payment-methods.service';
+import { RequestWithUser } from 'src/common/types/common.types';
 
 @ApiTags('payment-methods')
 @ApiBearerAuth('access-token')

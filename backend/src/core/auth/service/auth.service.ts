@@ -1,15 +1,8 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  Logger,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from 'src/core/user/service/users.service';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
-import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,35 +12,66 @@ export class AuthService {
     // Có thể bổ sung SecurityService, EmailService nếu cần
   ) {}
 
-  async validateUser(usernameOrEmail: string, password: string, clientIP?: string): Promise<any> {
-    const user = await this.usersService.findOneUsernameOrEmail(usernameOrEmail);
+  async validateUser(
+    usernameOrEmail: string,
+    password: string,
+    clientIP?: string,
+  ): Promise<any> {
+    const user =
+      await this.usersService.findOneUsernameOrEmail(usernameOrEmail);
     if (!user || !user.password_hash) {
-      if (this['securityService'] && this['securityService'].recordFailedLoginAttempt && clientIP)
+      if (
+        this['securityService'] &&
+        this['securityService'].recordFailedLoginAttempt &&
+        clientIP
+      )
         this['securityService'].recordFailedLoginAttempt(clientIP);
       return null;
     }
-    if (this['securityService'] && this['securityService'].isLoginBlocked && clientIP) {
+    if (
+      this['securityService'] &&
+      this['securityService'].isLoginBlocked &&
+      clientIP
+    ) {
       if (this['securityService'].isLoginBlocked(clientIP)) {
         throw new UnauthorizedException();
       }
     }
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      if (this['securityService'] && this['securityService'].recordFailedLoginAttempt && clientIP)
+      if (
+        this['securityService'] &&
+        this['securityService'].recordFailedLoginAttempt &&
+        clientIP
+      )
         this['securityService'].recordFailedLoginAttempt(clientIP);
       return null;
     }
     if (user.is_deleted) {
-      if (this['securityService'] && this['securityService'].recordFailedLoginAttempt && clientIP)
+      if (
+        this['securityService'] &&
+        this['securityService'].recordFailedLoginAttempt &&
+        clientIP
+      )
         this['securityService'].recordFailedLoginAttempt(clientIP);
-      throw new UnauthorizedException('Tài khoản không hoạt động hoặc đã bị xoá');
+      throw new UnauthorizedException(
+        'Tài khoản không hoạt động hoặc đã bị xoá',
+      );
     }
     if (!user.is_active) {
-      if (this['securityService'] && this['securityService'].recordFailedLoginAttempt && clientIP)
+      if (
+        this['securityService'] &&
+        this['securityService'].recordFailedLoginAttempt &&
+        clientIP
+      )
         this['securityService'].recordFailedLoginAttempt(clientIP);
       throw new UnauthorizedException();
     }
-    if (this['securityService'] && this['securityService'].recordSuccessfulLogin && clientIP)
+    if (
+      this['securityService'] &&
+      this['securityService'].recordSuccessfulLogin &&
+      clientIP
+    )
       this['securityService'].recordSuccessfulLogin(clientIP);
     // Chuyển sang kiểu SafeUser
     return {
@@ -70,8 +94,18 @@ export class AuthService {
       email: user.email,
     };
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-    if (clientIP && userAgent && this['securityService'] && this['securityService'].createSession) {
-      this['securityService'].createSession(user.user_id || user.userId, sessionId, clientIP, userAgent);
+    if (
+      clientIP &&
+      userAgent &&
+      this['securityService'] &&
+      this['securityService'].createSession
+    ) {
+      this['securityService'].createSession(
+        user.user_id || user.userId,
+        sessionId,
+        clientIP,
+        userAgent,
+      );
     }
     return {
       message: '🎉 Đăng nhập thành công!',

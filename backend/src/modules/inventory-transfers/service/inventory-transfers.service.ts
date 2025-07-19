@@ -4,16 +4,14 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { InventoryTransfer } from 'src/entities/tenant/inventory_transfer.entity';
-import {
-  CreateInventoryTransferDto,
-  InventoryTransferStatus,
-} from 'src/modules/inventory-transfers/dto/create-inventoryTransfer.dto';
-import { UpdateInventoryTransferDto } from 'src/modules/inventory-transfers/dto/update-inventoryTransfer.dto';
-import { InventoryTransferResponseDto } from 'src/modules/inventory-transfers/dto/inventoryTransfer-response.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { InventoryTransfer } from 'src/entities/tenant/inventory_transfer.entity';
+import { CreateInventoryTransferDto } from 'src/modules/inventory-transfers/dto/create-inventoryTransfer.dto';
+import { UpdateInventoryTransferDto } from 'src/modules/inventory-transfers/dto/update-inventoryTransfer.dto';
+import { InventoryTransferResponseDto } from 'src/modules/inventory-transfers/dto/inventoryTransfer-response.dto';
+import { InventoryTransferStatus } from 'src/modules/inventory-transfers/dto/create-inventoryTransfer.dto';
 
 @Injectable()
 export class InventoryTransfersService extends TenantBaseService<InventoryTransfer> {
@@ -279,17 +277,19 @@ export class InventoryTransfersService extends TenantBaseService<InventoryTransf
       `Stub: validateStockAvailability for store ${storeId} with items: ${JSON.stringify(stockItems)}`,
     );
     // TODO: Thêm logic kiểm tra tồn kho thực tế nếu cần
+    await Promise.resolve(); // Satisfy async requirement
   }
 
   async decreaseStock(
     storeId: string,
     stockItems: any[],
-    manager?: any,
+    _manager?: any,
   ): Promise<void> {
     this.logger.debug(
       `Stub: decreaseStock for store ${storeId} with items: ${JSON.stringify(stockItems)}`,
     );
     // TODO: Thêm logic giảm tồn kho thực tế nếu cần
+    await Promise.resolve(); // Satisfy async requirement
   }
 
   /**

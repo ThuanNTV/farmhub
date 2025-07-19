@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { Promotion } from 'src/entities/tenant/promotion.entity';
-import { CreatePromotionDto } from 'src/modules/promotions/dto/create-promotion.dto';
-import { UpdatePromotionDto } from 'src/modules/promotions/dto/update-promotion.dto';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { DeepPartial } from 'typeorm';
+import { Promotion } from 'src/entities/tenant/promotion.entity';
+import { UpdatePromotionDto } from 'src/modules/promotions/dto/update-promotion.dto';
 import { PromotionType } from 'src/entities/tenant/promotion.entity';
+import { DeepPartial } from 'typeorm';
 
 @Injectable()
 export class PromotionsService extends TenantBaseService<Promotion> {

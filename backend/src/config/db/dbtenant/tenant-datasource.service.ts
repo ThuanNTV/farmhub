@@ -6,9 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { getTenantDbConfig } from './getTenantDbConfig';
+import { getTenantDbConfig } from 'src/config/db/dbtenant/getTenantDbConfig';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Store } from '../../../entities/global/store.entity';
+import { Store } from 'src/entities/global/store.entity';
 
 interface CachedDataSource {
   dataSource: DataSource;

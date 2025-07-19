@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Customer } from 'src/entities/tenant/customer.entity';
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { CreateCustomerDto } from 'src/modules/customers/dto/create-customer.dto';
+import { UpdateCustomerDto } from 'src/modules/customers/dto/update-customer.dto';
+import { Customer } from 'src/entities/tenant/customer.entity';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { CustomerFilter } from 'src/common/types/common.types';
-import { CreateCustomerDto } from '../dto/create-customer.dto';
-import { UpdateCustomerDto } from '../dto/update-customer.dto';
 
 @Injectable()
 export class CustomersService extends TenantBaseService<Customer> {

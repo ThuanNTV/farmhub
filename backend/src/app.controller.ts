@@ -2,16 +2,16 @@ import { Controller, Get, UseGuards, Request, Logger } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { RedisCacheService } from './common/cache/redis-cache.service';
+import { RedisCacheService } from 'src/common/cache/redis-cache.service';
+import { JwtAuthGuard } from 'src/common/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/core/rbac/role/roles.guard';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { Roles } from 'src/core/rbac/role/roles.decorator';
 import {
   RequestWithUser,
   RequestUser,
   RedisStats,
 } from 'src/common/types/common.types';
-import { JwtAuthGuard } from './common/auth/jwt-auth.guard';
-import { RolesGuard } from 'src/core/rbac/role/roles.guard';
-import { UserRole } from 'src/modules/users/dto/create-user.dto';
-import { Roles } from 'src/core/rbac/role/roles.decorator';
 
 @Controller()
 export class AppController {

@@ -7,13 +7,6 @@ import {
   Get,
   Headers,
 } from '@nestjs/common';
-import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
-import {
-  RateLimitAuth,
-  RateLimitModerate,
-} from 'src/common/decorator/rate-limit.decorator';
-import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
-import { AuthService } from 'src/core/auth/service/auth.service';
 import {
   ApiTags,
   ApiOperation,
@@ -22,7 +15,13 @@ import {
   ApiBody,
   ApiHeader,
 } from '@nestjs/swagger';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { LocalAuthGuard } from 'src/common/auth/local-auth.guard';
+import {
+  RateLimitAuth,
+  RateLimitModerate,
+} from 'src/common/decorator/rate-limit.decorator';
+import { AuthService } from 'src/core/auth/service/auth.service';
 import {
   ForgotPasswordDto,
   LoginDto,
@@ -30,6 +29,7 @@ import {
   ResetPasswordDto,
   SafeUser,
 } from 'src/dto/auth/auth.dto';
+import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')

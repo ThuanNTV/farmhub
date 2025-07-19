@@ -13,11 +13,11 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { ScheduledTaskService } from 'src/modules/scheduled-task/service/scheduled-task.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
-import { ScheduledTaskService } from '../service/scheduled-task.service';
 
 @ApiTags('ScheduledTasks')
 @Controller('tenant/:storeId/scheduled-tasks')

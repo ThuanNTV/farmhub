@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsDate, IsUUID, IsEnum } from 'class-validator';
-import { CreatePaymentDto } from './create-payment.dto';
-import { PaymentStatus } from '../../../entities/tenant/payment.entity';
+import { CreatePaymentDto } from 'src/modules/payments/dto/create-payment.dto';
+import { PaymentStatus } from 'src/entities/tenant/payment.entity';
 
 export class UpdatePaymentDto extends PartialType(CreatePaymentDto) {
   @ApiProperty({

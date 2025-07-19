@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateStockTransferItemDto } from './create-stockTransferItem.dto';
+import { CreateStockTransferItemDto } from 'src/modules/stock-transfer-items/dto/create-stockTransferItem.dto';
 
 export class UpdateStockTransferItemDto extends PartialType(
   CreateStockTransferItemDto,

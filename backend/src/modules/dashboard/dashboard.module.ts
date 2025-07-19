@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { DashboardController } from './controller/dashboard.controller';
 import { SecurityModule } from 'src/common/auth/security.module';
-import { OrdersModule } from '../orders/orders.module';
-import { CustomersModule } from '../customers/customers.module';
-import { ProductsModule } from '../products/products.module';
-import { AuditLogsModule } from '../audit-logs/audit-logs.module';
-import { DashboardService } from './service/dashboard.service';
+import { DashboardController } from 'src/modules/dashboard/controller/dashboard.controller';
+import { OrdersModule } from 'src/modules/orders/orders.module';
+import { CustomersModule } from 'src/modules/customers/customers.module';
+import { ProductsModule } from 'src/modules/products/products.module';
+import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
+import { DashboardService } from 'src/modules/dashboard/service/dashboard.service';
 
 @Module({
   imports: [

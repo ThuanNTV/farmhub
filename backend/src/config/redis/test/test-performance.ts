@@ -8,8 +8,8 @@
 import { NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
 import { performance } from 'perf_hooks';
-import { RedisCacheService } from 'src/common/cache/redis-cache.service';
 import { AppModule } from 'src/app.module';
+import { RedisCacheService } from 'src/common/cache/redis-cache.service';
 
 interface PerformanceResult {
   operation: string;

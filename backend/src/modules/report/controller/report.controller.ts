@@ -5,9 +5,9 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { ReportService } from 'src/modules/report/service/report.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
-import { ReportService } from '../service/report.service';
 
 @ApiTags('Reports')
 @Controller('tenant/:storeId/reports')

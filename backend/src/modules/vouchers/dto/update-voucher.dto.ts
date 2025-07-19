@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateVoucherDto } from './create-voucher.dto';
+import { CreateVoucherDto } from 'src/modules/vouchers/dto/create-voucher.dto';
 
 export class UpdateVoucherDto extends PartialType(CreateVoucherDto) {}

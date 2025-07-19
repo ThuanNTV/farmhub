@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { Order } from './order.entity';
-import { Product } from './product.entity';
+import { Order } from 'src/entities/tenant/order.entity';
+import { Product } from 'src/entities/tenant/product.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity('order_item')

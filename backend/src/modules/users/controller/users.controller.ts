@@ -15,15 +15,15 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UsersService } from 'src/core/user/service/users.service';
-import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
-import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
-import { UserResponseDto } from 'src/modules/users/dto/user-response.dto';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequireUserPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
+import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
+import { UserResponseDto } from 'src/modules/users/dto/user-response.dto';
+import { UsersService } from 'src/core/user/service/users.service';
 
 @ApiTags('Users')
 @Controller('users')

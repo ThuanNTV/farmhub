@@ -44,9 +44,7 @@ export class PromotionsController {
   ) {
     const entityData = {
       ...dto,
-      type: PromotionType[
-        (dto.type as string).toUpperCase() as keyof typeof PromotionType
-      ],
+      type: PromotionType[dto.type.toUpperCase() as keyof typeof PromotionType],
       applies_to: dto.appliesTo,
       start_date: dto.startDate,
       end_date: dto.endDate,

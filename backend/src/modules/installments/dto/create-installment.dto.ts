@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { InstallmentStatus } from '../../../entities/tenant/installment.entity';
+import { InstallmentStatus } from 'src/entities/tenant/installment.entity';
 
 export class CreateInstallmentDto {
   @ApiProperty({ description: 'Order ID' })

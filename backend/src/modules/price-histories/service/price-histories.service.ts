@@ -4,13 +4,13 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { PriceHistory } from 'src/entities/tenant/price_history.entity';
 import { CreatePriceHistoryDto } from 'src/modules/price-histories/dto/create-priceHistory.dto';
 import { UpdatePriceHistoryDto } from 'src/modules/price-histories/dto/update-priceHistory.dto';
 import { PriceHistoryResponseDto } from 'src/modules/price-histories/dto/priceHistory-response.dto';
-import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class PriceHistoriesService extends TenantBaseService<PriceHistory> {

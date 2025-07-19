@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Store } from 'src/entities/global/store.entity';
-import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
-import { CreateStoreDto } from '../dto/create-store.dto';
-import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
-import { UpdateStoreDto } from '../dto/update-store.dto';
+import { CreateStoreDto } from 'src/modules/stores/dto/create-store.dto';
+import { UpdateStoreDto } from 'src/modules/stores/dto/update-store.dto';
 import { GlobalEntityService } from 'src/service/global-entity.service';
+import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { Store } from 'src/entities/global/store.entity';
 
 @Injectable()
 export class StoresService {

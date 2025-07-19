@@ -6,7 +6,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StockAdjustmentStatus } from '../../../entities/tenant/stock_adjustment.entity';
+import { StockAdjustmentStatus } from 'src/entities/tenant/stock_adjustment.entity';
 
 export class CreateStockAdjustmentDto {
   @ApiProperty({ description: 'Product ID' })

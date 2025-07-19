@@ -1,9 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HealthCheckResult } from 'src/common/types/common.types';
 import { ValidationPipe, Logger } from '@nestjs/common';
-import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
-import { AllExceptionsFilter } from 'src/common/interceptors/all-exceptions.filter';
 import { Server } from 'http';
 import * as dotenv from 'dotenv';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -11,6 +8,9 @@ import { writeFileSync } from 'fs';
 import { RedisCacheService } from './common/cache/redis-cache.service';
 import { INestApplication } from '@nestjs/common';
 import { createWinstonLogger } from './utils/logger';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { AllExceptionsFilter } from './common/interceptors/all-exceptions.filter';
+import { HealthCheckResult } from './common/types/common.types';
 
 dotenv.config();
 
@@ -65,8 +65,21 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
 
+    const { execSync } = await import('child_process');
     // Export OpenAPI JSON file
     writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+
+    // Convert json to Yaml
+    try {
+      execSync('npm run openapi:yaml', { stdio: 'inherit' });
+      logger.log('✅ Đã chuyển đổi openapi.json sang YAML!');
+    } catch (err) {
+      if (err instanceof Error) {
+        logger.error('❌ Lỗi chuyển đổi openapi.json:', err.message);
+      } else {
+        logger.error('❌ Lỗi chuyển đổi openapi.json:', err);
+      }
+    }
   }
 
   // Listen

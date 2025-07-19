@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/global/user.entity';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/entities/global/user.entity';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
 import { DtoMapper } from 'src/common/helpers/dto-mapper.helper';

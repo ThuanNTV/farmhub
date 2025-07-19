@@ -1,8 +1,5 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import {
-  Payment,
-  PaymentStatus,
-} from '../../../../entities/tenant/payment.entity';
+import { Payment, PaymentStatus } from 'src/entities/tenant/payment.entity';
 import { EntityManager } from 'typeorm';
 
 /**
@@ -214,6 +211,6 @@ export class PaymentTransactionService {
       `Stub: processPayment với số tiền ${totalPaid} và phương thức ${paymentMethodId}`,
     );
     // TODO: Thêm logic xử lý thanh toán thực tế nếu cần
-    return { success: true };
+    return Promise.resolve({ success: true });
   }
 }

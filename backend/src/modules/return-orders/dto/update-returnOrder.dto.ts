@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateReturnOrderDto } from './create-returnOrder.dto';
+import { CreateReturnOrderDto } from 'src/modules/return-orders/dto/create-returnOrder.dto';
 
 export class UpdateReturnOrderDto extends PartialType(CreateReturnOrderDto) {}

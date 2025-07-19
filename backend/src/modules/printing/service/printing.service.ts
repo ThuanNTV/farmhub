@@ -3,18 +3,18 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  QuotationData,
-  QuotationItem,
-  PrintData,
-  BarcodeData,
-} from 'src/common/types/common.types';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Customer } from 'src/entities/tenant/customer.entity';
 import { Order } from 'src/entities/tenant/order.entity';
 import { OrderItem } from 'src/entities/tenant/orderItem.entity';
 import { Payment } from 'src/entities/tenant/payment.entity';
 import { Product } from 'src/entities/tenant/product.entity';
+import {
+  QuotationData,
+  QuotationItem,
+  PrintData,
+  BarcodeData,
+} from 'src/common/types/common.types';
 
 @Injectable()
 export class PrintingService {

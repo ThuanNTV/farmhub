@@ -21,10 +21,10 @@ import { CreateStoreSettingDto } from 'src/modules/store-settings/dto/create-sto
 import { UpdateStoreSettingDto } from 'src/modules/store-settings/dto/update-storeSetting.dto';
 import { StoreSettingsService } from 'src/modules/store-settings/service/store-settings.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
-import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequestWithUser } from 'src/common/types/common.types';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 
 @ApiTags('Store Settings')
 @Controller('tenant/:storeId/store-settings')

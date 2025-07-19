@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ReturnOrderStatus } from '../../../entities/tenant/return_order.entity';
+import { ReturnOrderStatus } from 'src/entities/tenant/return_order.entity';
 
 export class ReturnOrderResponseDto {
   @ApiProperty()

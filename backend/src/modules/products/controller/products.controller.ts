@@ -23,10 +23,8 @@ import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
-import {
-  RequireProductPermission,
-  RequirePermissions,
-} from 'src/core/rbac/permission/permissions.decorator';
+import { RequireProductPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { RequirePermissions } from 'src/core/rbac/permission/permissions.decorator';
 
 @ApiTags('Products')
 @Controller('tenant/:storeId/products')

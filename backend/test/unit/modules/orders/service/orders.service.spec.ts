@@ -129,9 +129,7 @@ describe('OrdersService', () => {
     _mockAuditService = module.get(AuditTransactionService);
 
     // Mock getRepository method
-    jest
-      .spyOn(service as any, 'getRepo')
-      .mockResolvedValue(mockRepository);
+    jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
 
     const mockQueryRunner = {
       connect: jest.fn(),
@@ -152,7 +150,9 @@ describe('OrdersService', () => {
       createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
       isInitialized: true,
     };
-    _mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(mockDataSource as unknown as import('typeorm').DataSource);
+    _mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+      mockDataSource as unknown as import('typeorm').DataSource,
+    );
   });
 
   afterEach(() => {
@@ -286,10 +286,12 @@ describe('OrdersService', () => {
         updateOrderDto,
       );
 
-      expect(result).toMatchObject(expect.objectContaining({
-        customer_id: expect.any(String),
-        // ... các trường quan trọng khác ...
-      }));
+      expect(result).toMatchObject(
+        expect.objectContaining({
+          customer_id: expect.any(String),
+          // ... các trường quan trọng khác ...
+        }),
+      );
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: {
           order_id: 'order-123',
@@ -418,7 +420,9 @@ describe('OrdersService', () => {
       // Đảm bảo trạng thái order là PENDING (không phải CONFIRMED)
       const pendingOrder = { ...mockOrder, status: OrderStatus.PENDING };
       mockRepository.findOne.mockResolvedValue(pendingOrder);
-      await expect(service.shipOrder('store-123', 'order-123')).rejects.toThrow(BadRequestException);
+      await expect(service.shipOrder('store-123', 'order-123')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 

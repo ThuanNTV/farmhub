@@ -2,7 +2,6 @@
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
-
 // npx ts-node src/check/database-test.ts
 
 export async function testDatabaseConnection() {
@@ -38,6 +37,3 @@ export async function testDatabaseConnection() {
     return false;
   }
 }
-
-// Chạy test
-void testDatabaseConnection();

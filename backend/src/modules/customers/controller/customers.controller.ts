@@ -16,16 +16,16 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CustomersService } from 'src/modules/customers/service/customers.service';
-import { CreateCustomerDto } from 'src/modules/customers/dto/create-customer.dto';
-import { UpdateCustomerDto } from 'src/modules/customers/dto/update-customer.dto';
-import { CustomerResponseDto } from 'src/modules/customers/dto/customer-response.dto';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
-import { CustomerFilter } from 'src/common/types/common.types';
+import { CustomerResponseDto } from 'src/modules/customers/dto/customer-response.dto';
+import { CustomersService } from 'src/modules/customers/service/customers.service';
 import { RequireCustomerPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { CreateCustomerDto } from 'src/modules/customers/dto/create-customer.dto';
+import { UpdateCustomerDto } from 'src/modules/customers/dto/update-customer.dto';
+import { CustomerFilter } from 'src/common/types/common.types';
 
 @ApiTags('Customers')
 @Controller('tenant/:storeId/customers')
