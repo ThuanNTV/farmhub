@@ -47,6 +47,9 @@ export class AuditLog {
   is_deleted!: boolean;
 
   // Bổ sung các property cho entity AuditLog
+  device!: string;
+  browser!: string;
+  os!: string;
   user_name!: string;
   resource_type!: string;
   resource_id!: string;

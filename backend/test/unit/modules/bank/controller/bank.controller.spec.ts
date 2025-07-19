@@ -2,10 +2,22 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
 import { SecurityService } from 'src/service/global/security.service';
 import { BankController } from 'src/modules/bank/controller/bank.controller';
 import { BankService } from 'src/modules/bank/service/bank.service';
 import { Bank } from 'src/entities/global/bank.entity';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import {
+  mockAuditLogAsyncService,
+  mockReflector,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockAuditInterceptor,
+} from '../../../../utils/mock-dependencies';
 
 const mockBank = {
   id: 'BANK001',
@@ -15,6 +27,7 @@ const mockBank = {
   created_by_user_id: 'user1',
   is_deleted: false,
 };
+
 
 const mockBanks = [mockBank];
 
@@ -28,11 +41,12 @@ const mockService = {
 
 let mockSecurityService: jest.Mocked<SecurityService>;
 
+const fixedDate = new Date('2025-07-19T15:54:24.960Z');
 const createMockBank = (overrides: Partial<Bank> = {}): Bank => ({
   id: 'BANK001',
   name: 'Test Bank',
-  created_at: new Date(),
-  updated_at: new Date(),
+  created_at: fixedDate,
+  updated_at: fixedDate,
   created_by_user_id: 'USER001',
   is_deleted: false,
   ...overrides,
@@ -41,7 +55,7 @@ const createMockBank = (overrides: Partial<Bank> = {}): Bank => ({
 describe('BankController', () => {
   let controller: BankController;
   let service: BankService;
-  const req = { user: { userId: 'user-123' } } as unknown as Request & {
+  const req = { user: { userId: 'user1' } } as unknown as Request & {
     user: { userId: string };
   };
 
@@ -56,8 +70,20 @@ describe('BankController', () => {
       providers: [
         { provide: BankService, useValue: mockService },
         { provide: SecurityService, useValue: mockSecurityService },
+        { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },
+        { provide: Reflector, useValue: mockReflector },
+        { provide: EnhancedAuthGuard, useValue: mockEnhancedAuthGuard },
+        { provide: PermissionGuard, useValue: mockPermissionGuard },
+        { provide: AuditInterceptor, useValue: mockAuditInterceptor },
       ],
-    }).compile();
+    })
+      .overrideGuard(EnhancedAuthGuard)
+      .useValue(mockEnhancedAuthGuard)
+      .overrideGuard(PermissionGuard)
+      .useValue(mockPermissionGuard)
+      .overrideInterceptor(AuditInterceptor)
+      .useValue(mockAuditInterceptor)
+      .compile();
 
     controller = module.get<BankController>(BankController);
     service = module.get<BankService>(BankService);
@@ -85,41 +111,31 @@ describe('BankController', () => {
 
   it('should create a bank', async () => {
     const dto = { name: 'Test Bank' };
-
     jest.spyOn(service, 'create').mockResolvedValue(createMockBank());
-
-    await expect(controller.create(dto, req as any)).resolves.toEqual(
-      createMockBank,
-    );
+    await expect(controller.create(dto, req as any)).resolves.toEqual(createMockBank());
     expect(service.create).toHaveBeenCalledWith(dto, 'user1');
   });
 
   it('should get all banks', async () => {
-    const mockBanks = [{ id: 'BANK001', name: 'Test Bank' }];
-
-    jest.spyOn(service, 'findAll').mockResolvedValue([createMockBank()]);
-
+    const mockBanks = [createMockBank()];
+    jest.spyOn(service, 'findAll').mockResolvedValue(mockBanks);
     await expect(controller.findAll()).resolves.toEqual(mockBanks);
     expect(service.findAll).toHaveBeenCalled();
   });
 
   it('should get one bank', async () => {
-    const mockBank = { id: 'BANK001', name: 'Test Bank' };
-
-    jest.spyOn(service, 'findOne').mockResolvedValue(createMockBank());
-
+    const mockBank = createMockBank();
+    jest.spyOn(service, 'findOne').mockResolvedValue(mockBank);
     await expect(controller.findOne('BANK001')).resolves.toEqual(mockBank);
     expect(service.findOne).toHaveBeenCalledWith('BANK001');
   });
 
   it('should update a bank', async () => {
     const dto = { name: 'Updated Bank' };
-    const mockBank = { id: 'BANK001', name: 'Updated Bank' };
-
+    const mockBank = createMockBank({ name: 'Updated Bank' });
     jest
       .spyOn(service, 'update')
-      .mockResolvedValue(createMockBank({ name: 'Updated Bank' }));
-
+      .mockResolvedValue(mockBank);
     await expect(
       controller.update('BANK001', dto, req as any),
     ).resolves.toEqual(mockBank);
@@ -130,7 +146,6 @@ describe('BankController', () => {
     jest
       .spyOn(service, 'remove')
       .mockResolvedValue({ message: 'Đã xóa bank', data: null });
-
     await expect(controller.remove('BANK001', req as any)).resolves.toEqual({
       message: 'Đã xóa bank',
     });
