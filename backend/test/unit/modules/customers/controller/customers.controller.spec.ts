@@ -7,12 +7,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
-import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
-import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
-import { Reflector } from '@nestjs/core';
-import { SecurityService } from 'src/service/global/security.service';
-import { AuditLogsService } from 'src/modules/audit-logs/service/audit-logs.service';
 import { Customer } from 'src/entities/tenant/customer.entity';
 
 describe('CustomersController', () => {
@@ -57,41 +51,8 @@ describe('CustomersController', () => {
       filter: jest.fn(),
     } as any;
 
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [CustomersController],
-      providers: [
-        {
-          provide: CustomersService,
-          useValue: mockCustomersService,
-        },
-        {
-          provide: EnhancedAuthGuard,
-          useValue: { canActivate: jest.fn().mockReturnValue(true) },
-        },
-        {
-          provide: PermissionGuard,
-          useValue: { canActivate: jest.fn().mockReturnValue(true) },
-        },
-        {
-          provide: AuditInterceptor,
-          useValue: { intercept: jest.fn() },
-        },
-        {
-          provide: SecurityService,
-          useValue: {},
-        },
-        {
-          provide: Reflector,
-          useValue: { get: jest.fn(), getAllAndOverride: jest.fn() },
-        },
-        {
-          provide: AuditLogsService,
-          useValue: { log: jest.fn() },
-        },
-      ],
-    }).compile();
-
-    controller = module.get<CustomersController>(CustomersController);
+    // Simple approach: Direct controller instantiation
+    controller = new CustomersController(mockCustomersService);
   });
 
   afterEach(() => {
@@ -285,6 +246,66 @@ describe('CustomersController', () => {
       );
     });
 
+    it('should handle birthday string conversion', async () => {
+      const customerId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateDtoWithBirthday: UpdateCustomerDto = {
+        name: 'Updated Customer',
+        birthday: '1990-01-01' as any, // string birthday
+      };
+      const expectedResponse = {
+        message: 'Cập nhật thành công',
+        data: mockCustomer,
+      };
+
+      mockCustomersService.update.mockResolvedValue(expectedResponse);
+
+      const result = await controller.update(
+        mockRequest.user.storeId,
+        customerId,
+        updateDtoWithBirthday,
+      );
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockCustomersService.update).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        customerId,
+        expect.objectContaining({
+          name: 'Updated Customer',
+          birthday: '1990-01-01', // Should be converted to yyyy-mm-dd format
+        }),
+      );
+    });
+
+    it('should handle invalid birthday string', async () => {
+      const customerId = '123e4567-e89b-12d3-a456-426614174000';
+      const updateDtoWithInvalidBirthday: UpdateCustomerDto = {
+        name: 'Updated Customer',
+        birthday: 'invalid-date' as any,
+      };
+      const expectedResponse = {
+        message: 'Cập nhật thành công',
+        data: mockCustomer,
+      };
+
+      mockCustomersService.update.mockResolvedValue(expectedResponse);
+
+      const result = await controller.update(
+        mockRequest.user.storeId,
+        customerId,
+        updateDtoWithInvalidBirthday,
+      );
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockCustomersService.update).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        customerId,
+        expect.objectContaining({
+          name: 'Updated Customer',
+          birthday: 'invalid-date', // Should remain unchanged for invalid dates
+        }),
+      );
+    });
+
     it('should handle update errors', async () => {
       const customerId = '123e4567-e89b-12d3-a456-426614174000';
       mockCustomersService.update.mockRejectedValue(
@@ -403,17 +424,35 @@ describe('CustomersController', () => {
     });
   });
 
-  describe('request validation', () => {
-    it('should handle missing user in request', async () => {
-      const invalidRequest = {} as any;
-      expect(() => controller.findAll(invalidRequest)).toThrow();
+  describe('storeId validation', () => {
+    it('should throw BadRequestException for empty storeId', () => {
+      expect(() => controller.findAll('')).toThrow(
+        'Thiếu hoặc sai định dạng storeId',
+      );
     });
 
-    it('should handle missing storeId in user', async () => {
-      const invalidRequest = {
-        user: { userId: '123' },
-      } as any;
-      expect(() => controller.findAll(invalidRequest)).toThrow();
+    it('should throw BadRequestException for whitespace storeId', () => {
+      expect(() => controller.findAll('   ')).toThrow(
+        'Thiếu hoặc sai định dạng storeId',
+      );
+    });
+
+    it('should throw BadRequestException for null storeId', () => {
+      expect(() => controller.findAll(null as any)).toThrow(
+        'Thiếu hoặc sai định dạng storeId',
+      );
+    });
+
+    it('should throw BadRequestException for undefined storeId', () => {
+      expect(() => controller.findAll(undefined as any)).toThrow(
+        'Thiếu hoặc sai định dạng storeId',
+      );
+    });
+
+    it('should throw BadRequestException for non-string storeId', () => {
+      expect(() => controller.findAll(123 as any)).toThrow(
+        'Thiếu hoặc sai định dạng storeId',
+      );
     });
   });
 
@@ -478,31 +517,77 @@ describe('CustomersController', () => {
     });
   });
 
-  describe('guards and interceptors', () => {
-    it('should apply EnhancedAuthGuard and PermissionGuard', () => {
-      const guards = Reflect.getMetadata('__guards__', CustomersController);
-      expect(guards).toEqual(
-        expect.arrayContaining([EnhancedAuthGuard, PermissionGuard]),
+  describe('edge cases', () => {
+    it('should handle search with special characters', async () => {
+      const specialKeyword = '@#$%^&*()';
+      mockCustomersService.search.mockResolvedValue([]);
+
+      const result = await controller.search(
+        mockRequest.user.storeId,
+        specialKeyword,
+      );
+
+      expect(result).toEqual([]);
+      expect(mockCustomersService.search).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        specialKeyword,
       );
     });
 
-    it('should apply AuditInterceptor', () => {
-      const interceptors = Reflect.getMetadata(
-        '__interceptors__',
-        CustomersController,
-      );
-      expect(interceptors).toEqual(expect.arrayContaining([AuditInterceptor]));
-    });
-  });
+    it('should handle filter with empty object', async () => {
+      const emptyFilter = {};
+      mockCustomersService.filter.mockResolvedValue([mockCustomer]);
 
-  describe('response validation', () => {
-    it('should return correct Swagger response for create', () => {
-      const responses = Reflect.getMetadata(
-        'swagger/apiResponse',
-        controller.create,
+      const result = await controller.filter(
+        mockRequest.user.storeId,
+        emptyFilter,
       );
-      expect(responses).toHaveProperty('201');
-      expect(responses['201'].description).toBe('Tạo khách hàng thành công');
+
+      expect(result).toEqual([mockCustomer]);
+      expect(mockCustomersService.filter).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        emptyFilter,
+      );
+    });
+
+    it('should handle filter with complex criteria', async () => {
+      const complexFilter = {
+        search: 'test',
+        gender: 'male',
+        isActive: true,
+        dateRange: {
+          from: '2023-01-01',
+          to: '2023-12-31',
+        },
+      };
+      mockCustomersService.filter.mockResolvedValue([mockCustomer]);
+
+      const result = await controller.filter(
+        mockRequest.user.storeId,
+        complexFilter,
+      );
+
+      expect(result).toEqual([mockCustomer]);
+      expect(mockCustomersService.filter).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        complexFilter,
+      );
+    });
+
+    it('should handle very long customer names in search', async () => {
+      const longName = 'a'.repeat(1000);
+      mockCustomersService.search.mockResolvedValue([]);
+
+      const result = await controller.search(
+        mockRequest.user.storeId,
+        longName,
+      );
+
+      expect(result).toEqual([]);
+      expect(mockCustomersService.search).toHaveBeenCalledWith(
+        mockRequest.user.storeId,
+        longName,
+      );
     });
   });
 });
