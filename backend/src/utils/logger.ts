@@ -3,8 +3,14 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 
+// Helper function to get log level based on environment
+export const getLogLevel = (): string => {
+  return process.env.LOG_LEVEL ??
+    (process.env.NODE_ENV === 'production' ? 'info' : 'debug');
+};
+
 // Tạo transport cho file log với rotation
-const createFileTransport = (filename: string, level: string) => {
+export const createFileTransport = (filename: string, level: string) => {
   return new DailyRotateFile({
     filename,
     level,
@@ -22,9 +28,7 @@ const createFileTransport = (filename: string, level: string) => {
 
 // Cấu hình Winston Logger
 export const winstonConfig = {
-  level:
-    process.env.LOG_LEVEL ??
-    (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  level: getLogLevel(),
   format: winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',

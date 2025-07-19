@@ -1,11 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
-import { RecreateOrderController } from '@modules/recreate-order/controller/recreate-order.controller';
-import { OrdersService } from '@modules/orders/service/orders.service';
+import { RecreateOrderController } from 'src/modules/recreate-order/controller/recreate-order.controller';
+import { OrdersService } from 'src/modules/orders/service/orders.service';
 import { SecurityService } from 'src/service/global/security.service';
 import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import {
+  DebtStatus,
+  OrderStatus,
+  DeliveryStatus,
+} from 'src/entities/tenant/order.entity';
 import {
   mockSecurityService,
   mockAuditLogAsyncService,
@@ -57,12 +62,22 @@ describe('RecreateOrderController', () => {
       orderCode: 'ORD002',
       customerId: 'customer-123',
       totalAmount: 100,
-      status: 'pending',
+      status: OrderStatus.PENDING,
       items: [],
+      isCreditOrder: false,
+      debtStatus: DebtStatus.UNPAID,
+      vatAmount: 0,
+      totalPaid: 0,
+      isDeleted: false,
+      deliveryAddress: '',
+      deliveryStatus: DeliveryStatus.PROCESSING,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      orderItems: [],
     };
 
     it('should recreate order successfully', async () => {
-      ordersService.recreateOrder.mockResolvedValue(mockRecreatedOrder);
+      ordersService.recreateOrder.mockResolvedValue(mockRecreatedOrder as any);
 
       const result = await controller.recreateOrder(storeId, orderId);
 

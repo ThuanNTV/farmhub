@@ -1,286 +1,430 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+
+// Mock winston và DailyRotateFile trước khi import logger
+jest.mock('winston');
+jest.mock('winston-daily-rotate-file');
+jest.mock('nest-winston');
+
+// Import logger sau khi mock
 import {
+  getLogLevel,
+  createFileTransport,
+  winstonConfig,
   createWinstonLogger,
   WinstonLoggerModule,
-  winstonConfig,
-} from 'src/utils/logger';
-import * as winston from 'winston';
-import * as DailyRotateFile from 'winston-daily-rotate-file';
+} from '../../../src/utils/logger';
 
-// Mock winston-daily-rotate-file
-jest.mock('winston-daily-rotate-file');
-
-describe('Winston Logger', () => {
-  let logger: Logger;
-  let module: TestingModule;
-  let originalEnv: NodeJS.ProcessEnv;
+describe('Logger', () => {
+  let mockFormat: any;
+  let mockCombine: jest.Mock;
+  let mockTimestamp: jest.Mock;
+  let mockErrors: jest.Mock;
+  let mockLabel: jest.Mock;
+  let mockPrintf: jest.Mock;
+  let mockColorize: jest.Mock;
+  let mockConsoleTransport: jest.Mock;
+  let mockDailyRotateFile: jest.Mock;
+  let mockCreateLogger: jest.Mock;
+  let mockWinstonModule: any;
 
   beforeEach(() => {
-    // Save original environment
-    originalEnv = { ...process.env };
-  });
-
-  afterEach(() => {
-    // Restore original environment
-    process.env = originalEnv;
     jest.clearAllMocks();
-  });
+    jest.resetModules();
 
-  beforeEach(async () => {
-    module = await Test.createTestingModule({
-      imports: [WinstonLoggerModule],
-    }).compile();
+    // Mock winston format functions
+    mockCombine = jest.fn();
+    mockTimestamp = jest.fn().mockReturnValue('timestamp');
+    mockErrors = jest.fn().mockReturnValue('errors');
+    mockLabel = jest.fn().mockReturnValue('label');
+    mockPrintf = jest.fn().mockReturnValue('printf');
+    mockColorize = jest.fn().mockReturnValue('colorize');
 
-    logger = module.get<Logger>(Logger);
-  });
+    mockFormat = {
+      combine: mockCombine,
+      timestamp: mockTimestamp,
+      errors: mockErrors,
+      label: mockLabel,
+      printf: mockPrintf,
+      colorize: mockColorize,
+    };
 
-  afterEach(async () => {
-    if (module) {
-      await module.close();
-    }
-  });
+    // Mock winston transports
+    mockConsoleTransport = jest.fn();
+    mockConsoleTransport.mockImplementation((options: any) => ({
+      ...options,
+      _type: 'console',
+    }));
 
-  it('should be defined', () => {
-    expect(logger).toBeDefined();
-  });
-
-  it('should create winston logger', () => {
-    const winstonLogger = createWinstonLogger();
-    expect(winstonLogger).toBeDefined();
-  });
-
-  describe('winstonConfig', () => {
-    it('should have correct default configuration', () => {
-      expect(winstonConfig).toBeDefined();
-      expect(winstonConfig.transports).toHaveLength(4);
-      expect(winstonConfig.level).toBeDefined();
+    // Mock winston logger
+    mockCreateLogger = jest.fn().mockReturnValue({
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
     });
 
-    it('should use LOG_LEVEL from environment when set', () => {
-      process.env.LOG_LEVEL = 'warn';
+    // Mock winston module
+    (winston as any).format = mockFormat;
+    (winston as any).transports = {
+      Console: mockConsoleTransport,
+    };
+    (winston as any).createLogger = mockCreateLogger;
 
-      // Re-import to get fresh config
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        expect(freshConfig.level).toBe('warn');
-      });
+    // Mock DailyRotateFile
+    mockDailyRotateFile = jest.fn();
+    mockDailyRotateFile.mockImplementation((options: any) => ({
+      ...options,
+      _type: 'dailyRotateFile',
+    }));
+    (DailyRotateFile as any).mockImplementation(mockDailyRotateFile);
+
+    // Mock WinstonModule
+    mockWinstonModule = {
+      createLogger: jest.fn().mockReturnValue({
+        module: WinstonModule,
+        providers: [],
+        exports: [],
+      }),
+      forRoot: jest.fn().mockReturnValue({
+        module: WinstonModule,
+        providers: [],
+        exports: [],
+      }),
+    };
+    (WinstonModule as any).createLogger = mockWinstonModule.createLogger;
+
+    // Clear environment variables
+    delete process.env.LOG_LEVEL;
+    delete process.env.NODE_ENV;
+  });
+
+  describe('getLogLevel', () => {
+    it('should return LOG_LEVEL environment variable when set', () => {
+      process.env.LOG_LEVEL = 'debug';
+      expect(getLogLevel()).toBe('debug');
     });
 
-    it('should use info level for production environment', () => {
+    it('should return info for production environment when LOG_LEVEL is not set', () => {
       process.env.NODE_ENV = 'production';
-      delete process.env.LOG_LEVEL;
-
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        expect(freshConfig.level).toBe('info');
-      });
+      expect(getLogLevel()).toBe('info');
     });
 
-    it('should use debug level for development environment', () => {
+    it('should return debug for non-production environment when LOG_LEVEL is not set', () => {
       process.env.NODE_ENV = 'development';
-      delete process.env.LOG_LEVEL;
-
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        expect(freshConfig.level).toBe('debug');
-      });
+      expect(getLogLevel()).toBe('debug');
     });
 
-    it('should default to debug level when NODE_ENV is not set', () => {
-      delete process.env.NODE_ENV;
-      delete process.env.LOG_LEVEL;
-
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        expect(freshConfig.level).toBe('debug');
-      });
-    });
-  });
-
-  describe('winston format', () => {
-    it('should format log messages with all components', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: { user: 'test', action: 'create' },
-        stack: 'Error stack trace',
-      };
-
-      // Test the printf formatter
-      const formatter = winstonConfig.format;
-      expect(formatter).toBeDefined();
+    it('should return debug when neither LOG_LEVEL nor NODE_ENV is set', () => {
+      expect(getLogLevel()).toBe('debug');
     });
 
-    it('should handle context as string', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: 'TestContext',
-        stack: null,
-      };
-
-      // This tests the context handling in the printf function
-      expect(mockInfo.context).toBe('TestContext');
+    it('should return empty string when LOG_LEVEL is empty string', () => {
+      process.env.LOG_LEVEL = '';
+      expect(getLogLevel()).toBe('');
     });
 
-    it('should handle context as array', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: ['item1', 'item2'],
-        stack: null,
-      };
-
-      // This tests the array context handling
-      expect(Array.isArray(mockInfo.context)).toBe(true);
-    });
-
-    it('should handle null context', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: null,
-        stack: null,
-      };
-
-      // This tests null context handling
-      expect(mockInfo.context).toBe(null);
-    });
-
-    it('should handle undefined context', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: undefined,
-        stack: undefined,
-      };
-
-      // This tests undefined context/stack handling
-      expect(mockInfo.context).toBeUndefined();
-      expect(mockInfo.stack).toBeUndefined();
-    });
-
-    it('should handle stack as object', () => {
-      const mockInfo = {
-        timestamp: '2023-01-01 12:00:00',
-        level: 'info',
-        message: 'Test message',
-        context: null,
-        stack: { error: 'test error', trace: 'stack trace' },
-      };
-
-      // This tests object stack handling
-      expect(typeof mockInfo.stack).toBe('object');
+    it('should return LOG_LEVEL even if it is unusual value', () => {
+      process.env.LOG_LEVEL = 'custom-level';
+      expect(getLogLevel()).toBe('custom-level');
     });
   });
 
   describe('createFileTransport', () => {
-    it('should create file transport with correct configuration', () => {
-      // Mock DailyRotateFile constructor
-      const mockTransport = jest.fn();
-      (DailyRotateFile as unknown as jest.Mock).mockImplementation(
-        mockTransport,
-      );
+    it('should create DailyRotateFile transport with correct options', () => {
+      const filename = 'test-%DATE%.log';
+      const level = 'info';
 
-      // Re-import to trigger createFileTransport
-      jest.isolateModules(() => {
-        require('src/utils/logger');
+      const result = createFileTransport(filename, level);
 
-        // Verify that DailyRotateFile was called with correct options
-        expect(DailyRotateFile).toHaveBeenCalledWith(
-          expect.objectContaining({
-            level: expect.any(String),
-            datePattern: 'YYYY-MM-DD',
-            zippedArchive: true,
-            maxSize: '20m',
-            maxFiles: '14d',
-            format: expect.any(Object),
-          }),
-        );
+      expect(mockDailyRotateFile).toHaveBeenCalledWith({
+        filename,
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level,
+      });
+
+      expect(result).toEqual({
+        filename,
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level,
+        _type: 'dailyRotateFile',
+      });
+    });
+
+    it('should create transport with different filename and level', () => {
+      const filename = 'error-%DATE%.log';
+      const level = 'error';
+
+      createFileTransport(filename, level);
+
+      expect(mockDailyRotateFile).toHaveBeenCalledWith({
+        filename,
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level,
       });
     });
   });
 
-  describe('logging functionality', () => {
-    it('should log debug messages', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      logger.debug('Test debug message');
-      consoleSpy.mockRestore();
+  describe('winston format printf function', () => {
+    let printfFn: (info: any) => string;
+
+    beforeEach(() => {
+      // Reset mocks để có thể capture printf function
+      mockPrintf.mockClear();
+      
+      // Import lại để trigger việc tạo winston config
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
+      
+      // Re-import để trigger tạo config
+      require('../../../src/utils/logger');
+      
+      // Lấy printf function từ mock call
+      expect(mockPrintf).toHaveBeenCalled();
+      printfFn = mockPrintf.mock.calls[0][0];
     });
 
-    it('should log info messages', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      logger.log('Test info message');
-      consoleSpy.mockRestore();
+    it('should format log without context or stack', () => {
+      const info = {
+        timestamp: '2024-01-01T12:00:00Z',
+        level: 'info',
+        message: 'Test message',
+        label: 'test-service',
+      };
+
+      const result = printfFn(info);
+
+      expect(result).toBe('2024-01-01T12:00:00Z [test-service] info: Test message');
     });
 
-    it('should log warning messages', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      logger.warn('Test warning message');
-      consoleSpy.mockRestore();
+    it('should format log with context', () => {
+      const info = {
+        timestamp: '2024-01-01T12:00:00Z',
+        level: 'info',
+        message: 'Test message',
+        label: 'test-service',
+        context: 'TestController',
+      };
+
+      const result = printfFn(info);
+
+      expect(result).toBe('2024-01-01T12:00:00Z [test-service] info: [TestController] Test message');
     });
 
-    it('should log error messages', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      logger.error('Test error message');
-      consoleSpy.mockRestore();
+    it('should format log with stack trace', () => {
+      const info = {
+        timestamp: '2024-01-01T12:00:00Z',
+        level: 'error',
+        message: 'Test error',
+        label: 'test-service',
+        stack: 'Error: Test error\n    at test.js:1:1',
+      };
+
+      const result = printfFn(info);
+
+      expect(result).toBe(
+        '2024-01-01T12:00:00Z [test-service] error: Test error\nError: Test error\n    at test.js:1:1'
+      );
     });
 
-    it('should log messages with context', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      logger.log('Test message', 'TestContext');
-      consoleSpy.mockRestore();
-    });
+    it('should format log with both context and stack', () => {
+      const info = {
+        timestamp: '2024-01-01T12:00:00Z',
+        level: 'error',
+        message: 'Test error',
+        label: 'test-service',
+        context: 'ErrorHandler',
+        stack: 'Error: Test error\n    at handler.js:10:5',
+      };
 
-    it('should log error messages with stack trace', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      const error = new Error('Test error');
-      logger.error('Test error message', error.stack);
-      consoleSpy.mockRestore();
+      const result = printfFn(info);
+
+      expect(result).toBe(
+        '2024-01-01T12:00:00Z [test-service] error: [ErrorHandler] Test error\nError: Test error\n    at handler.js:10:5'
+      );
     });
   });
 
-  describe('winston transports', () => {
-    it('should configure console transport', () => {
-      const consoleTransport = winstonConfig.transports.find(
-        (transport) => transport instanceof winston.transports.Console,
-      );
-      expect(consoleTransport).toBeDefined();
+  describe('winstonConfig', () => {
+    beforeEach(() => {
+      // Clear previous calls
+      mockCombine.mockClear();
+      mockTimestamp.mockClear();
+      mockErrors.mockClear();
+      mockLabel.mockClear();
+      mockPrintf.mockClear();
+      mockConsoleTransport.mockClear();
+      mockCreateLogger.mockClear();
     });
 
-    it('should configure file transports for different log levels', () => {
-      // The configuration should have multiple file transports
-      expect(winstonConfig.transports).toHaveLength(4); // Console + 3 file transports
-    });
+    it('should create winston logger with correct configuration', () => {
+      process.env.LOG_LEVEL = 'info';
 
-    it('should handle LOG_LEVEL environment variable for console transport', () => {
-      process.env.LOG_LEVEL = 'error';
+      // Re-import để trigger tạo config với LOG_LEVEL mới
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
 
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        const consoleTransport = freshConfig.transports.find(
-          (transport: any) => transport.constructor.name === 'Console',
-        );
-        expect(consoleTransport.level).toBe('error');
+      const { winstonConfig: config } = require('../../../src/utils/logger');
+
+      expect(mockCreateLogger).toHaveBeenCalledWith({
+        level: 'info',
+        format: mockFormat.combine(),
+        transports: expect.any(Array),
       });
     });
 
-    it('should default to debug level for console transport', () => {
+    it('should include console transport in development', () => {
+      process.env.NODE_ENV = 'development';
+
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
+
+      require('../../../src/utils/logger');
+
+      expect(mockConsoleTransport).toHaveBeenCalledWith({
+        format: expect.anything(),
+      });
+    });
+
+    it('should include console transport in production', () => {
+      process.env.NODE_ENV = 'production';
+
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
+
+      require('../../../src/utils/logger');
+
+      expect(mockConsoleTransport).toHaveBeenCalled();
+    });
+
+    it('should create file transports for info and error logs', () => {
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
+
+      require('../../../src/utils/logger');
+
+      // Kiểm tra có 2 file transports được tạo (info và error)
+      expect(mockDailyRotateFile).toHaveBeenCalledTimes(2);
+      
+      // Kiểm tra info transport
+      expect(mockDailyRotateFile).toHaveBeenCalledWith({
+        filename: 'logs/app-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level: 'info',
+      });
+
+      // Kiểm tra error transport
+      expect(mockDailyRotateFile).toHaveBeenCalledWith({
+        filename: 'logs/error-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level: 'error',
+      });
+    });
+
+    it('should configure format correctly', () => {
+      jest.resetModules();
+      jest.doMock('winston', () => ({
+        format: mockFormat,
+        transports: { Console: mockConsoleTransport },
+        createLogger: mockCreateLogger,
+      }));
+      jest.doMock('winston-daily-rotate-file', () => mockDailyRotateFile);
+
+      require('../../../src/utils/logger');
+
+      expect(mockTimestamp).toHaveBeenCalled();
+      expect(mockErrors).toHaveBeenCalledWith({ stack: true });
+      expect(mockLabel).toHaveBeenCalledWith({ label: 'farmhub-backend' });
+      expect(mockPrintf).toHaveBeenCalled();
+      expect(mockCombine).toHaveBeenCalled();
+    });
+  });
+
+  describe('createWinstonLogger', () => {
+    it('should create winston logger module', () => {
+      const result = createWinstonLogger();
+
+      expect(mockWinstonModule.createLogger).toHaveBeenCalledWith({
+        instance: expect.any(Object),
+      });
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('WinstonLoggerModule', () => {
+    it('should be defined', () => {
+      expect(WinstonLoggerModule).toBeDefined();
+    });
+
+    it('should create logger module with winston configuration', () => {
+      expect(mockWinstonModule.createLogger).toHaveBeenCalled();
+    });
+  });
+
+  describe('environment edge cases', () => {
+    it('should handle undefined NODE_ENV', () => {
+      delete process.env.NODE_ENV;
       delete process.env.LOG_LEVEL;
 
-      jest.isolateModules(() => {
-        const { winstonConfig: freshConfig } = require('src/utils/logger');
-        const consoleTransport = freshConfig.transports.find(
-          (transport: any) => transport.constructor.name === 'Console',
-        );
-        expect(consoleTransport.level).toBe('debug');
-      });
+      expect(getLogLevel()).toBe('debug');
+    });
+
+    it('should handle empty NODE_ENV', () => {
+      process.env.NODE_ENV = '';
+      delete process.env.LOG_LEVEL;
+
+      expect(getLogLevel()).toBe('debug');
+    });
+
+    it('should prioritize LOG_LEVEL over NODE_ENV', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.LOG_LEVEL = 'verbose';
+
+      expect(getLogLevel()).toBe('verbose');
     });
   });
 });
