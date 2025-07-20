@@ -1,7 +1,7 @@
 # 🚫 Node & Package files
 node_modules/
 package-lock.json
-bun.lockb
+bun.lockb*
 
 # 🏗 Build output
 dist/
@@ -13,9 +13,11 @@ dist/
 # 🧠 AI, tools & editors
 .cursor/
 .vscode/
+.augment/
 
 # 🧪 Test & coverage
 coverage/
+test/coverage/
 
 # 🗂 System folders
 logs/

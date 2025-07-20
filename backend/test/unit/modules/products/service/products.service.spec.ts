@@ -596,6 +596,133 @@ describe('ProductsService', () => {
         NotFoundException,
       );
     });
+
+    it('should validate category exists during creation', async () => {
+      const storeId = 'store-123';
+      const createProductDto: CreateProductDto = {
+        productId: 'test-product-id',
+        productCode: 'TEST-001',
+        name: 'Test Product',
+        slug: 'test-product',
+        description: 'Test description',
+        categoryId: 'non-existent-category',
+        priceRetail: 100.0,
+        stock: 50,
+        minStockLevel: 10,
+        isActive: true,
+        isDeleted: false,
+      };
+
+      // Mock no existing product/code conflicts
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category repository to return null (category doesn't exist)
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue(null),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockReturnValue(mockCategoryRepo),
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
+      await expect(
+        service.createProduct(storeId, createProductDto),
+      ).rejects.toThrow(
+        new InternalServerErrorException(
+          '❌ Danh mục với ID "non-existent-category" không tồn tại trong hệ thống',
+        ),
+      );
+    });
+
+    it('should validate category exists during update', async () => {
+      const storeId = 'store-123';
+      const productId = 'existing-product-id';
+      const updateDto: UpdateProductDto = {
+        categoryId: 'non-existent-category',
+      };
+
+      // Mock existing product
+      jest.spyOn(service, 'findOneProduc').mockResolvedValue({
+        repo: mockRepository,
+        product: mockProduct,
+      });
+
+      // Mock category repository to return null (category doesn't exist)
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue(null),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockReturnValue(mockCategoryRepo),
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
+      await expect(
+        service.update(storeId, productId, updateDto),
+      ).rejects.toThrow(
+        new InternalServerErrorException(
+          '❌ Danh mục với ID "non-existent-category" không tồn tại trong hệ thống',
+        ),
+      );
+    });
+
+    it('should pass validation when category exists during creation', async () => {
+      const storeId = 'store-123';
+      const createProductDto: CreateProductDto = {
+        productId: 'test-product-id',
+        productCode: 'TEST-001',
+        name: 'Test Product',
+        slug: 'test-product',
+        description: 'Test description',
+        categoryId: 'valid-category',
+        priceRetail: 100.0,
+        stock: 50,
+        minStockLevel: 10,
+        isActive: true,
+        isDeleted: false,
+      };
+
+      // Mock no existing product/code conflicts
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category exists
+      const mockCategory = {
+        category_id: 'valid-category',
+        name: 'Valid Category',
+      };
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue(mockCategory),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockImplementation((entity) => {
+          if (entity.name === 'Category') return mockCategoryRepo;
+          return mockRepository;
+        }),
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
+      // Mock successful creation
+      mockRepository.create.mockReturnValue(mockProduct);
+      mockRepository.save.mockResolvedValue(mockProduct);
+
+      const result = await service.createProduct(storeId, createProductDto);
+
+      expect(result).toEqual(mockProduct);
+      expect(mockCategoryRepo.findOne).toHaveBeenCalledWith({
+        where: {
+          category_id: 'valid-category',
+          is_deleted: false,
+          is_active: true,
+        },
+      });
+    });
   });
 
   describe('product management scenarios', () => {

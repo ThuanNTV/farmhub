@@ -3,6 +3,17 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@modules/(.*)$': '<rootDir>/src/modules/$1',
+    '^@core/(.*)$': '<rootDir>/src/core/$1',
+    '^@common/(.*)$': '<rootDir>/src/common/$1',
+    '^@config/(.*)$': '<rootDir>/src/config/$1',
+    '^@entities/(.*)$': '<rootDir>/src/entities/$1',
+    '^@dto/(.*)$': '<rootDir>/src/dto/$1',
+    '^@service/(.*)$': '<rootDir>/src/service/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
+    '^@migration/(.*)$': '<rootDir>/src/migration/$1',
   },
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
@@ -15,6 +26,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '/node_modules/',
     'src/config/redis/test/',
-    'src/examples'
+    'src/examples',
+    'src/migration',
   ],
-}; 
+};

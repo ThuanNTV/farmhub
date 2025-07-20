@@ -9,6 +9,8 @@ import {
   IsPositive,
   Min,
   MaxLength,
+  Matches,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -67,6 +69,7 @@ export class CreateProductDto {
     { maxDecimalPlaces: 2 },
     { message: 'Giá bán sỉ phải là số hợp lệ' },
   )
+  @IsPositive({ message: 'Giá bán sỉ phải lớn hơn 0' })
   priceWholesale?: number; // maps to price_wholesale
 
   @ApiProperty({ description: 'Credit price', required: false, minimum: 0 })
@@ -75,16 +78,21 @@ export class CreateProductDto {
     { maxDecimalPlaces: 2 },
     { message: 'Giá trả góp phải là số hợp lệ' },
   )
+  @IsPositive({ message: 'Giá trả góp phải lớn hơn 0' })
   creditPrice?: number; // maps to credit_price
 
   @ApiProperty({ description: 'Cost price', required: false, minimum: 0 })
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 }, { message: 'Giá vốn phải là số hợp lệ' })
+  @IsPositive({ message: 'Giá vốn phải lớn hơn 0' })
   costPrice?: number; // maps to cost_price
 
   @ApiProperty({ description: 'Product barcode', required: false })
   @IsOptional()
   @IsString()
+  @Matches(/^\d{12,13}$/, {
+    message: 'Barcode phải đúng định dạng 12 hoặc 13 chữ số',
+  })
   barcode?: string;
 
   @ApiProperty({ description: 'Stock quantity', minimum: 0 })

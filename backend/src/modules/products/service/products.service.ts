@@ -8,6 +8,7 @@ import {
 import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
+import { Category } from 'src/entities/tenant/category.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service';
 import { CreateProductDto } from 'src/modules/products/dto/create-product.dto';
 import { UpdateProductDto } from 'src/modules/products/dto/update-product.dto';
@@ -45,6 +46,9 @@ export class ProductsService extends TenantBaseService<Product> {
           `❌ Sản phẩm với productCode "${dto.productCode}" đã tồn tại`,
         );
       }
+
+      // Validate categoryId exists
+      await this.validateCategoryExists(storeId, dto.categoryId);
       const product = repo.create(dto);
       const saved = await repo.save(product);
 
@@ -176,6 +180,11 @@ export class ProductsService extends TenantBaseService<Product> {
         }
       }
 
+      // Validate categoryId if provided
+      if (dto.categoryId) {
+        await this.validateCategoryExists(storeId, dto.categoryId);
+      }
+
       const updated = repo.merge(product, dto);
       const saved = await repo.save(updated);
 
@@ -288,6 +297,47 @@ export class ProductsService extends TenantBaseService<Product> {
         errorStack,
       );
       throw error;
+    }
+  }
+
+  /**
+   * Validate if categoryId exists in the system
+   * @param storeId - Store ID
+   * @param categoryId - Category ID to validate
+   * @throws InternalServerErrorException if category doesn't exist
+   */
+  private async validateCategoryExists(
+    storeId: string,
+    categoryId: string,
+  ): Promise<void> {
+    try {
+      const dataSource =
+        await this.tenantDataSourceService.getTenantDataSource(storeId);
+      const categoryRepo = dataSource.getRepository(Category);
+
+      const category = await categoryRepo.findOne({
+        where: {
+          category_id: categoryId,
+          is_deleted: false,
+          is_active: true,
+        },
+      });
+
+      if (!category) {
+        throw new InternalServerErrorException(
+          `❌ Danh mục với ID "${categoryId}" không tồn tại trong hệ thống`,
+        );
+      }
+    } catch (error) {
+      // Re-throw InternalServerErrorException
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
+      // Handle other errors
+      this.logger.error(`Error validating category existence: ${error}`);
+      throw new InternalServerErrorException(
+        `❌ Lỗi kiểm tra danh mục: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 }
