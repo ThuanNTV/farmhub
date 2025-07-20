@@ -59,10 +59,10 @@ export class CategoryExistsConstraint implements ValidatorConstraintInterface {
 }
 
 export function CategoryExists(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       options: validationOptions,
       constraints: [],
       validator: CategoryExistsConstraint,

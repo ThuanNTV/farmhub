@@ -36,11 +36,13 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/../setup.ts'],
   moduleNameMapper: {
+    '^@core/(.*)$': '<rootDir>/../../src/core/$1',
+    '^@modules/(.*)$': '<rootDir>/../../src/modules/$1',
     '^src/(.*)$': '<rootDir>/../../src/$1',
     '^@/(.*)$': '<rootDir>/../../src/$1',
   },
   transform: {
-    '^.+\\.(t|j)s$': [
+    '^.+\.(t|j)s$': [
       'ts-jest',
       {
         tsconfig: '<rootDir>/../../tsconfig.json',

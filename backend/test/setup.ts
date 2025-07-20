@@ -127,16 +127,29 @@ jest.mock('../src/common/helpers/dto-mapper.helper', () => ({
 }));
 
 // Mock logger
-jest.mock('@nestjs/common', () => ({
-  ...jest.requireActual('@nestjs/common'),
-  Logger: jest.fn().mockImplementation(() => ({
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-    verbose: jest.fn(),
-  })),
-}));
+jest.mock('@nestjs/common', () => {
+  const ActualNestCommon = jest.requireActual('@nestjs/common');
+  return {
+    ...ActualNestCommon,
+    Logger: Object.assign(
+      jest.fn().mockImplementation(() => ({
+        log: jest.fn(),
+        error: jest.fn(),
+        warn: jest.fn(),
+        debug: jest.fn(),
+        verbose: jest.fn(),
+      })),
+      {
+        overrideLogger: jest.fn(),
+        log: jest.fn(),
+        error: jest.fn(),
+        warn: jest.fn(),
+        debug: jest.fn(),
+        verbose: jest.fn(),
+      },
+    ),
+  };
+});
 
 // Global test utilities
 global.testUtils = {
