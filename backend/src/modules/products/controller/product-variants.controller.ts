@@ -39,7 +39,7 @@ export class ProductVariantsController {
   ) {}
 
   // Product Attributes endpoints
-  @Post(':storeId/attributes')
+  @Post('attributes')
   @RequireProductPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo thuộc tính sản phẩm mới' })
@@ -57,7 +57,7 @@ export class ProductVariantsController {
     return this.productVariantsService.createAttribute(storeId, createDto);
   }
 
-  @Get(':storeId/attributes')
+  @Get('attributes')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách thuộc tính sản phẩm' })
@@ -72,7 +72,7 @@ export class ProductVariantsController {
   }
 
   // Product Variants endpoints
-  @Post(':storeId/:productId/variants')
+  @Post(':productId/variants')
   @RequireProductPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo biến thể sản phẩm mới' })
@@ -94,7 +94,7 @@ export class ProductVariantsController {
     return this.productVariantsService.createVariant(storeId, createDto);
   }
 
-  @Get(':storeId/:productId/variants')
+  @Get(':productId/variants')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm với tất cả biến thể' })
@@ -115,7 +115,7 @@ export class ProductVariantsController {
     );
   }
 
-  @Get(':storeId/variants')
+  @Get('variants')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách biến thể với bộ lọc' })
@@ -143,7 +143,7 @@ export class ProductVariantsController {
     return this.productVariantsService.getVariants(storeId, filterDto);
   }
 
-  @Get(':storeId/variants/:variantId')
+  @Get('variants/:variantId')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy chi tiết biến thể' })
@@ -161,7 +161,7 @@ export class ProductVariantsController {
     return this.productVariantsService.getVariantById(storeId, variantId);
   }
 
-  @Put(':storeId/variants/:variantId')
+  @Put('variants/:variantId')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật biến thể sản phẩm' })
@@ -184,7 +184,7 @@ export class ProductVariantsController {
     );
   }
 
-  @Delete(':storeId/variants/:variantId')
+  @Delete('variants/:variantId')
   @RequireProductPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa biến thể sản phẩm' })
@@ -202,7 +202,7 @@ export class ProductVariantsController {
   }
 
   // Bulk operations
-  @Post(':storeId/:productId/variants/bulk')
+  @Post(':productId/variants/bulk')
   @RequireProductPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo nhiều biến thể cùng lúc' })
@@ -229,7 +229,7 @@ export class ProductVariantsController {
     return results;
   }
 
-  @Put(':storeId/variants/bulk')
+  @Put('variants/bulk')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật nhiều biến thể cùng lúc' })
@@ -256,7 +256,7 @@ export class ProductVariantsController {
     return results;
   }
 
-  @Delete(':storeId/variants/bulk')
+  @Delete('variants/bulk')
   @RequireProductPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa nhiều biến thể cùng lúc' })
@@ -276,7 +276,7 @@ export class ProductVariantsController {
   }
 
   // Utility endpoints
-  @Post(':storeId/:productId/variants/generate')
+  @Post(':productId/variants/generate')
   @RequireProductPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tự động tạo biến thể từ thuộc tính' })
@@ -287,10 +287,10 @@ export class ProductVariantsController {
   })
   @ApiResponse({ status: 403, description: 'Không có quyền tạo' })
   generateVariants(
-    @Param('storeId') storeId: string,
-    @Param('productId') productId: string,
+    @Param('storeId') _storeId: string,
+    @Param('productId') _productId: string,
     @Body()
-    generateDto: {
+    _generateDto: {
       attributes: Array<{
         attributeId: string;
         values: Array<{ value: string; displayValue?: string }>;

@@ -31,7 +31,7 @@ import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 export class ProductSeoController {
   constructor(private readonly productSeoService: ProductSeoService) {}
 
-  @Get(':storeId/:productId/seo')
+  @Get(':productId/seo')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin SEO của sản phẩm' })
@@ -49,7 +49,7 @@ export class ProductSeoController {
     return this.productSeoService.getProductSeo(storeId, productId);
   }
 
-  @Get(':storeId/seo/slug/:slug')
+  @Get('seo/slug/:slug')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin SEO theo slug' })
@@ -67,7 +67,7 @@ export class ProductSeoController {
     return this.productSeoService.getProductSeoBySlug(storeId, slug);
   }
 
-  @Put(':storeId/:productId/seo')
+  @Put(':productId/seo')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật thông tin SEO của sản phẩm' })
@@ -86,7 +86,7 @@ export class ProductSeoController {
     return this.productSeoService.updateProductSeo(storeId, productId, seoDto);
   }
 
-  @Post(':storeId/seo/bulk')
+  @Post('seo/bulk')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật SEO hàng loạt' })
@@ -103,7 +103,7 @@ export class ProductSeoController {
     return this.productSeoService.bulkUpdateSeo(storeId, updates);
   }
 
-  @Get(':storeId/sitemap')
+  @Get('sitemap')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo sitemap cho tất cả sản phẩm' })
@@ -117,7 +117,7 @@ export class ProductSeoController {
     return this.productSeoService.generateSitemap(storeId);
   }
 
-  @Get(':storeId/sitemap.xml')
+  @Get('sitemap.xml')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo sitemap XML cho tất cả sản phẩm' })
@@ -167,7 +167,7 @@ export class ProductSeoController {
     return xml;
   }
 
-  @Post(':storeId/:productId/seo/analyze')
+  @Post(':productId/seo/analyze')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích SEO cho sản phẩm' })
@@ -201,11 +201,11 @@ export class ProductSeoController {
     );
     return {
       analysis: seoData.seoAnalysis,
-      recommendations: seoData.seoAnalysis?.recommendations || [],
+      recommendations: seoData.seoAnalysis.recommendations,
     };
   }
 
-  @Post(':storeId/seo/auto-generate')
+  @Post('seo/auto-generate')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tự động tạo SEO cho tất cả sản phẩm chưa có SEO' })
@@ -226,9 +226,9 @@ export class ProductSeoController {
     },
   })
   @ApiResponse({ status: 403, description: 'Không có quyền cập nhật' })
-  async autoGenerateSeo(
-    @Param('storeId') storeId: string,
-    @Query('force') force?: boolean,
+  autoGenerateSeo(
+    @Param('storeId') _storeId: string,
+    @Query('force') _force?: boolean,
   ) {
     // This would implement auto-generation logic for all products
     // For now, return a placeholder
@@ -240,7 +240,7 @@ export class ProductSeoController {
     };
   }
 
-  @Get(':storeId/seo/robots.txt')
+  @Get('seo/robots.txt')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo robots.txt cho store' })
@@ -266,7 +266,7 @@ export class ProductSeoController {
     return robotsTxt;
   }
 
-  @Get(':storeId/seo/meta-tags/:productId')
+  @Get('seo/meta-tags/:productId')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy meta tags HTML cho sản phẩm' })

@@ -92,7 +92,7 @@ export class ProductsController {
     private readonly advancedSearchService: AdvancedSearchService,
   ) {}
 
-  @Post(':storeId')
+  @Post()
   @RequireProductPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo sản phẩm mới' })
@@ -110,7 +110,7 @@ export class ProductsController {
     return this.productsService.createProduct(storeId, createProductDto);
   }
 
-  @Get(':storeId')
+  @Get()
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách sản phẩm' })
@@ -124,7 +124,7 @@ export class ProductsController {
     return this.productsService.findAll(storeId);
   }
 
-  @Get(':storeId/:id')
+  @Get(':id')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin sản phẩm theo ID' })
@@ -139,7 +139,7 @@ export class ProductsController {
     return this.productsService.findOne(storeId, id);
   }
 
-  @Patch(':storeId/:id')
+  @Patch(':id')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật sản phẩm' })
@@ -158,7 +158,7 @@ export class ProductsController {
     return this.productsService.update(storeId, id, updateProductDto);
   }
 
-  @Delete(':storeId/:id')
+  @Delete(':id')
   @RequireProductPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa sản phẩm' })
@@ -169,7 +169,7 @@ export class ProductsController {
     return this.productsService.remove(storeId, id);
   }
 
-  @Patch(':storeId/:id/restore')
+  @Patch(':id/restore')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Khôi phục sản phẩm đã xóa mềm' })
@@ -184,7 +184,7 @@ export class ProductsController {
   }
 
   // Search endpoints
-  @Get(':storeId/search')
+  @Get('search')
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tìm kiếm sản phẩm' })
@@ -201,7 +201,7 @@ export class ProductsController {
     return this.productsService.searchProducts(storeId, searchDto);
   }
 
-  @Post(':storeId/filter')
+  @Post('filter')
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lọc sản phẩm nâng cao' })
@@ -218,7 +218,7 @@ export class ProductsController {
     return this.productsService.filterProducts(storeId, filterDto);
   }
 
-  @Get(':storeId/low-stock')
+  @Get('low-stock')
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách sản phẩm sắp hết hàng' })
@@ -236,7 +236,7 @@ export class ProductsController {
     return this.productsService.findLowStockProducts(storeId, page, limit);
   }
 
-  @Get(':storeId/stats')
+  @Get('stats')
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thống kê sản phẩm' })
@@ -250,7 +250,7 @@ export class ProductsController {
     return this.productsService.getProductStats(storeId);
   }
 
-  @Get(':storeId/barcode/:barcode')
+  @Get('barcode/:barcode')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tìm sản phẩm theo barcode' })
@@ -268,7 +268,7 @@ export class ProductsController {
     return this.productsService.findByBarcode(storeId, barcode);
   }
 
-  @Get(':storeId/category/:categoryId')
+  @Get('category/:categoryId')
   @RequireProductPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm theo danh mục' })
@@ -293,7 +293,7 @@ export class ProductsController {
   }
 
   // Bulk operations
-  @Post(':storeId/bulk-update')
+  @Post('bulk-update')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật hàng loạt sản phẩm' })
@@ -310,7 +310,7 @@ export class ProductsController {
     return this.productsService.bulkUpdateProducts(storeId, bulkUpdateDto);
   }
 
-  @Post(':storeId/bulk-delete')
+  @Post('bulk-delete')
   @RequireProductPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa hàng loạt sản phẩm' })
@@ -327,7 +327,7 @@ export class ProductsController {
     return this.productsService.bulkDeleteProducts(storeId, bulkDeleteDto);
   }
 
-  @Post(':storeId/bulk-stock-adjustment')
+  @Post('bulk-stock-adjustment')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Điều chỉnh tồn kho hàng loạt' })
@@ -344,7 +344,7 @@ export class ProductsController {
     return this.productsService.bulkStockAdjustment(storeId, bulkStockDto);
   }
 
-  @Patch(':storeId/:id/stock')
+  @Patch(':id/stock')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật tồn kho sản phẩm' })
@@ -370,7 +370,7 @@ export class ProductsController {
   }
 
   // Price History endpoints
-  @Get(':storeId/:id/price-history')
+  @Get(':id/price-history')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy lịch sử thay đổi giá sản phẩm' })
@@ -391,7 +391,7 @@ export class ProductsController {
   }
 
   // Advanced Reporting endpoints
-  @Get(':storeId/reports/performance')
+  @Get('reports/performance')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Báo cáo hiệu suất sản phẩm nâng cao' })
@@ -406,11 +406,11 @@ export class ProductsController {
     @Query('to') to?: string,
   ) {
     const fromDate =
-      from ||
+      from ??
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-    const toDate = to || new Date().toISOString().split('T')[0];
+    const toDate = to ?? new Date().toISOString().split('T')[0];
     return this.reportService.previewReport(
       storeId,
       'product-performance',
@@ -419,7 +419,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/reports/analytics')
+  @Get('reports/analytics')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Báo cáo phân tích sản phẩm chi tiết' })
@@ -434,11 +434,11 @@ export class ProductsController {
     @Query('to') to?: string,
   ) {
     const fromDate =
-      from ||
+      from ??
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-    const toDate = to || new Date().toISOString().split('T')[0];
+    const toDate = to ?? new Date().toISOString().split('T')[0];
     return this.reportService.previewReport(
       storeId,
       'product-analytics',
@@ -447,7 +447,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/reports/inventory-analysis')
+  @Get('reports/inventory-analysis')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Báo cáo phân tích tồn kho nâng cao' })
@@ -462,11 +462,11 @@ export class ProductsController {
     @Query('to') to?: string,
   ) {
     const fromDate =
-      from ||
+      from ??
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-    const toDate = to || new Date().toISOString().split('T')[0];
+    const toDate = to ?? new Date().toISOString().split('T')[0];
     return this.reportService.previewReport(
       storeId,
       'inventory-analysis',
@@ -475,7 +475,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/reports/price-trends')
+  @Get('reports/price-trends')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Báo cáo xu hướng thay đổi giá' })
@@ -490,11 +490,11 @@ export class ProductsController {
     @Query('to') to?: string,
   ) {
     const fromDate =
-      from ||
+      from ??
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-    const toDate = to || new Date().toISOString().split('T')[0];
+    const toDate = to ?? new Date().toISOString().split('T')[0];
     return this.reportService.previewReport(
       storeId,
       'price-trends',
@@ -503,7 +503,7 @@ export class ProductsController {
     );
   }
 
-  @Post(':storeId/reports/export')
+  @Post('reports/export')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xuất báo cáo sản phẩm' })
@@ -535,7 +535,7 @@ export class ProductsController {
   }
 
   // Inventory Analytics endpoints
-  @Post(':storeId/analytics/inventory')
+  @Post('analytics/inventory')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích tồn kho nâng cao' })
@@ -555,7 +555,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/analytics/inventory/overview')
+  @Get('analytics/inventory/overview')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tổng quan tồn kho' })
@@ -579,7 +579,7 @@ export class ProductsController {
     return this.inventoryAnalyticsService.generateOverview(storeId, filterDto);
   }
 
-  @Get(':storeId/analytics/inventory/turnover')
+  @Get('analytics/inventory/turnover')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích luân chuyển tồn kho' })
@@ -606,7 +606,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/analytics/inventory/movement')
+  @Get('analytics/inventory/movement')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích chuyển động tồn kho' })
@@ -631,7 +631,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/analytics/inventory/kpis')
+  @Get('analytics/inventory/kpis')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'KPIs tồn kho' })
@@ -658,7 +658,7 @@ export class ProductsController {
   }
 
   // Ví dụ về permission với điều kiện phức tạp
-  @Get('store/:storeId')
+  @Get('store')
   @RequirePermissions({
     resource: 'products',
     action: 'list',
@@ -682,7 +682,7 @@ export class ProductsController {
   }
 
   // Supplier Integration endpoints
-  @Get(':storeId/suppliers/:supplierId/products')
+  @Get('suppliers/:supplierId/products')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm theo nhà cung cấp' })
@@ -704,12 +704,12 @@ export class ProductsController {
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ) {
     const filterDto: SupplierProductFilterDto = {
-      page: page || 1,
-      limit: limit || 10,
+      page: page ?? 1,
+      limit: limit ?? 10,
       dateFrom,
       dateTo,
-      sortBy: sortBy || 'name',
-      sortOrder: sortOrder || 'ASC',
+      sortBy: sortBy ?? 'name',
+      sortOrder: sortOrder ?? 'ASC',
     };
     return this.supplierIntegrationService.getSupplierProducts(
       storeId,
@@ -718,7 +718,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/suppliers/performance')
+  @Get('suppliers/performance')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích hiệu suất nhà cung cấp' })
@@ -743,7 +743,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/suppliers/analytics')
+  @Get('suppliers/analytics')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Phân tích tổng quan nhà cung cấp' })
@@ -757,7 +757,7 @@ export class ProductsController {
     return this.supplierIntegrationService.getSupplierAnalytics(storeId);
   }
 
-  @Post(':storeId/suppliers/assign')
+  @Post('suppliers/assign')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Gán nhà cung cấp cho sản phẩm' })
@@ -777,7 +777,7 @@ export class ProductsController {
     );
   }
 
-  @Post(':storeId/suppliers/unassign')
+  @Post('suppliers/unassign')
   @RequireProductPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Hủy gán nhà cung cấp khỏi sản phẩm' })
@@ -797,7 +797,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/products/without-supplier')
+  @Get('products/without-supplier')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm chưa có nhà cung cấp' })
@@ -813,12 +813,12 @@ export class ProductsController {
   ) {
     return this.supplierIntegrationExtendedService.getProductsWithoutSupplier(
       storeId,
-      page || 1,
-      limit || 10,
+      page ?? 1,
+      limit ?? 10,
     );
   }
 
-  @Get(':storeId/suppliers/summary')
+  @Get('suppliers/summary')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tóm tắt nhà cung cấp với số lượng sản phẩm' })
@@ -834,7 +834,7 @@ export class ProductsController {
   }
 
   // Product Recommendations endpoints
-  @Get(':storeId/recommendations/:productId')
+  @Get('recommendations/:productId')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy gợi ý sản phẩm liên quan' })
@@ -863,8 +863,8 @@ export class ProductsController {
   ) {
     const filterDto: ProductRecommendationFilterDto = {
       productId,
-      recommendationType: recommendationType || 'similar',
-      limit: limit || 10,
+      recommendationType: recommendationType ?? 'similar',
+      limit: limit ?? 10,
       minPrice,
       maxPrice,
       inStockOnly: inStockOnly !== false,
@@ -876,7 +876,7 @@ export class ProductsController {
     );
   }
 
-  @Post(':storeId/recommendations/bulk')
+  @Post('recommendations/bulk')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy gợi ý sản phẩm cho nhiều sản phẩm' })
@@ -896,7 +896,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/recommendations/:productId/similar')
+  @Get('recommendations/:productId/similar')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm tương tự' })
@@ -914,7 +914,7 @@ export class ProductsController {
     const filterDto: ProductRecommendationFilterDto = {
       productId,
       recommendationType: 'similar',
-      limit: limit || 10,
+      limit: limit ?? 10,
     };
     return this.productRecommendationsService.getProductRecommendations(
       storeId,
@@ -922,7 +922,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/recommendations/:productId/category')
+  @Get('recommendations/:productId/category')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm cùng danh mục' })
@@ -940,7 +940,7 @@ export class ProductsController {
     const filterDto: ProductRecommendationFilterDto = {
       productId,
       recommendationType: 'category_based',
-      limit: limit || 10,
+      limit: limit ?? 10,
     };
     return this.productRecommendationsService.getProductRecommendations(
       storeId,
@@ -948,7 +948,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/recommendations/:productId/brand')
+  @Get('recommendations/:productId/brand')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm cùng thương hiệu' })
@@ -966,7 +966,7 @@ export class ProductsController {
     const filterDto: ProductRecommendationFilterDto = {
       productId,
       recommendationType: 'brand_based',
-      limit: limit || 10,
+      limit: limit ?? 10,
     };
     return this.productRecommendationsService.getProductRecommendations(
       storeId,
@@ -974,7 +974,7 @@ export class ProductsController {
     );
   }
 
-  @Get(':storeId/recommendations/:productId/price-range')
+  @Get('recommendations/:productId/price-range')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy sản phẩm cùng tầm giá' })
@@ -992,7 +992,7 @@ export class ProductsController {
     const filterDto: ProductRecommendationFilterDto = {
       productId,
       recommendationType: 'price_based',
-      limit: limit || 10,
+      limit: limit ?? 10,
     };
     return this.productRecommendationsService.getProductRecommendations(
       storeId,
@@ -1001,7 +1001,7 @@ export class ProductsController {
   }
 
   // Advanced Search endpoints
-  @Post(':storeId/search/advanced')
+  @Post('search/advanced')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tìm kiếm nâng cao với full-text search' })
@@ -1018,7 +1018,7 @@ export class ProductsController {
     return this.advancedSearchService.advancedSearch(storeId, searchDto);
   }
 
-  @Get(':storeId/search/suggestions')
+  @Get('search/suggestions')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy gợi ý tìm kiếm' })
@@ -1035,7 +1035,7 @@ export class ProductsController {
     return this.advancedSearchService.getSearchSuggestions(storeId, query);
   }
 
-  @Get(':storeId/search')
+  @Get('search')
   @RequireProductPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tìm kiếm sản phẩm với query parameters' })
@@ -1064,12 +1064,12 @@ export class ProductsController {
   ) {
     const searchDto: AdvancedSearchDto = {
       query,
-      searchType: searchType || 'simple',
+      searchType: searchType ?? 'simple',
       searchFields: searchFields ? (searchFields.split(',') as any) : ['all'],
-      page: page || 1,
-      limit: limit || 10,
-      sortBy: sortBy || 'relevance',
-      sortOrder: sortOrder || 'DESC',
+      page: page ?? 1,
+      limit: limit ?? 10,
+      sortBy: sortBy ?? 'relevance',
+      sortOrder: sortOrder ?? 'DESC',
       highlight: highlight !== false,
       categoryIds: categoryIds ? categoryIds.split(',') : undefined,
       brands: brands ? brands.split(',') : undefined,

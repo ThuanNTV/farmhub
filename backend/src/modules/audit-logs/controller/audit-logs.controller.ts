@@ -120,7 +120,7 @@ export class AuditLogsController {
     return this.service.remove(storeId, id);
   }
 
-  @Get(':storeId/search')
+  @Get('search')
   @RequireUserPermission('read')
   @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
@@ -133,7 +133,7 @@ export class AuditLogsController {
     return this.service.findWithFilters(storeId, filters);
   }
 
-  @Get(':storeId/statistics')
+  @Get('statistics')
   @RequireUserPermission('read')
   @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @RateLimitAPI()
@@ -146,7 +146,7 @@ export class AuditLogsController {
     return this.service.getStatistics(storeId, dateRange);
   }
 
-  @Get(':storeId/history/:targetTable/:targetId')
+  @Get('history/:targetTable/:targetId')
   @RequireUserPermission('read')
   @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()

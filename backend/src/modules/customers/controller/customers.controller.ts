@@ -35,7 +35,7 @@ import { CustomerFilter } from 'src/common/types/common.types';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-  @Post(':storeId')
+  @Post()
   @RequireCustomerPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo khách hàng mới' })
@@ -51,12 +51,12 @@ export class CustomersController {
     storeId: string,
     @Body()
     createCustomerDto: CreateCustomerDto,
-    p0: any,
+    _p0: any,
   ) {
     return this.customersService.createCustomer(storeId, createCustomerDto);
   }
 
-  @Get(':storeId')
+  @Get()
   @RequireCustomerPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách khách hàng' })
@@ -73,7 +73,7 @@ export class CustomersController {
     return this.customersService.findAll(storeId);
   }
 
-  @Get(':storeId/:id')
+  @Get(':id')
   @RequireCustomerPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin khách hàng theo ID' })
@@ -88,7 +88,7 @@ export class CustomersController {
     return this.customersService.findOne(storeId, id);
   }
 
-  @Patch(':storeId/:id')
+  @Patch(':id')
   @RequireCustomerPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật khách hàng' })
@@ -115,7 +115,7 @@ export class CustomersController {
     return this.customersService.update(storeId, id, dto);
   }
 
-  @Delete(':storeId/:id')
+  @Delete(':id')
   @RequireCustomerPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa khách hàng' })
@@ -126,7 +126,7 @@ export class CustomersController {
     return this.customersService.remove(storeId, id);
   }
 
-  @Patch(':storeId/:id/restore')
+  @Patch(':id/restore')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Khôi phục khách hàng đã xóa mềm' })
   @ApiResponse({ status: 200, description: 'Khôi phục thành công' })
@@ -139,7 +139,7 @@ export class CustomersController {
     return this.customersService.restore(storeId, id);
   }
 
-  @Get(':storeId/search/:keyword')
+  @Get('search/:keyword')
   @RequireCustomerPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tìm kiếm khách hàng' })
@@ -152,7 +152,7 @@ export class CustomersController {
     return this.customersService.search(storeId, keyword);
   }
 
-  @Post(':storeId/filter')
+  @Post('filter')
   @ApiOperation({ summary: 'Tìm kiếm nâng cao khách hàng' })
   @ApiResponse({ status: 200, description: 'Danh sách khách hàng' })
   filter(@Param('storeId') storeId: string, @Body() filter: CustomerFilter) {

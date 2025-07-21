@@ -40,7 +40,7 @@ export class OrdersController {
   }
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post(':storeId')
+  @Post()
   @RequireOrderPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo đơn hàng mới' })
@@ -58,7 +58,7 @@ export class OrdersController {
     return this.ordersService.createOrder(storeId, createOrderDto);
   }
 
-  @Post(':storeId/atomic')
+  @Post('atomic')
   @RequireOrderPermission('create')
   @RateLimitAPI()
   @ApiOperation({
@@ -91,7 +91,7 @@ export class OrdersController {
     );
   }
 
-  @Get(':storeId')
+  @Get()
   @RequireOrderPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách đơn hàng' })
@@ -105,7 +105,7 @@ export class OrdersController {
     return this.ordersService.findAllOrder(storeId);
   }
 
-  @Get(':storeId/:id')
+  @Get(':id')
   @RequireOrderPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin đơn hàng theo ID' })
@@ -120,7 +120,7 @@ export class OrdersController {
     return this.ordersService.findOne(storeId, id);
   }
 
-  @Patch(':storeId/:id')
+  @Patch(':id')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật đơn hàng' })
@@ -139,7 +139,7 @@ export class OrdersController {
     return this.ordersService.update(storeId, id, updateOrderDto);
   }
 
-  @Delete(':storeId/:id')
+  @Delete(':id')
   @RequireOrderPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa đơn hàng' })
@@ -150,7 +150,7 @@ export class OrdersController {
     return this.ordersService.remove(storeId, id);
   }
 
-  @Patch(':storeId/:id/restore')
+  @Patch(':id/restore')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Khôi phục đơn hàng đã xóa mềm' })
@@ -164,7 +164,7 @@ export class OrdersController {
     return this.ordersService.restore(storeId, id);
   }
 
-  @Patch(':storeId/:id/confirm')
+  @Patch(':id/confirm')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xác nhận đơn hàng' })
@@ -178,7 +178,7 @@ export class OrdersController {
     return this.ordersService.confirmOrder(storeId, id);
   }
 
-  @Patch(':storeId/:id/ship')
+  @Patch(':id/ship')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Giao hàng' })
@@ -189,7 +189,7 @@ export class OrdersController {
     return this.ordersService.shipOrder(storeId, id);
   }
 
-  @Patch(':storeId/:id/complete')
+  @Patch(':id/complete')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Hoàn thành đơn hàng' })
@@ -203,7 +203,7 @@ export class OrdersController {
     return this.ordersService.completeOrder(storeId, id);
   }
 
-  @Patch(':storeId/:id/cancel')
+  @Patch(':id/cancel')
   @RequireOrderPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Hủy đơn hàng' })
@@ -217,7 +217,7 @@ export class OrdersController {
     return this.ordersService.cancelOrder(storeId, id);
   }
 
-  @Get(':storeId/status/:status')
+  @Get('status/:status')
   @RequireOrderPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy đơn hàng theo trạng thái' })
@@ -241,7 +241,7 @@ export class OrdersController {
     );
   }
 
-  @Get(':storeId/customer/:customerId')
+  @Get('customer/:customerId')
   @RequireOrderPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy đơn hàng theo khách hàng' })

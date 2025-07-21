@@ -33,7 +33,7 @@ import { UpdateCategoryDto } from 'src/modules/categories/dto/update-category.dt
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Post(':storeId')
+  @Post()
   @RequireCategoryPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Tạo danh mục mới' })
@@ -51,7 +51,7 @@ export class CategoriesController {
     return this.categoriesService.createCategory(storeId, createCategoryDto);
   }
 
-  @Get(':storeId')
+  @Get()
   @RequireCategoryPermission('list')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh sách danh mục' })
@@ -65,7 +65,7 @@ export class CategoriesController {
     return this.categoriesService.findAll(storeId);
   }
 
-  @Get(':storeId/:id')
+  @Get(':id')
   @RequireCategoryPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo ID' })
@@ -80,7 +80,7 @@ export class CategoriesController {
     return this.categoriesService.findOne(storeId, id);
   }
 
-  @Patch(':storeId/:id')
+  @Patch(':id')
   @RequireCategoryPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Cập nhật danh mục' })
@@ -99,7 +99,7 @@ export class CategoriesController {
     return this.categoriesService.update(storeId, id, updateCategoryDto);
   }
 
-  @Delete(':storeId/:id')
+  @Delete(':id')
   @RequireCategoryPermission('delete')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Xóa danh mục' })
@@ -110,7 +110,7 @@ export class CategoriesController {
     return this.categoriesService.remove(storeId, id);
   }
 
-  @Patch(':storeId/:id/restore')
+  @Patch(':id/restore')
   @RequireCategoryPermission('update')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Khôi phục danh mục đã xóa mềm' })
@@ -124,7 +124,7 @@ export class CategoriesController {
     return this.categoriesService.restore(storeId, id);
   }
 
-  @Get(':storeId/parent/:parentId')
+  @Get('parent/:parentId')
   @RequireCategoryPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy danh mục con theo danh mục cha' })
@@ -140,7 +140,7 @@ export class CategoriesController {
     return this.categoriesService.findByParent(storeId, parentId);
   }
 
-  @Get(':storeId/tree')
+  @Get('tree')
   @RequireCategoryPermission('read')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Lấy cây danh mục lồng nhau' })

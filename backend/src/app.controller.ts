@@ -164,7 +164,7 @@ export class AppController {
   // Store manager và admin có thể truy cập
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
-  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.ADMIN_STORE, UserRole.STORE_MANAGER)
   @Get('manager-data')
   getManagerData(
     @Request() req: { user: { id: string; username: string; role: UserRole } },
@@ -177,6 +177,7 @@ export class AppController {
   @ApiBearerAuth('access-token')
   @Roles(
     UserRole.ADMIN_GLOBAL,
+    UserRole.ADMIN_STORE,
     UserRole.STORE_MANAGER,
     UserRole.STORE_STAFF,
     UserRole.VIEWER,
