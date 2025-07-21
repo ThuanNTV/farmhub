@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TenantBaseService } from 'src/core/tenant/tenant-base.service';
-import { TenantDataSourceService } from 'src/core/tenant/tenant-datasource.service';
-import { Product } from '../entity/product.entity';
+import { SelectQueryBuilder } from 'typeorm';
 import { InventoryTransfer } from 'src/entities/tenant/inventory_transfer.entity';
 import { InventoryTransferItem } from 'src/entities/tenant/inventory_transfer_item.entity';
 import {
@@ -15,10 +13,14 @@ import {
   CategoryInventoryDto,
   InventoryKPIDto,
 } from '../dto/inventory-analytics.dto';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { Product } from 'src/entities/tenant/product.entity';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class InventoryAnalyticsService extends TenantBaseService<Product> {
-  private readonly logger = new Logger(InventoryAnalyticsService.name);
+  protected readonly logger = new Logger(InventoryAnalyticsService.name);
+  protected primaryKey = 'product_id';
 
   constructor(
     protected readonly tenantDataSourceService: TenantDataSourceService,
@@ -202,7 +204,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
         .limit(50)
         .getMany();
 
-      return products.map((product, index) => {
+      return products.map((product) => {
         // Simplified calculations - would need actual sales and movement data
         const soldQuantity = Math.floor(Math.random() * 1000) + 100;
         const transferredQuantity = Math.floor(Math.random() * 200) + 20;
@@ -221,7 +223,8 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
         return {
           productId: product.product_id,
           productName: product.name,
-          sku: product.sku,
+          // sku: product.sku,
+          barcode: product.barcode,
           category: product.category_id,
           currentStock: product.stock,
           averageStock,
@@ -250,18 +253,18 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
    * @param filterDto - Analytics filters
    * @returns Inventory movement data
    */
-  async generateMovementAnalysis(
+  generateMovementAnalysis(
     storeId: string,
     filterDto: InventoryAnalyticsFilterDto,
-  ): Promise<InventoryMovementDto[]> {
+  ): InventoryMovementDto[] {
     try {
       // This would typically analyze actual stock movements from transaction logs
       // For now, generating sample data based on the time period
       const movements: InventoryMovementDto[] = [];
       const startDate = new Date(
-        filterDto.dateFrom || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        filterDto.dateFrom ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       );
-      const endDate = new Date(filterDto.dateTo || new Date());
+      const endDate = new Date(filterDto.dateTo ?? new Date());
 
       let currentDate = new Date(startDate);
       let runningStock = 2000;
@@ -352,7 +355,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
           0,
         );
         const totalValue = items.reduce(
-          (sum, item) => sum + item.quantity * (item.unit_price || 0),
+          (sum, item) => sum + item.quantity * (item.unit_price ?? 0),
           0,
         );
 
@@ -401,7 +404,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
     filterDto: InventoryAnalyticsFilterDto,
   ): Promise<InventoryTrendsDto> {
     try {
-      const groupBy = filterDto.groupBy || 'month';
+      const groupBy = filterDto.groupBy ?? 'month';
 
       // Stock trends (simplified)
       const stockTrends = await this.getStockTrends(
@@ -603,6 +606,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
   }
 
   // Helper methods
+  // eslint-disable-next-line @typescript-eslint/require-await
   private async getStockTrends(
     storeId: string,
     filterDto: InventoryAnalyticsFilterDto,
@@ -637,6 +641,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
     ];
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   private async getTurnoverTrends(
     storeId: string,
     filterDto: InventoryAnalyticsFilterDto,
@@ -669,12 +674,12 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
   }
 
   private async getTransferTrends(
-    storeId: string,
-    filterDto: InventoryAnalyticsFilterDto,
-    groupBy: string,
+    _storeId: string,
+    _filterDto: InventoryAnalyticsFilterDto,
+    _groupBy: string,
   ): Promise<any[]> {
     // Simplified implementation
-    return [
+    return Promise.resolve([
       {
         period: '2024-01',
         transferCount: 25,
@@ -696,15 +701,15 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
         totalValue: 2000000,
         averageProcessingTime: 24.8,
       },
-    ];
+    ]);
   }
 
   private async generateStockForecast(
-    storeId: string,
-    filterDto: InventoryAnalyticsFilterDto,
+    _storeId: string,
+    _filterDto: InventoryAnalyticsFilterDto,
   ): Promise<any[]> {
     // Simplified implementation
-    return [
+    return Promise.resolve([
       {
         period: '2024-04',
         predictedStock: 2450,
@@ -723,11 +728,11 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
         predictedValue: 3437500,
         confidence: 75,
       },
-    ];
+    ]);
   }
 
   private applyBaseFilters(
-    queryBuilder: any,
+    queryBuilder: SelectQueryBuilder<Product>,
     filterDto: InventoryAnalyticsFilterDto,
   ): void {
     if (!filterDto.includeDeleted) {
@@ -785,11 +790,11 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
     days: number;
   } {
     const from =
-      filterDto.dateFrom ||
+      filterDto.dateFrom ??
       new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-    const to = filterDto.dateTo || new Date().toISOString().split('T')[0];
+    const to = filterDto.dateTo ?? new Date().toISOString().split('T')[0];
     const days = Math.ceil(
       (new Date(to).getTime() - new Date(from).getTime()) /
         (1000 * 60 * 60 * 24),

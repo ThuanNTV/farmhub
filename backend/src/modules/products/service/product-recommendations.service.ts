@@ -15,7 +15,8 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 
 @Injectable()
 export class ProductRecommendationsService extends TenantBaseService<Product> {
-  private readonly logger = new Logger(ProductRecommendationsService.name);
+  protected readonly logger = new Logger(ProductRecommendationsService.name);
+  protected primaryKey = 'product_id';
 
   constructor(
     protected readonly tenantDataSourceService: TenantDataSourceService,

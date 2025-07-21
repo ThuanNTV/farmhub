@@ -66,7 +66,13 @@ export class ProductVariant {
   @Column({ type: 'int', name: 'min_stock_level', default: 0 })
   min_stock_level!: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 3, name: 'weight', nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 3,
+    name: 'weight',
+    nullable: true,
+  })
   weight?: number;
 
   @Column({ type: 'varchar', length: 50, name: 'weight_unit', nullable: true })

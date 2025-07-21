@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuditLogAsyncService } from '../../../../src/common/audit/audit-log-async.service';
-import { AuditLogQueueService } from '../../../../src/common/queue/audit-log-queue.service';
+import {
+  AuditLogQueueService,
+  AuditLogJobData,
+} from '../../../../src/common/queue/audit-log-queue.service';
 
 describe('AuditLogAsyncService', () => {
   let service: AuditLogAsyncService;
@@ -85,49 +88,47 @@ describe('AuditLogAsyncService', () => {
     expect(auditLogQueueService.addCriticalAuditLog).toHaveBeenCalled();
   });
 
-  it('should call addCriticalAuditLog on logLogin', async () => {
-    await service.logLogin('u1', 'user', 'ip', 'agent', {
-      details: { foo: 1 },
+  it('logLogin nên gọi addCriticalAuditLog với dữ liệu đúng', async () => {
+    await service.logLogin('u1', 'user', 'store1', 'ip', 'agent', {
+      details: JSON.stringify({ foo: 1 }),
     });
-    expect(auditLogQueueService.addCriticalAuditLog).toHaveBeenCalled();
+    expect(auditLogQueueService.addCriticalAuditLog).toHaveBeenCalledTimes(1);
   });
 
-  it('should call addCriticalAuditLog on logLogout', async () => {
-    await service.logLogout('u1', 'user', 'ip', 'agent', {
-      details: { bar: 2 },
+  it('logLogout nên gọi addCriticalAuditLog với dữ liệu đúng', async () => {
+    await service.logLogout('u1', 'user', 'store1', 'ip', 'agent', {
+      details: JSON.stringify({ bar: 2 }),
     });
-    expect(auditLogQueueService.addCriticalAuditLog).toHaveBeenCalled();
+    expect(auditLogQueueService.addCriticalAuditLog).toHaveBeenCalledTimes(1);
   });
 
-  it('should call addBulkAuditLogs on logBulkActions', async () => {
-    auditLogQueueService.addBulkAuditLogs = jest.fn();
-    const arr = [
+  it('logBulkActions nên gọi addBulkAuditLogs', async () => {
+    const auditData: AuditLogJobData[] = [
       {
         userId: 'u1',
-        userName: 'user',
-        action: 'A',
-        resource: 'R',
-        resourceId: 'id',
-        newValue: 1,
+        action: 'a1',
+        targetTable: 't1',
+        targetId: 't1_id',
+        storeId: 's1',
       },
       {
         userId: 'u2',
-        userName: 'user2',
-        action: 'B',
-        resource: 'R2',
-        resourceId: 'id2',
-        newValue: 2,
-        timestamp: new Date(),
+        action: 'a2',
+        targetTable: 't2',
+        targetId: 't2_id',
+        storeId: 's2',
       },
     ];
-    await service.logBulkActions(arr as any);
-    expect(auditLogQueueService.addBulkAuditLogs).toHaveBeenCalled();
-    const calledArg = auditLogQueueService.addBulkAuditLogs.mock.calls[0][0];
-    expect(calledArg[0].timestamp).toBeDefined();
-    expect(calledArg[1].timestamp).toBeDefined();
+    await service.logBulkActions(auditData);
+    expect(auditLogQueueService.addBulkAuditLogs).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: 'u1' }),
+        expect.objectContaining({ userId: 'u2' }),
+      ]),
+    );
   });
 
-  it('should call getQueueStatus', async () => {
+  it('getQueueStatus nên gọi getQueueStatus của queue service', async () => {
     auditLogQueueService.getQueueStatus = jest.fn().mockResolvedValue('ok');
     const result = await service.getQueueStatus();
     expect(auditLogQueueService.getQueueStatus).toHaveBeenCalled();

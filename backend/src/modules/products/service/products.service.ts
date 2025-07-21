@@ -955,7 +955,7 @@ export class ProductsService extends TenantBaseService<Product> {
               action: 'BULK_UPDATE',
               resource: 'Product',
               resourceId: productUpdate.productId,
-              changes: productUpdate,
+              changes: productUpdate as unknown as Record<string, unknown>,
             },
           });
         } catch (error) {

@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -1075,5 +1077,16 @@ export class ProductsController {
       maxPrice,
     };
     return this.advancedSearchService.advancedSearch(storeId, searchDto);
+  }
+
+  @Get('report')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Generate a product report' })
+  async generateProductReport(
+    @Param('storeId') storeId: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    return this.reportService.exportReport(storeId, 'products', from, to);
   }
 }

@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateProductVariantsTables1700000000003 implements MigrationInterface {
+export class CreateProductVariantsTables1700000000003
+  implements MigrationInterface
+{
   name = 'CreateProductVariantsTables1700000000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -81,19 +83,37 @@ export class CreateProductVariantsTables1700000000003 implements MigrationInterf
     `);
 
     // Create indexes for product_attribute
-    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_product_attribute_name" ON "product_attribute" ("name") WHERE "is_deleted" = false`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_attribute_type" ON "product_attribute" ("type")`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_attribute_active_deleted" ON "product_attribute" ("is_active", "is_deleted")`);
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "IDX_product_attribute_name" ON "product_attribute" ("name") WHERE "is_deleted" = false`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_attribute_type" ON "product_attribute" ("type")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_attribute_active_deleted" ON "product_attribute" ("is_active", "is_deleted")`,
+    );
 
     // Create indexes for product_variant
-    await queryRunner.query(`CREATE INDEX "IDX_product_variant_product_id" ON "product_variant" ("product_id")`);
-    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_product_variant_sku" ON "product_variant" ("sku") WHERE "is_deleted" = false`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_variant_active_deleted" ON "product_variant" ("is_active", "is_deleted")`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_variant_product_id" ON "product_variant" ("product_id")`,
+    );
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "IDX_product_variant_sku" ON "product_variant" ("sku") WHERE "is_deleted" = false`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_variant_active_deleted" ON "product_variant" ("is_active", "is_deleted")`,
+    );
 
     // Create indexes for product_variant_attribute
-    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_product_variant_attribute_unique" ON "product_variant_attribute" ("variant_id", "attribute_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_variant_attribute_variant_id" ON "product_variant_attribute" ("variant_id")`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_variant_attribute_attribute_id" ON "product_variant_attribute" ("attribute_id")`);
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "IDX_product_variant_attribute_unique" ON "product_variant_attribute" ("variant_id", "attribute_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_variant_attribute_variant_id" ON "product_variant_attribute" ("variant_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_variant_attribute_attribute_id" ON "product_variant_attribute" ("attribute_id")`,
+    );
 
     // Create foreign key constraints
     await queryRunner.query(`
@@ -135,18 +155,32 @@ export class CreateProductVariantsTables1700000000003 implements MigrationInterf
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign key constraints
-    await queryRunner.query(`ALTER TABLE "product_variant_attribute" DROP CONSTRAINT "FK_product_variant_attribute_attribute"`);
-    await queryRunner.query(`ALTER TABLE "product_variant_attribute" DROP CONSTRAINT "FK_product_variant_attribute_variant"`);
-    await queryRunner.query(`ALTER TABLE "product_variant" DROP CONSTRAINT "FK_product_variant_product"`);
+    await queryRunner.query(
+      `ALTER TABLE "product_variant_attribute" DROP CONSTRAINT "FK_product_variant_attribute_attribute"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "product_variant_attribute" DROP CONSTRAINT "FK_product_variant_attribute_variant"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "product_variant" DROP CONSTRAINT "FK_product_variant_product"`,
+    );
 
     // Drop indexes
-    await queryRunner.query(`DROP INDEX "IDX_product_variant_attribute_attribute_id"`);
-    await queryRunner.query(`DROP INDEX "IDX_product_variant_attribute_variant_id"`);
-    await queryRunner.query(`DROP INDEX "IDX_product_variant_attribute_unique"`);
+    await queryRunner.query(
+      `DROP INDEX "IDX_product_variant_attribute_attribute_id"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "IDX_product_variant_attribute_variant_id"`,
+    );
+    await queryRunner.query(
+      `DROP INDEX "IDX_product_variant_attribute_unique"`,
+    );
     await queryRunner.query(`DROP INDEX "IDX_product_variant_active_deleted"`);
     await queryRunner.query(`DROP INDEX "IDX_product_variant_sku"`);
     await queryRunner.query(`DROP INDEX "IDX_product_variant_product_id"`);
-    await queryRunner.query(`DROP INDEX "IDX_product_attribute_active_deleted"`);
+    await queryRunner.query(
+      `DROP INDEX "IDX_product_attribute_active_deleted"`,
+    );
     await queryRunner.query(`DROP INDEX "IDX_product_attribute_type"`);
     await queryRunner.query(`DROP INDEX "IDX_product_attribute_name"`);
 

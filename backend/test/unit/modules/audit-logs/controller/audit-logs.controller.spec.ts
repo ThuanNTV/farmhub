@@ -34,6 +34,7 @@ describe('AuditLogsController', () => {
     action: 'CREATE',
     targetTable: 'products',
     targetId: 'product-123',
+    storeId: 'store-123', // Added missing property
     metadata: {
       action: 'CREATE',
       resource: 'products',
@@ -51,6 +52,7 @@ describe('AuditLogsController', () => {
     action: 'CREATE',
     targetTable: 'products',
     targetId: 'product-123',
+    storeId: 'store-123', // Added missing property
     metadata: {
       action: 'CREATE',
       resource: 'products',

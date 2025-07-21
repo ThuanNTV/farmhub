@@ -22,7 +22,9 @@ export class ProductVariantAttribute {
   @Column({ type: 'varchar', length: 255, name: 'variant_id' })
   variant_id!: string;
 
-  @ManyToOne(() => ProductVariant, (variant) => variant.attributes, { nullable: false })
+  @ManyToOne(() => ProductVariant, (variant) => variant.attributes, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'variant_id' })
   variant!: ProductVariant;
 
@@ -36,7 +38,12 @@ export class ProductVariantAttribute {
   @Column({ type: 'varchar', length: 500, name: 'value' })
   value!: string;
 
-  @Column({ type: 'varchar', length: 100, name: 'display_value', nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'display_value',
+    nullable: true,
+  })
   display_value?: string;
 
   @Column({ type: 'int', name: 'sort_order', default: 0 })

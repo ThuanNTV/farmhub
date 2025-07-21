@@ -9,11 +9,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ProductVariantsService } from '../service/product-variants.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { RateLimitAPI } from 'src/common/decorators/rate-limit.decorator';
-import { RequireProductPermission } from 'src/common/decorators/require-product-permission.decorator';
 import {
   CreateProductVariantDto,
   UpdateProductVariantDto,
@@ -23,13 +25,18 @@ import {
   ProductWithVariantsResponseDto,
   VariantFilterDto,
 } from '../dto/product-variants.dto';
+import { JwtAuthGuard } from 'src/common/auth/jwt-auth.guard';
+import { RequireProductPermission } from 'src/core/rbac/permission/permissions.decorator';
+import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 
 @ApiTags('Product Variants')
 @Controller('tenant/:storeId/products')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ProductVariantsController {
-  constructor(private readonly productVariantsService: ProductVariantsService) {}
+  constructor(
+    private readonly productVariantsService: ProductVariantsService,
+  ) {}
 
   // Product Attributes endpoints
   @Post(':storeId/attributes')
@@ -102,7 +109,10 @@ export class ProductVariantsController {
     @Param('storeId') storeId: string,
     @Param('productId') productId: string,
   ) {
-    return this.productVariantsService.getProductWithVariants(storeId, productId);
+    return this.productVariantsService.getProductWithVariants(
+      storeId,
+      productId,
+    );
   }
 
   @Get(':storeId/variants')
@@ -167,7 +177,11 @@ export class ProductVariantsController {
     @Param('variantId') variantId: string,
     @Body() updateDto: UpdateProductVariantDto,
   ) {
-    return this.productVariantsService.updateVariant(storeId, variantId, updateDto);
+    return this.productVariantsService.updateVariant(
+      storeId,
+      variantId,
+      updateDto,
+    );
   }
 
   @Delete(':storeId/variants/:variantId')
@@ -203,10 +217,13 @@ export class ProductVariantsController {
     @Param('productId') productId: string,
     @Body() createDtos: CreateProductVariantDto[],
   ) {
-    const results = [];
+    const results: ProductVariantResponseDto[] = [];
     for (const createDto of createDtos) {
       createDto.productId = productId;
-      const variant = await this.productVariantsService.createVariant(storeId, createDto);
+      const variant = await this.productVariantsService.createVariant(
+        storeId,
+        createDto,
+      );
       results.push(variant);
     }
     return results;
@@ -224,9 +241,10 @@ export class ProductVariantsController {
   @ApiResponse({ status: 403, description: 'Không có quyền cập nhật' })
   async updateVariantsBulk(
     @Param('storeId') storeId: string,
-    @Body() updates: Array<{ variantId: string; data: UpdateProductVariantDto }>,
+    @Body()
+    updates: Array<{ variantId: string; data: UpdateProductVariantDto }>,
   ) {
-    const results = [];
+    const results: ProductVariantResponseDto[] = [];
     for (const update of updates) {
       const variant = await this.productVariantsService.updateVariant(
         storeId,
@@ -271,12 +289,16 @@ export class ProductVariantsController {
   generateVariants(
     @Param('storeId') storeId: string,
     @Param('productId') productId: string,
-    @Body() generateDto: {
+    @Body()
+    generateDto: {
       attributes: Array<{
         attributeId: string;
         values: Array<{ value: string; displayValue?: string }>;
       }>;
-      baseVariant: Omit<CreateProductVariantDto, 'productId' | 'attributes' | 'sku' | 'name'>;
+      baseVariant: Omit<
+        CreateProductVariantDto,
+        'productId' | 'attributes' | 'sku' | 'name'
+      >;
     },
   ) {
     // This would implement automatic variant generation logic

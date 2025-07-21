@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber, IsEnum, IsArray, Min, Max, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsArray,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ProductRecommendationFilterDto {
@@ -7,17 +16,43 @@ export class ProductRecommendationFilterDto {
   @IsString()
   productId!: string;
 
-  @ApiProperty({ 
-    description: 'Loại gợi ý', 
-    enum: ['similar', 'related', 'frequently_bought_together', 'price_based', 'category_based', 'brand_based'],
+  @ApiProperty({
+    description: 'Loại gợi ý',
+    enum: [
+      'similar',
+      'related',
+      'frequently_bought_together',
+      'price_based',
+      'category_based',
+      'brand_based',
+    ],
     required: false,
-    default: 'similar'
+    default: 'similar',
   })
   @IsOptional()
-  @IsEnum(['similar', 'related', 'frequently_bought_together', 'price_based', 'category_based', 'brand_based'])
-  recommendationType?: 'similar' | 'related' | 'frequently_bought_together' | 'price_based' | 'category_based' | 'brand_based' = 'similar';
+  @IsEnum([
+    'similar',
+    'related',
+    'frequently_bought_together',
+    'price_based',
+    'category_based',
+    'brand_based',
+  ])
+  recommendationType?:
+    | 'similar'
+    | 'related'
+    | 'frequently_bought_together'
+    | 'price_based'
+    | 'category_based'
+    | 'brand_based' = 'similar';
 
-  @ApiProperty({ description: 'Số lượng gợi ý', required: false, minimum: 1, maximum: 50, default: 10 })
+  @ApiProperty({
+    description: 'Số lượng gợi ý',
+    required: false,
+    minimum: 1,
+    maximum: 50,
+    default: 10,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -25,42 +60,70 @@ export class ProductRecommendationFilterDto {
   @Max(50)
   limit?: number = 10;
 
-  @ApiProperty({ description: 'Khoảng giá tối thiểu', required: false, minimum: 0 })
+  @ApiProperty({
+    description: 'Khoảng giá tối thiểu',
+    required: false,
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   minPrice?: number;
 
-  @ApiProperty({ description: 'Khoảng giá tối đa', required: false, minimum: 0 })
+  @ApiProperty({
+    description: 'Khoảng giá tối đa',
+    required: false,
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   maxPrice?: number;
 
-  @ApiProperty({ description: 'Chỉ sản phẩm có sẵn', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm có sẵn',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   inStockOnly?: boolean = true;
 
-  @ApiProperty({ description: 'Chỉ sản phẩm đang hoạt động', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm đang hoạt động',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   activeOnly?: boolean = true;
 
-  @ApiProperty({ description: 'Loại trừ sản phẩm gốc', required: false, default: true })
+  @ApiProperty({
+    description: 'Loại trừ sản phẩm gốc',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   excludeOriginal?: boolean = true;
 
-  @ApiProperty({ description: 'Danh sách ID danh mục để lọc', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID danh mục để lọc',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   categoryIds?: string[];
 
-  @ApiProperty({ description: 'Danh sách thương hiệu để lọc', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách thương hiệu để lọc',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -77,10 +140,16 @@ export class RecommendedProductDto {
   @ApiProperty({ description: 'Mã sản phẩm', example: 'NPK-002' })
   productCode!: string;
 
-  @ApiProperty({ description: 'Slug sản phẩm', example: 'phan-bon-npk-16-16-8' })
+  @ApiProperty({
+    description: 'Slug sản phẩm',
+    example: 'phan-bon-npk-16-16-8',
+  })
   slug!: string;
 
-  @ApiProperty({ description: 'Mô tả sản phẩm', example: 'Phân bón NPK chất lượng cao' })
+  @ApiProperty({
+    description: 'Mô tả sản phẩm',
+    example: 'Phân bón NPK chất lượng cao',
+  })
   description!: string;
 
   @ApiProperty({ description: 'ID danh mục', example: 'cat-001' })
@@ -107,13 +176,19 @@ export class RecommendedProductDto {
   @ApiProperty({ description: 'Hình ảnh', example: '{"url": "image.jpg"}' })
   images?: string;
 
-  @ApiProperty({ description: 'Thông số kỹ thuật', example: '{"N": "16%", "P": "16%", "K": "8%"}' })
+  @ApiProperty({
+    description: 'Thông số kỹ thuật',
+    example: '{"N": "16%", "P": "16%", "K": "8%"}',
+  })
   specs?: string;
 
   @ApiProperty({ description: 'Điểm tương đồng', example: 0.85 })
   similarityScore!: number;
 
-  @ApiProperty({ description: 'Lý do gợi ý', example: 'Cùng danh mục và thương hiệu' })
+  @ApiProperty({
+    description: 'Lý do gợi ý',
+    example: 'Cùng danh mục và thương hiệu',
+  })
   recommendationReason!: string;
 
   @ApiProperty({ description: 'Trạng thái hoạt động', example: true })
@@ -124,10 +199,16 @@ export class RecommendedProductDto {
 }
 
 export class ProductRecommendationsResponseDto {
-  @ApiProperty({ description: 'Thông tin sản phẩm gốc', type: RecommendedProductDto })
+  @ApiProperty({
+    description: 'Thông tin sản phẩm gốc',
+    type: RecommendedProductDto,
+  })
   originalProduct!: RecommendedProductDto;
 
-  @ApiProperty({ description: 'Danh sách sản phẩm gợi ý', type: [RecommendedProductDto] })
+  @ApiProperty({
+    description: 'Danh sách sản phẩm gợi ý',
+    type: [RecommendedProductDto],
+  })
   recommendations!: RecommendedProductDto[];
 
   @ApiProperty({ description: 'Loại gợi ý được sử dụng', example: 'similar' })
@@ -136,7 +217,10 @@ export class ProductRecommendationsResponseDto {
   @ApiProperty({ description: 'Tổng số gợi ý', example: 8 })
   totalRecommendations!: number;
 
-  @ApiProperty({ description: 'Thời gian tạo gợi ý', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo gợi ý',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 
   @ApiProperty({ description: 'Metadata gợi ý' })
@@ -152,7 +236,10 @@ export class RecommendationAlgorithmDto {
   @ApiProperty({ description: 'Tên thuật toán', example: 'content_based' })
   name!: string;
 
-  @ApiProperty({ description: 'Mô tả thuật toán', example: 'Gợi ý dựa trên nội dung sản phẩm' })
+  @ApiProperty({
+    description: 'Mô tả thuật toán',
+    example: 'Gợi ý dựa trên nội dung sản phẩm',
+  })
   description!: string;
 
   @ApiProperty({ description: 'Trọng số các yếu tố' })
@@ -174,17 +261,43 @@ export class BulkRecommendationRequestDto {
   @IsString({ each: true })
   productIds!: string[];
 
-  @ApiProperty({ 
-    description: 'Loại gợi ý', 
-    enum: ['similar', 'related', 'frequently_bought_together', 'price_based', 'category_based', 'brand_based'],
+  @ApiProperty({
+    description: 'Loại gợi ý',
+    enum: [
+      'similar',
+      'related',
+      'frequently_bought_together',
+      'price_based',
+      'category_based',
+      'brand_based',
+    ],
     required: false,
-    default: 'similar'
+    default: 'similar',
   })
   @IsOptional()
-  @IsEnum(['similar', 'related', 'frequently_bought_together', 'price_based', 'category_based', 'brand_based'])
-  recommendationType?: 'similar' | 'related' | 'frequently_bought_together' | 'price_based' | 'category_based' | 'brand_based' = 'similar';
+  @IsEnum([
+    'similar',
+    'related',
+    'frequently_bought_together',
+    'price_based',
+    'category_based',
+    'brand_based',
+  ])
+  recommendationType?:
+    | 'similar'
+    | 'related'
+    | 'frequently_bought_together'
+    | 'price_based'
+    | 'category_based'
+    | 'brand_based' = 'similar';
 
-  @ApiProperty({ description: 'Số lượng gợi ý cho mỗi sản phẩm', required: false, minimum: 1, maximum: 20, default: 5 })
+  @ApiProperty({
+    description: 'Số lượng gợi ý cho mỗi sản phẩm',
+    required: false,
+    minimum: 1,
+    maximum: 20,
+    default: 5,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -192,7 +305,11 @@ export class BulkRecommendationRequestDto {
   @Max(20)
   limitPerProduct?: number = 5;
 
-  @ApiProperty({ description: 'Chỉ sản phẩm có sẵn', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm có sẵn',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   inStockOnly?: boolean = true;
@@ -210,24 +327,33 @@ export class BulkRecommendationResponseDto {
     processingTime: number;
   };
 
-  @ApiProperty({ description: 'Thời gian tạo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 
 export class RecommendationAnalyticsDto {
   @ApiProperty({ description: 'Thống kê theo loại gợi ý' })
-  byType!: Record<string, {
-    count: number;
-    averageScore: number;
-    topProducts: string[];
-  }>;
+  byType!: Record<
+    string,
+    {
+      count: number;
+      averageScore: number;
+      topProducts: string[];
+    }
+  >;
 
   @ApiProperty({ description: 'Thống kê theo danh mục' })
-  byCategory!: Record<string, {
-    count: number;
-    averageScore: number;
-    topBrands: string[];
-  }>;
+  byCategory!: Record<
+    string,
+    {
+      count: number;
+      averageScore: number;
+      topBrands: string[];
+    }
+  >;
 
   @ApiProperty({ description: 'Hiệu suất thuật toán' })
   performance!: {
@@ -237,7 +363,10 @@ export class RecommendationAnalyticsDto {
     uniqueProducts: number;
   };
 
-  @ApiProperty({ description: 'Thời gian tạo báo cáo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo báo cáo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 
@@ -246,7 +375,10 @@ export class CustomRecommendationRuleDto {
   @IsString()
   ruleName!: string;
 
-  @ApiProperty({ description: 'Mô tả quy tắc', example: 'Gợi ý sản phẩm theo mùa' })
+  @ApiProperty({
+    description: 'Mô tả quy tắc',
+    example: 'Gợi ý sản phẩm theo mùa',
+  })
   @IsString()
   description!: string;
 

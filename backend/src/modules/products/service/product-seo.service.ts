@@ -97,34 +97,24 @@ export class ProductSeoService {
         seoRecord.schema_markup = seoDto.schemaMarkup;
 
       // Generate automatic SEO data if not provided
-      if (!seoRecord.seo_title) {
-        seoRecord.seo_title = this.generateSeoTitle(product);
-      }
+      seoRecord.seo_title ??= this.generateSeoTitle(product);
 
-      if (!seoRecord.seo_description) {
-        seoRecord.seo_description = this.generateSeoDescription(product);
-      }
+      seoRecord.seo_description ??= this.generateSeoDescription(product);
 
       if (!seoRecord.seo_keywords || seoRecord.seo_keywords.length === 0) {
         seoRecord.seo_keywords = this.generateSeoKeywords(product);
       }
 
-      if (!seoRecord.canonical_url) {
-        seoRecord.canonical_url = this.generateCanonicalUrl(
-          storeId,
-          product.slug,
-        );
-      }
+      seoRecord.canonical_url ??= this.generateCanonicalUrl(
+        storeId,
+        product.slug,
+      );
 
       // Generate structured data
-      if (!seoRecord.structured_data) {
-        seoRecord.structured_data = await this.generateStructuredData(product);
-      }
+      seoRecord.structured_data ??= this.generateStructuredData(product);
 
       // Generate schema markup
-      if (!seoRecord.schema_markup) {
-        seoRecord.schema_markup = await this.generateSchemaMarkup(product);
-      }
+      seoRecord.schema_markup ??= this.generateSchemaMarkup(product);
 
       // Perform SEO analysis
       const seoAnalysis = await this.analyzeSeo(product, seoRecord);
@@ -138,11 +128,12 @@ export class ProductSeoService {
         action: 'UPDATE_PRODUCT_SEO',
         targetTable: 'ProductSeo',
         targetId: savedSeo.seo_id,
+        storeId,
         metadata: {
           action: 'UPDATE_PRODUCT_SEO',
           resource: 'ProductSeo',
           resourceId: savedSeo.seo_id,
-          changes: seoDto,
+          changes: seoDto as Record<string, unknown>,
         },
       });
 
@@ -310,7 +301,7 @@ export class ProductSeoService {
         `Bulk updating SEO for ${updates.length} products in store: ${storeId}`,
       );
 
-      const results = [];
+      const results: ProductSeoResponseDto[] = [];
       for (const update of updates) {
         const result = await this.updateProductSeo(
           storeId,
@@ -364,7 +355,7 @@ export class ProductSeoService {
    * @returns SEO keywords
    */
   private generateSeoKeywords(product: Product): string[] {
-    const keywords = [];
+    const keywords: string[] = [];
 
     // Add product name words
     keywords.push(
@@ -380,7 +371,7 @@ export class ProductSeoService {
     }
 
     // Add category
-    if (product.category?.name) {
+    if (product.category.name) {
       keywords.push(
         ...product.category.name
           .toLowerCase()
@@ -446,22 +437,30 @@ export class ProductSeoService {
         metaRobots: seoRecord.meta_robots,
         hreflangTags: seoRecord.hreflang_tags,
         customMetaTags: seoRecord.custom_meta_tags,
-        openGraph: seoRecord.open_graph_data,
+        openGraph: seoRecord.open_graph_data
+          ? {
+              ...seoRecord.open_graph_data,
+              type: seoRecord.open_graph_data.type as OpenGraphType,
+            }
+          : undefined,
         twitterCard: seoRecord.twitter_card_data,
-        structuredData: seoRecord.structured_data,
+        structuredData: seoRecord.structured_data?.map((item) => ({
+          ...item,
+          '@type': item['@type'] as StructuredDataType,
+        })),
         schemaMarkup: seoRecord.schema_markup,
       },
-      seoAnalysis: seoRecord.seo_analysis,
+      seoAnalysis: seoRecord.seo_analysis as SeoAnalysisDto,
       canonicalUrl:
-        seoRecord.canonical_url ||
+        seoRecord.canonical_url ??
         this.generateCanonicalUrl('', seoRecord.slug),
       sitemapEntry: {
         url:
-          seoRecord.canonical_url ||
+          seoRecord.canonical_url ??
           this.generateCanonicalUrl('', seoRecord.slug),
         lastModified: seoRecord.updated_at,
-        changeFreq: seoRecord.sitemap_change_freq || 'weekly',
-        priority: seoRecord.sitemap_priority || 0.8,
+        changeFreq: seoRecord.sitemap_change_freq ?? 'weekly',
+        priority: seoRecord.sitemap_priority ?? 0.8,
         images: seoRecord.sitemap_images,
       },
       updatedAt: seoRecord.updated_at,
@@ -473,8 +472,8 @@ export class ProductSeoService {
    * @param product - Product entity
    * @returns Structured data array
    */
-  private async generateStructuredData(product: Product): Promise<any[]> {
-    const structuredData = [];
+  private generateStructuredData(product: Product): any[] {
+    const structuredData: any[] = [];
 
     // Product schema
     structuredData.push({
@@ -487,7 +486,7 @@ export class ProductSeoService {
         brand: product.brand
           ? { '@type': 'Brand', name: product.brand }
           : undefined,
-        category: product.category?.name,
+        category: product.category.name,
         image: this.extractImageUrls(product.images),
         offers: {
           '@type': 'Offer',
@@ -513,9 +512,7 @@ export class ProductSeoService {
    * @param product - Product entity
    * @returns Schema markup object
    */
-  private async generateSchemaMarkup(
-    product: Product,
-  ): Promise<Record<string, any>> {
+  private generateSchemaMarkup(product: Product): Record<string, any> {
     return {
       '@context': 'https://schema.org',
       '@type': 'Product',
@@ -525,7 +522,7 @@ export class ProductSeoService {
       brand: product.brand
         ? { '@type': 'Brand', name: product.brand }
         : undefined,
-      category: product.category?.name,
+      category: product.category.name,
       image: this.extractImageUrls(product.images),
       offers: {
         '@type': 'Offer',
@@ -549,23 +546,20 @@ export class ProductSeoService {
    * @param seoRecord - SEO record
    * @returns SEO analysis
    */
-  private async analyzeSeo(
-    product: Product,
-    seoRecord: ProductSeo,
-  ): Promise<any> {
+  private analyzeSeo(product: Product, seoRecord: ProductSeo): any {
     const analysis = {
       overallScore: 0,
-      titleAnalysis: this.analyzeSeoTitle(seoRecord.seo_title || ''),
+      titleAnalysis: this.analyzeSeoTitle(seoRecord.seo_title ?? ''),
       descriptionAnalysis: this.analyzeSeoDescription(
-        seoRecord.seo_description || '',
+        seoRecord.seo_description ?? '',
       ),
       keywordAnalysis: this.analyzeSeoKeywords(
-        seoRecord.seo_keywords || [],
+        seoRecord.seo_keywords ?? [],
         product,
       ),
       imageAnalysis: this.analyzeSeoImages(product.images),
       structuredDataAnalysis: this.analyzeStructuredData(
-        seoRecord.structured_data || [],
+        seoRecord.structured_data ?? [],
       ),
       recommendations: [] as string[],
       analyzedAt: new Date(),
@@ -590,18 +584,278 @@ export class ProductSeoService {
   }
 
   /**
+   * Analyze SEO description
+   * @param description - SEO description
+   * @returns Description analysis
+   */
+  private analyzeSeoDescription(description: string): {
+    score: number;
+    length: number;
+    hasKeywords: boolean;
+    suggestions: string[];
+  } {
+    const length = description.length;
+    const hasKeywords =
+      description.toLowerCase().includes('farmhub') ||
+      description.toLowerCase().includes('nông nghiệp') ||
+      description.toLowerCase().includes('cây trồng');
+
+    let score = 0;
+    const suggestions: string[] = [];
+
+    // Length check (150-160 characters is optimal)
+    if (length >= 150 && length <= 160) {
+      score += 40;
+    } else if (length >= 120 && length < 150) {
+      score += 30;
+      suggestions.push('Mô tả hơi ngắn, nên từ 150-160 ký tự');
+    } else if (length > 160 && length <= 200) {
+      score += 30;
+      suggestions.push('Mô tả hơi dài, nên từ 150-160 ký tự');
+    } else {
+      score += 10;
+      suggestions.push('Mô tả không tối ưu, nên từ 150-160 ký tự');
+    }
+
+    // Keywords check
+    if (hasKeywords) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm từ khóa chính vào mô tả');
+    }
+
+    // Call-to-action check
+    if (
+      description.toLowerCase().includes('mua ngay') ||
+      description.toLowerCase().includes('đặt hàng') ||
+      description.toLowerCase().includes('liên hệ')
+    ) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm lời kêu gọi hành động vào mô tả');
+    }
+
+    return { score, length, hasKeywords, suggestions };
+  }
+
+  /**
+   * Analyze SEO keywords
+   * @param keywords - SEO keywords array
+   * @param product - Product entity
+   * @returns Keywords analysis
+   */
+  private analyzeSeoKeywords(
+    keywords: string[],
+    _product: Product,
+  ): {
+    score: number;
+    count: number;
+    hasRelevantKeywords: boolean;
+    suggestions: string[];
+  } {
+    const count = keywords.length;
+    const hasRelevantKeywords = keywords.some(
+      (keyword) =>
+        keyword.toLowerCase().includes('farmhub') ||
+        keyword.toLowerCase().includes('nông nghiệp') ||
+        keyword.toLowerCase().includes('cây trồng'),
+    );
+
+    let score = 0;
+    const suggestions: string[] = [];
+
+    // Count check (5-10 keywords is optimal)
+    if (count >= 5 && count <= 10) {
+      score += 40;
+    } else if (count >= 3 && count < 5) {
+      score += 30;
+      suggestions.push('Nên có từ 5-10 từ khóa');
+    } else if (count > 10 && count <= 15) {
+      score += 30;
+      suggestions.push('Quá nhiều từ khóa, nên từ 5-10 từ khóa');
+    } else {
+      score += 10;
+      suggestions.push('Số lượng từ khóa không tối ưu, nên từ 5-10 từ khóa');
+    }
+
+    // Relevance check
+    if (hasRelevantKeywords) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm từ khóa liên quan đến nông nghiệp');
+    }
+
+    // Diversity check
+    const uniqueKeywords = new Set(keywords.map((k) => k.toLowerCase()));
+    if (uniqueKeywords.size === keywords.length) {
+      score += 30;
+    } else {
+      suggestions.push('Tránh lặp lại từ khóa');
+    }
+
+    return { score, count, hasRelevantKeywords, suggestions };
+  }
+
+  /**
+   * Analyze SEO images
+   * @param images - Images JSON string
+   * @returns Images analysis
+   */
+  private analyzeSeoImages(_images: string | undefined): {
+    score: number;
+    count: number;
+    hasAltText: boolean;
+    suggestions: string[];
+  } {
+    const imageUrls = this.extractImageUrls(_images);
+    const count = imageUrls.length;
+
+    let score = 0;
+    const suggestions: string[] = [];
+
+    // Count check (at least 1 image is required)
+    if (count >= 3) {
+      score += 40;
+    } else if (count >= 1) {
+      score += 30;
+      suggestions.push('Nên có ít nhất 3 hình ảnh cho sản phẩm');
+    } else {
+      score += 0;
+      suggestions.push('Sản phẩm cần có hình ảnh');
+    }
+
+    // Alt text check (assuming images have alt text if they exist)
+    const hasAltText = count > 0;
+    if (hasAltText) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm alt text cho hình ảnh');
+    }
+
+    // Quality check (basic check based on URL structure)
+    if (count > 0) {
+      score += 30;
+    } else {
+      suggestions.push('Nên tối ưu chất lượng hình ảnh');
+    }
+
+    return { score, count, hasAltText, suggestions };
+  }
+
+  /**
+   * Analyze structured data
+   * @param structuredData - Structured data array
+   * @returns Structured data analysis
+   */
+  private analyzeStructuredData(
+    structuredData: Array<{
+      '@type': string;
+      '@context': string;
+      data: Record<string, any>;
+    }>,
+  ): {
+    score: number;
+    hasProductSchema: boolean;
+    hasOfferSchema: boolean;
+    suggestions: string[];
+  } {
+    const hasProductSchema = structuredData.some(
+      (item) => item['@type'] === 'Product',
+    );
+    const hasOfferSchema = structuredData.some((item) => {
+      const offers = item.data?.offers;
+      return (
+        offers &&
+        typeof offers === 'object' &&
+        offers !== null &&
+        '@type' in offers &&
+        (offers as Record<string, unknown>)['@type'] === 'Offer'
+      );
+    });
+
+    let score = 0;
+    const suggestions: string[] = [];
+
+    // Product schema check
+    if (hasProductSchema) {
+      score += 40;
+    } else {
+      suggestions.push('Nên thêm Product schema markup');
+    }
+
+    // Offer schema check
+    if (hasOfferSchema) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm Offer schema markup');
+    }
+
+    // Basic structure check
+    if (structuredData.length > 0) {
+      score += 30;
+    } else {
+      suggestions.push('Nên thêm structured data');
+    }
+
+    return { score, hasProductSchema, hasOfferSchema, suggestions };
+  }
+
+  /**
+   * Generate SEO recommendations
+   * @param analysis - SEO analysis object
+   * @returns Array of recommendations
+   */
+  private generateSeoRecommendations(analysis: {
+    overallScore: number;
+    titleAnalysis: { suggestions: string[] };
+    descriptionAnalysis: { suggestions: string[] };
+    keywordAnalysis: { suggestions: string[] };
+    imageAnalysis: { suggestions: string[] };
+    structuredDataAnalysis: { suggestions: string[] };
+    recommendations: string[];
+    analyzedAt: Date;
+  }): string[] {
+    const recommendations: string[] = [];
+
+    // Collect suggestions from all analyses
+    recommendations.push(...analysis.titleAnalysis.suggestions);
+    recommendations.push(...analysis.descriptionAnalysis.suggestions);
+    recommendations.push(...analysis.keywordAnalysis.suggestions);
+    recommendations.push(...analysis.imageAnalysis.suggestions);
+    recommendations.push(...analysis.structuredDataAnalysis.suggestions);
+
+    // Add overall recommendations based on score
+    if (analysis.overallScore < 50) {
+      recommendations.push(
+        'SEO tổng thể cần cải thiện đáng kể. Hãy tập trung vào các đề xuất trên.',
+      );
+    } else if (analysis.overallScore < 80) {
+      recommendations.push('SEO đã khá tốt nhưng vẫn có thể cải thiện thêm.');
+    } else {
+      recommendations.push('SEO rất tốt! Tiếp tục duy trì chất lượng.');
+    }
+
+    return recommendations;
+  }
+
+  /**
    * Analyze SEO title
    * @param title - SEO title
    * @returns Title analysis
    */
-  private analyzeSeoTitle(title: string): any {
+  private analyzeSeoTitle(title: string): {
+    score: number;
+    length: number;
+    hasKeywords: boolean;
+    suggestions: string[];
+  } {
     const length = title.length;
     const hasKeywords =
       title.toLowerCase().includes('farmhub') ||
       title.toLowerCase().includes('nông nghiệp');
 
     let score = 0;
-    const suggestions = [];
+    const suggestions: string[] = [];
 
     // Length check (50-60 characters is optimal)
     if (length >= 50 && length <= 60) {

@@ -10,6 +10,7 @@ import { DataSource } from 'typeorm';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { Product } from 'src/entities/tenant/product.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service';
+import { PriceHistoriesService } from 'src/modules/price-histories/service/price-histories.service';
 
 describe('ProductsService', () => {
   // Tắt log error của NestJS và console.error khi chạy test
@@ -22,6 +23,7 @@ describe('ProductsService', () => {
   let mockTenantDataSourceService: jest.Mocked<TenantDataSourceService>;
   let mockRepository: jest.Mocked<any>;
   let mockAuditLogsService: any;
+  let mockPriceHistoriesService: any;
 
   const mockCategory = {} as any;
 
@@ -74,6 +76,7 @@ describe('ProductsService', () => {
     } as any;
 
     mockAuditLogsService = { create: jest.fn() };
+    mockPriceHistoriesService = { createPriceHistories: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -85,6 +88,10 @@ describe('ProductsService', () => {
         {
           provide: AuditLogsService,
           useValue: mockAuditLogsService,
+        },
+        {
+          provide: PriceHistoriesService,
+          useValue: mockPriceHistoriesService,
         },
       ],
     }).compile();

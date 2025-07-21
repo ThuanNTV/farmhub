@@ -1,22 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardService } from '@modules/dashboard/service/dashboard.service';
+import { OrdersService } from '@modules/orders/service/orders.service';
+import { CustomersService } from '@modules/customers/service/customers.service';
+import { ProductsService } from '@modules/products/service/products.service';
 
 describe('DashboardService', () => {
   let service: DashboardService;
-
-  const mockDependencies = {
-    // Add mock dependencies here based on constructor
-  };
+  let mockOrdersService: jest.Mocked<OrdersService>;
+  let mockCustomersService: jest.Mocked<CustomersService>;
+  let mockProductsService: jest.Mocked<ProductsService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DashboardService,
-        // Add dependency mocks here
+        {
+          provide: OrdersService,
+          useValue: {
+            // Add mock methods here based on usage in DashboardService
+          },
+        },
+        {
+          provide: CustomersService,
+          useValue: {
+            // Add mock methods here
+          },
+        },
+        {
+          provide: ProductsService,
+          useValue: {
+            // Add mock methods here
+          },
+        },
       ],
     }).compile();
 
     service = module.get<DashboardService>(DashboardService);
+    mockOrdersService = module.get(OrdersService);
+    mockCustomersService = module.get(CustomersService);
+    mockProductsService = module.get(ProductsService);
   });
 
   afterEach(() => {

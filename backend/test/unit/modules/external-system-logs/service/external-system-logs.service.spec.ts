@@ -1,18 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExternalSystemLogsService } from '@modules/external-system-logs/service/external-system-logs.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 describe('ExternalSystemLogsService', () => {
   let service: ExternalSystemLogsService;
-
-  const mockDependencies = {
-    // Add mock dependencies here based on constructor
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ExternalSystemLogsService,
-        // Add dependency mocks here
+        {
+          provide: TenantDataSourceService,
+          useValue: {
+            getTenantDataSource: jest.fn().mockResolvedValue({
+              getRepository: jest.fn().mockReturnValue({
+                // mock repo methods
+              }),
+            }),
+          },
+        },
+        {
+          provide: AuditLogAsyncService,
+          useValue: {
+            // mock methods
+          },
+        },
       ],
     }).compile();
 

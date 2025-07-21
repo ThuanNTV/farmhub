@@ -187,7 +187,7 @@ export class AuditInterceptor implements NestInterceptor {
           resourceId ?? '',
           body,
           storeId,
-          { details },
+          { details: JSON.stringify(details) },
         );
       } else if (action === 'UPDATE') {
         await this.auditLogAsyncService.logUpdate(
@@ -195,10 +195,10 @@ export class AuditInterceptor implements NestInterceptor {
           user.username || '',
           resource,
           resourceId ?? '',
-          params.oldData || {},
+          (params.oldData || {}) as Record<string, any>,
           body,
           storeId,
-          { details },
+          { details: JSON.stringify(details) },
         );
       } else if (action === 'DELETE') {
         await this.auditLogAsyncService.logDelete(
@@ -208,7 +208,7 @@ export class AuditInterceptor implements NestInterceptor {
           resourceId ?? '',
           body,
           storeId,
-          { details },
+          { details: JSON.stringify(details) },
         );
       } else {
         await this.auditLogAsyncService.logCriticalAction(

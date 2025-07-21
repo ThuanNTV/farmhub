@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StoreSettingsService } from '@modules/store-settings/service/store-settings.service';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 describe('StoreSettingsService', () => {
   let service: StoreSettingsService;
@@ -12,7 +13,16 @@ describe('StoreSettingsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StoreSettingsService,
-        // Add dependency mocks here
+        {
+          provide: TenantDataSourceService,
+          useValue: {
+            getTenantDataSource: jest.fn().mockResolvedValue({
+              getRepository: jest.fn().mockReturnValue({
+                // mock repo methods
+              }),
+            }),
+          },
+        },
       ],
     }).compile();
 

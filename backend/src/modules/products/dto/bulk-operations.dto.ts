@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsString, IsNumber, IsBoolean, IsOptional, ValidateNested, Min } from 'class-validator';
+import {
+  IsArray,
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  ValidateNested,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class BulkUpdateProductDto {
@@ -7,13 +15,21 @@ export class BulkUpdateProductDto {
   @IsString()
   productId!: string;
 
-  @ApiProperty({ description: 'Giá bán lẻ mới', required: false, example: 150000 })
+  @ApiProperty({
+    description: 'Giá bán lẻ mới',
+    required: false,
+    example: 150000,
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
   priceRetail?: number;
 
-  @ApiProperty({ description: 'Giá bán sỉ mới', required: false, example: 140000 })
+  @ApiProperty({
+    description: 'Giá bán sỉ mới',
+    required: false,
+    example: 140000,
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -25,26 +41,38 @@ export class BulkUpdateProductDto {
   @Min(0)
   stock?: number;
 
-  @ApiProperty({ description: 'Trạng thái hoạt động', required: false, example: true })
+  @ApiProperty({
+    description: 'Trạng thái hoạt động',
+    required: false,
+    example: true,
+  })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({ description: 'Danh mục mới', required: false, example: 'cat-002' })
+  @ApiProperty({
+    description: 'Danh mục mới',
+    required: false,
+    example: 'cat-002',
+  })
   @IsOptional()
   @IsString()
   categoryId?: string;
 
-  @ApiProperty({ description: 'Thương hiệu mới', required: false, example: 'Brand X' })
+  @ApiProperty({
+    description: 'Thương hiệu mới',
+    required: false,
+    example: 'Brand X',
+  })
   @IsOptional()
   @IsString()
   brand?: string;
 }
 
 export class BulkUpdateRequestDto {
-  @ApiProperty({ 
-    description: 'Danh sách cập nhật sản phẩm', 
-    type: [BulkUpdateProductDto] 
+  @ApiProperty({
+    description: 'Danh sách cập nhật sản phẩm',
+    type: [BulkUpdateProductDto],
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -58,10 +86,10 @@ export class BulkUpdateRequestDto {
 }
 
 export class BulkDeleteRequestDto {
-  @ApiProperty({ 
-    description: 'Danh sách ID sản phẩm cần xóa', 
+  @ApiProperty({
+    description: 'Danh sách ID sản phẩm cần xóa',
     type: [String],
-    example: ['prod-001', 'prod-002', 'prod-003']
+    example: ['prod-001', 'prod-002', 'prod-003'],
   })
   @IsArray()
   @IsString({ each: true })
@@ -83,24 +111,24 @@ export class BulkOperationResultDto {
   @ApiProperty({ description: 'Tổng số items', example: 10 })
   totalCount!: number;
 
-  @ApiProperty({ 
-    description: 'Danh sách lỗi', 
+  @ApiProperty({
+    description: 'Danh sách lỗi',
     type: [String],
-    example: ['Product prod-001 not found', 'Invalid price for prod-002']
+    example: ['Product prod-001 not found', 'Invalid price for prod-002'],
   })
   errors!: string[];
 
-  @ApiProperty({ 
-    description: 'Danh sách ID thành công', 
+  @ApiProperty({
+    description: 'Danh sách ID thành công',
     type: [String],
-    example: ['prod-003', 'prod-004', 'prod-005']
+    example: ['prod-003', 'prod-004', 'prod-005'],
   })
   successIds!: string[];
 
-  @ApiProperty({ 
-    description: 'Danh sách ID thất bại', 
+  @ApiProperty({
+    description: 'Danh sách ID thất bại',
     type: [String],
-    example: ['prod-001', 'prod-002']
+    example: ['prod-001', 'prod-002'],
   })
   failureIds!: string[];
 }
@@ -120,9 +148,9 @@ export class StockAdjustmentDto {
 }
 
 export class BulkStockAdjustmentDto {
-  @ApiProperty({ 
-    description: 'Danh sách điều chỉnh tồn kho', 
-    type: [StockAdjustmentDto] 
+  @ApiProperty({
+    description: 'Danh sách điều chỉnh tồn kho',
+    type: [StockAdjustmentDto],
   })
   @IsArray()
   @ValidateNested({ each: true })

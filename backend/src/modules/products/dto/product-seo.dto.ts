@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsArray, IsNumber, IsBoolean, IsUrl, IsEnum, ValidateNested, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsArray,
+  IsNumber,
+  IsBoolean,
+  IsUrl,
+  IsEnum,
+  ValidateNested,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum StructuredDataType {
@@ -22,34 +33,57 @@ export class MetaTagDto {
   @IsString()
   name!: string;
 
-  @ApiProperty({ description: 'Nội dung meta tag', example: 'Phân bón hữu cơ chất lượng cao' })
+  @ApiProperty({
+    description: 'Nội dung meta tag',
+    example: 'Phân bón hữu cơ chất lượng cao',
+  })
   @IsString()
   content!: string;
 
-  @ApiProperty({ description: 'Thuộc tính meta tag', required: false, example: 'property' })
+  @ApiProperty({
+    description: 'Thuộc tính meta tag',
+    required: false,
+    example: 'property',
+  })
   @IsOptional()
   @IsString()
   property?: string;
 }
 
 export class OpenGraphDto {
-  @ApiProperty({ description: 'Tiêu đề OG', example: 'Phân bón hữu cơ NPK 16-16-8' })
+  @ApiProperty({
+    description: 'Tiêu đề OG',
+    example: 'Phân bón hữu cơ NPK 16-16-8',
+  })
   @IsString()
   title!: string;
 
-  @ApiProperty({ description: 'Mô tả OG', example: 'Phân bón hữu cơ chất lượng cao cho cây trồng' })
+  @ApiProperty({
+    description: 'Mô tả OG',
+    example: 'Phân bón hữu cơ chất lượng cao cho cây trồng',
+  })
   @IsString()
   description!: string;
 
-  @ApiProperty({ description: 'Loại OG', enum: OpenGraphType, example: OpenGraphType.PRODUCT })
+  @ApiProperty({
+    description: 'Loại OG',
+    enum: OpenGraphType,
+    example: OpenGraphType.PRODUCT,
+  })
   @IsEnum(OpenGraphType)
   type!: OpenGraphType;
 
-  @ApiProperty({ description: 'URL hình ảnh OG', example: 'https://example.com/image.jpg' })
+  @ApiProperty({
+    description: 'URL hình ảnh OG',
+    example: 'https://example.com/image.jpg',
+  })
   @IsUrl()
   image!: string;
 
-  @ApiProperty({ description: 'URL trang', example: 'https://example.com/product/phan-bon-npk' })
+  @ApiProperty({
+    description: 'URL trang',
+    example: 'https://example.com/product/phan-bon-npk',
+  })
   @IsUrl()
   url!: string;
 
@@ -65,39 +99,65 @@ export class OpenGraphDto {
 }
 
 export class TwitterCardDto {
-  @ApiProperty({ description: 'Loại Twitter card', example: 'summary_large_image' })
+  @ApiProperty({
+    description: 'Loại Twitter card',
+    example: 'summary_large_image',
+  })
   @IsString()
   card!: string;
 
-  @ApiProperty({ description: 'Tiêu đề Twitter', example: 'Phân bón hữu cơ NPK 16-16-8' })
+  @ApiProperty({
+    description: 'Tiêu đề Twitter',
+    example: 'Phân bón hữu cơ NPK 16-16-8',
+  })
   @IsString()
   title!: string;
 
-  @ApiProperty({ description: 'Mô tả Twitter', example: 'Phân bón hữu cơ chất lượng cao' })
+  @ApiProperty({
+    description: 'Mô tả Twitter',
+    example: 'Phân bón hữu cơ chất lượng cao',
+  })
   @IsString()
   description!: string;
 
-  @ApiProperty({ description: 'URL hình ảnh Twitter', example: 'https://example.com/image.jpg' })
+  @ApiProperty({
+    description: 'URL hình ảnh Twitter',
+    example: 'https://example.com/image.jpg',
+  })
   @IsUrl()
   image!: string;
 
-  @ApiProperty({ description: 'Twitter site', required: false, example: '@farmhub' })
+  @ApiProperty({
+    description: 'Twitter site',
+    required: false,
+    example: '@farmhub',
+  })
   @IsOptional()
   @IsString()
   site?: string;
 
-  @ApiProperty({ description: 'Twitter creator', required: false, example: '@farmhub' })
+  @ApiProperty({
+    description: 'Twitter creator',
+    required: false,
+    example: '@farmhub',
+  })
   @IsOptional()
   @IsString()
   creator?: string;
 }
 
 export class StructuredDataDto {
-  @ApiProperty({ description: 'Loại structured data', enum: StructuredDataType })
+  @ApiProperty({
+    description: 'Loại structured data',
+    enum: StructuredDataType,
+  })
   @IsEnum(StructuredDataType)
   '@type'!: StructuredDataType;
 
-  @ApiProperty({ description: 'Context schema.org', example: 'https://schema.org' })
+  @ApiProperty({
+    description: 'Context schema.org',
+    example: 'https://schema.org',
+  })
   @IsString()
   '@context'!: string;
 
@@ -106,23 +166,36 @@ export class StructuredDataDto {
 }
 
 export class ProductSeoDto {
-  @ApiProperty({ description: 'Tiêu đề SEO', example: 'Phân bón hữu cơ NPK 16-16-8 - Chất lượng cao' })
+  @ApiProperty({
+    description: 'Tiêu đề SEO',
+    example: 'Phân bón hữu cơ NPK 16-16-8 - Chất lượng cao',
+  })
   @IsOptional()
   @IsString()
   seoTitle?: string;
 
-  @ApiProperty({ description: 'Mô tả SEO', example: 'Phân bón hữu cơ NPK 16-16-8 chất lượng cao, giúp cây trồng phát triển mạnh mẽ' })
+  @ApiProperty({
+    description: 'Mô tả SEO',
+    example:
+      'Phân bón hữu cơ NPK 16-16-8 chất lượng cao, giúp cây trồng phát triển mạnh mẽ',
+  })
   @IsOptional()
   @IsString()
   seoDescription?: string;
 
-  @ApiProperty({ description: 'Từ khóa SEO', example: ['phân bón', 'hữu cơ', 'NPK', 'cây trồng'] })
+  @ApiProperty({
+    description: 'Từ khóa SEO',
+    example: ['phân bón', 'hữu cơ', 'NPK', 'cây trồng'],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   seoKeywords?: string[];
 
-  @ApiProperty({ description: 'Canonical URL', example: 'https://farmhub.com/products/phan-bon-npk-16-16-8' })
+  @ApiProperty({
+    description: 'Canonical URL',
+    example: 'https://farmhub.com/products/phan-bon-npk-16-16-8',
+  })
   @IsOptional()
   @IsUrl()
   canonicalUrl?: string;
@@ -136,26 +209,42 @@ export class ProductSeoDto {
   @IsOptional()
   hreflangTags?: Record<string, string>;
 
-  @ApiProperty({ description: 'Custom meta tags', type: [MetaTagDto], required: false })
+  @ApiProperty({
+    description: 'Custom meta tags',
+    type: [MetaTagDto],
+    required: false,
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => MetaTagDto)
   customMetaTags?: MetaTagDto[];
 
-  @ApiProperty({ description: 'Open Graph data', type: OpenGraphDto, required: false })
+  @ApiProperty({
+    description: 'Open Graph data',
+    type: OpenGraphDto,
+    required: false,
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => OpenGraphDto)
   openGraph?: OpenGraphDto;
 
-  @ApiProperty({ description: 'Twitter Card data', type: TwitterCardDto, required: false })
+  @ApiProperty({
+    description: 'Twitter Card data',
+    type: TwitterCardDto,
+    required: false,
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => TwitterCardDto)
   twitterCard?: TwitterCardDto;
 
-  @ApiProperty({ description: 'Structured data', type: [StructuredDataDto], required: false })
+  @ApiProperty({
+    description: 'Structured data',
+    type: [StructuredDataDto],
+    required: false,
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
@@ -217,7 +306,10 @@ export class SeoAnalysisDto {
   @ApiProperty({ description: 'Gợi ý cải thiện' })
   recommendations!: string[];
 
-  @ApiProperty({ description: 'Ngày phân tích', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Ngày phân tích',
+    example: '2024-01-15T10:30:00Z',
+  })
   analyzedAt!: Date;
 }
 
@@ -264,11 +356,17 @@ export class SeoConfigDto {
 }
 
 export class SitemapEntryDto {
-  @ApiProperty({ description: 'URL', example: 'https://farmhub.com/products/phan-bon-npk' })
+  @ApiProperty({
+    description: 'URL',
+    example: 'https://farmhub.com/products/phan-bon-npk',
+  })
   @IsUrl()
   url!: string;
 
-  @ApiProperty({ description: 'Ngày sửa đổi cuối', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Ngày sửa đổi cuối',
+    example: '2024-01-15T10:30:00Z',
+  })
   lastModified!: Date;
 
   @ApiProperty({ description: 'Tần suất thay đổi', example: 'weekly' })
@@ -295,7 +393,10 @@ export class ProductSeoResponseDto {
   @ApiProperty({ description: 'ID sản phẩm', example: 'prod-001' })
   productId!: string;
 
-  @ApiProperty({ description: 'Slug sản phẩm', example: 'phan-bon-npk-16-16-8' })
+  @ApiProperty({
+    description: 'Slug sản phẩm',
+    example: 'phan-bon-npk-16-16-8',
+  })
   slug!: string;
 
   @ApiProperty({ description: 'Thông tin SEO', type: ProductSeoDto })
@@ -304,12 +405,18 @@ export class ProductSeoResponseDto {
   @ApiProperty({ description: 'Phân tích SEO', type: SeoAnalysisDto })
   seoAnalysis!: SeoAnalysisDto;
 
-  @ApiProperty({ description: 'URL canonical', example: 'https://farmhub.com/products/phan-bon-npk-16-16-8' })
+  @ApiProperty({
+    description: 'URL canonical',
+    example: 'https://farmhub.com/products/phan-bon-npk-16-16-8',
+  })
   canonicalUrl!: string;
 
   @ApiProperty({ description: 'Sitemap entry', type: SitemapEntryDto })
   sitemapEntry!: SitemapEntryDto;
 
-  @ApiProperty({ description: 'Ngày cập nhật SEO', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Ngày cập nhật SEO',
+    example: '2024-01-15T10:30:00Z',
+  })
   updatedAt!: Date;
 }

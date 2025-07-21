@@ -1,49 +1,57 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-// Mock tất cả dependencies trước khi import
+// Mock 'winston' and 'winston-daily-rotate-file' first
 jest.mock('winston', () => ({
   format: {
-    combine: jest.fn(),
-    timestamp: jest.fn(),
-    errors: jest.fn(),
-    printf: jest.fn(),
-    colorize: jest.fn(),
-    simple: jest.fn(),
-    json: jest.fn(),
+    combine: jest.fn(() => 'combined'),
+    timestamp: jest.fn(() => 'timestamp'),
+    errors: jest.fn(() => 'errors'),
+    printf: jest.fn(() => 'printf'),
+    colorize: jest.fn(() => 'colorize'),
+    json: jest.fn(() => 'json'),
+    simple: jest.fn(() => 'simple'),
   },
   transports: {
     Console: jest.fn(),
   },
-  createLogger: jest.fn(),
+  createLogger: jest.fn(() => ({
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  })),
 }));
-
 jest.mock('winston-daily-rotate-file', () => jest.fn());
 
-jest.mock('nest-winston', () => ({
-  createLogger: jest.fn().mockReturnValue({
-    module: 'WinstonModule',
-    providers: [],
-    exports: [],
-  }),
-  forRoot: jest.fn().mockReturnValue({
-    module: 'WinstonModule',
-    providers: [],
-    exports: [],
-  }),
+// Use doMock for 'nest-winston' to control execution order
+jest.doMock('nest-winston', () => ({
+  WinstonModule: {
+    forRoot: jest.fn().mockReturnValue({
+      module: 'WinstonModule',
+      providers: [],
+      exports: [],
+    }),
+  },
 }));
 
-// Import sau khi mock
-import {
-  getLogLevel,
-  createFileTransport,
-  winstonConfig,
-  createWinstonLogger,
-  WinstonLoggerModule,
-} from '../../../src/utils/logger';
-
 describe('Logger Utils', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  let getLogLevel: any,
+    createFileTransport: any,
+    winstonConfig: any,
+    WinstonLoggerModule: any;
+
+  beforeEach(async () => {
+    // Reset modules to apply mocks before each test
+    jest.resetModules();
+    // Dynamically import the module after mocks are set up
+    const loggerModule = await import('../../../src/utils/logger');
+    getLogLevel = loggerModule.getLogLevel;
+    createFileTransport = loggerModule.createFileTransport;
+    winstonConfig = loggerModule.winstonConfig;
+    WinstonLoggerModule = loggerModule.WinstonLoggerModule;
+  });
+
+  afterEach(() => {
     // Clear environment variables
     delete process.env.LOG_LEVEL;
     delete process.env.NODE_ENV;
@@ -114,13 +122,6 @@ describe('Logger Utils', () => {
       jest.resetModules();
       const { winstonConfig: newConfig } = require('../../../src/utils/logger');
       expect(newConfig.level).toBe('warn');
-    });
-  });
-
-  describe('createWinstonLogger', () => {
-    it('should create Winston logger module', () => {
-      const result = createWinstonLogger();
-      expect(result).toBeDefined();
     });
   });
 

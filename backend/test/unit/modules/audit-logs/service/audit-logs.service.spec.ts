@@ -9,18 +9,17 @@ import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dt
 const mockAuditLog: AuditLog = {
   id: '1',
   user_id: 'u1',
-  user_name: 'test user',
   action: 'CREATE',
   target_table: 'table',
   target_id: 'tid',
-  resource_type: 'type',
-  resource_id: 'rid',
-  old_value: JSON.stringify({}),
-  new_value: JSON.stringify({}),
+  store_id: 'store1',
+  old_value: { data: 'before' },
+  new_value: { data: 'after' },
   ip_address: '127.0.0.1',
   device: 'PC',
   browser: 'Chrome',
   os: 'Windows',
+  user_name: 'test user',
   metadata: {
     action: 'CREATE',
     resource: 'table',
@@ -29,13 +28,10 @@ const mockAuditLog: AuditLog = {
   created_at: new Date(),
   updated_at: new Date(),
   is_deleted: false,
-  deleted_at: new Date(),
+  deleted_at: undefined,
   user_agent: 'Mozilla/5.0',
-  timestamp: new Date(),
-  store_id: 'store1',
   session_id: 'session1',
-  details: '',
-  audit_log_id: 'audit1',
+  details: 'Details here',
 };
 
 describe('AuditLogsService', () => {
@@ -108,17 +104,17 @@ describe('AuditLogsService', () => {
 
   describe('findOne', () => {
     it('should return audit log if found', async () => {
-      jest
-        .spyOn(AuditLogsService.prototype, 'findById')
-        .mockResolvedValue(mockAuditLog);
+      mockRepository.findOneBy.mockResolvedValue(mockAuditLog);
       const result = await service.findOne('store1', '1');
       expect(result).toBe(mockAuditLog);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: '1' });
     });
     it('should throw NotFoundException if not found', async () => {
-      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      mockRepository.findOneBy.mockResolvedValue(null);
       await expect(service.findOne('store1', '2')).rejects.toThrow(
         NotFoundException,
       );
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: '2' });
     });
   });
 

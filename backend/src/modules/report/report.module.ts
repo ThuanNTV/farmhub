@@ -10,5 +10,6 @@ import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
   imports: [TenantModule, AuditLogsModule, SecurityModule, AuditLogAsyncModule],
   controllers: [ReportController],
   providers: [ReportService],
+  exports: [ReportService],
 })
 export class ReportModule {}

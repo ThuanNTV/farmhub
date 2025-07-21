@@ -296,7 +296,7 @@ describe('CategoryExists decorator', () => {
 
     class TestClass {
       @CategoryExists({ message: 'Custom message' })
-      categoryId: string;
+      categoryId!: string;
     }
 
     // Verify decorator được register (implementation detail test)
@@ -309,7 +309,7 @@ describe('CategoryExists decorator', () => {
     expect(() => {
       class TestClass {
         @CategoryExists()
-        categoryId: string;
+        categoryId!: string;
       }
     }).not.toThrow();
   });

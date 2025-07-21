@@ -13,7 +13,7 @@ import { CategoriesModule } from 'src/modules/categories/categories.module';
 import { CustomersModule } from 'src/modules/customers/customers.module';
 import { LogLevelControllerModule } from 'src/controllers/log-level.controller.module';
 import { BullModule } from '@nestjs/bull';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbglobal/global-database.module';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 import { User } from 'src/entities/global/user.entity';
 import { Bank } from 'src/entities/global/bank.entity';

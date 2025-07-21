@@ -1,41 +1,81 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber, IsDateString, IsEnum, IsArray, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsEnum,
+  IsArray,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SupplierProductFilterDto {
-  @ApiProperty({ description: 'ID nhà cung cấp', required: false, example: 'sup-001' })
+  @ApiProperty({
+    description: 'ID nhà cung cấp',
+    required: false,
+    example: 'sup-001',
+  })
   @IsOptional()
   @IsString()
   supplierId?: string;
 
-  @ApiProperty({ description: 'Danh sách ID nhà cung cấp', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID nhà cung cấp',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   supplierIds?: string[];
 
-  @ApiProperty({ description: 'Tên nhà cung cấp', required: false, example: 'Công ty ABC' })
+  @ApiProperty({
+    description: 'Tên nhà cung cấp',
+    required: false,
+    example: 'Công ty ABC',
+  })
   @IsOptional()
   @IsString()
   supplierName?: string;
 
-  @ApiProperty({ description: 'Ngày bắt đầu', required: false, example: '2024-01-01' })
+  @ApiProperty({
+    description: 'Ngày bắt đầu',
+    required: false,
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   dateFrom?: string;
 
-  @ApiProperty({ description: 'Ngày kết thúc', required: false, example: '2024-12-31' })
+  @ApiProperty({
+    description: 'Ngày kết thúc',
+    required: false,
+    example: '2024-12-31',
+  })
   @IsOptional()
   @IsDateString()
   dateTo?: string;
 
-  @ApiProperty({ description: 'Trang hiện tại', required: false, minimum: 1, default: 1 })
+  @ApiProperty({
+    description: 'Trang hiện tại',
+    required: false,
+    minimum: 1,
+    default: 1,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
   page?: number = 1;
 
-  @ApiProperty({ description: 'Số lượng mỗi trang', required: false, minimum: 1, maximum: 100, default: 10 })
+  @ApiProperty({
+    description: 'Số lượng mỗi trang',
+    required: false,
+    minimum: 1,
+    maximum: 100,
+    default: 10,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -43,21 +83,21 @@ export class SupplierProductFilterDto {
   @Max(100)
   limit?: number = 10;
 
-  @ApiProperty({ 
-    description: 'Sắp xếp theo', 
+  @ApiProperty({
+    description: 'Sắp xếp theo',
     enum: ['name', 'created_at', 'product_count', 'total_value'],
     required: false,
-    default: 'name'
+    default: 'name',
   })
   @IsOptional()
   @IsString()
   sortBy?: 'name' | 'created_at' | 'product_count' | 'total_value' = 'name';
 
-  @ApiProperty({ 
-    description: 'Thứ tự sắp xếp', 
+  @ApiProperty({
+    description: 'Thứ tự sắp xếp',
     enum: ['ASC', 'DESC'],
     required: false,
-    default: 'ASC'
+    default: 'ASC',
   })
   @IsOptional()
   @IsString()
@@ -101,7 +141,10 @@ export class SupplierProductDto {
   @ApiProperty({ description: 'Ngày tạo', example: '2024-01-15T10:30:00Z' })
   createdAt!: Date;
 
-  @ApiProperty({ description: 'Ngày cập nhật cuối', example: '2024-01-20T14:20:00Z' })
+  @ApiProperty({
+    description: 'Ngày cập nhật cuối',
+    example: '2024-01-20T14:20:00Z',
+  })
   updatedAt!: Date;
 }
 
@@ -142,15 +185,24 @@ export class SupplierSummaryDto {
   @ApiProperty({ description: 'Ngày tạo', example: '2024-01-01T00:00:00Z' })
   createdAt!: Date;
 
-  @ApiProperty({ description: 'Ngày cập nhật cuối', example: '2024-01-20T14:20:00Z' })
+  @ApiProperty({
+    description: 'Ngày cập nhật cuối',
+    example: '2024-01-20T14:20:00Z',
+  })
   updatedAt!: Date;
 }
 
 export class SupplierProductsResponseDto {
-  @ApiProperty({ description: 'Thông tin nhà cung cấp', type: SupplierSummaryDto })
+  @ApiProperty({
+    description: 'Thông tin nhà cung cấp',
+    type: SupplierSummaryDto,
+  })
   supplier!: SupplierSummaryDto;
 
-  @ApiProperty({ description: 'Danh sách sản phẩm', type: [SupplierProductDto] })
+  @ApiProperty({
+    description: 'Danh sách sản phẩm',
+    type: [SupplierProductDto],
+  })
   products!: SupplierProductDto[];
 
   @ApiProperty({ description: 'Thông tin phân trang' })
@@ -215,13 +267,22 @@ export class SupplierAnalyticsDto {
   @ApiProperty({ description: 'Tổng giá trị tồn kho', example: 75000000 })
   totalInventoryValue!: number;
 
-  @ApiProperty({ description: 'Giá trị trung bình mỗi nhà cung cấp', example: 5000000 })
+  @ApiProperty({
+    description: 'Giá trị trung bình mỗi nhà cung cấp',
+    example: 5000000,
+  })
   averageValuePerSupplier!: number;
 
-  @ApiProperty({ description: 'Số sản phẩm trung bình mỗi nhà cung cấp', example: 23 })
+  @ApiProperty({
+    description: 'Số sản phẩm trung bình mỗi nhà cung cấp',
+    example: 23,
+  })
   averageProductsPerSupplier!: number;
 
-  @ApiProperty({ description: 'Top nhà cung cấp theo hiệu suất', type: [SupplierPerformanceDto] })
+  @ApiProperty({
+    description: 'Top nhà cung cấp theo hiệu suất',
+    type: [SupplierPerformanceDto],
+  })
   topPerformers!: SupplierPerformanceDto[];
 
   @ApiProperty({ description: 'Phân phối theo hiệu suất' })
@@ -232,7 +293,10 @@ export class SupplierAnalyticsDto {
     poor: number;
   };
 
-  @ApiProperty({ description: 'Thời gian tạo báo cáo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo báo cáo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 
@@ -246,12 +310,20 @@ export class AssignSupplierDto {
   @IsString({ each: true })
   productIds!: string[];
 
-  @ApiProperty({ description: 'ID người thực hiện', required: false, example: 'user-001' })
+  @ApiProperty({
+    description: 'ID người thực hiện',
+    required: false,
+    example: 'user-001',
+  })
   @IsOptional()
   @IsString()
   updatedByUserId?: string;
 
-  @ApiProperty({ description: 'Ghi chú', required: false, example: 'Gán nhà cung cấp mới' })
+  @ApiProperty({
+    description: 'Ghi chú',
+    required: false,
+    example: 'Gán nhà cung cấp mới',
+  })
   @IsOptional()
   @IsString()
   note?: string;
@@ -263,12 +335,20 @@ export class UnassignSupplierDto {
   @IsString({ each: true })
   productIds!: string[];
 
-  @ApiProperty({ description: 'ID người thực hiện', required: false, example: 'user-001' })
+  @ApiProperty({
+    description: 'ID người thực hiện',
+    required: false,
+    example: 'user-001',
+  })
   @IsOptional()
   @IsString()
   updatedByUserId?: string;
 
-  @ApiProperty({ description: 'Ghi chú', required: false, example: 'Hủy gán nhà cung cấp' })
+  @ApiProperty({
+    description: 'Ghi chú',
+    required: false,
+    example: 'Hủy gán nhà cung cấp',
+  })
   @IsOptional()
   @IsString()
   note?: string;

@@ -27,27 +27,25 @@ export class AuditLogProcessor {
       auditLog.user_id = data.userId;
       auditLog.user_name = data.userName;
       auditLog.action = data.action;
-      auditLog.resource_type = data.resource;
-      auditLog.resource_id = data.resourceId ?? '';
-      auditLog.old_value = data.oldValue ? JSON.stringify(data.oldValue) : null;
-      auditLog.new_value = data.newValue ? JSON.stringify(data.newValue) : null;
-      auditLog.ip_address = data.ipAddress ?? '';
-      auditLog.user_agent = data.userAgent ?? '';
-      auditLog.timestamp = data.timestamp;
-      auditLog.store_id = data.storeId ?? '';
-      auditLog.session_id = data.sessionId ?? '';
-      auditLog.details = data.details ? JSON.stringify(data.details) : null;
-      auditLog.created_at = new Date();
+      auditLog.target_table = data.targetTable;
+      auditLog.target_id = data.targetId;
+      auditLog.store_id = data.storeId;
+      auditLog.old_value = data.oldValue;
+      auditLog.new_value = data.newValue;
+      auditLog.metadata = data.metadata;
+      auditLog.ip_address = data.ipAddress;
+      auditLog.user_agent = data.userAgent;
+      auditLog.session_id = data.sessionId;
+      auditLog.details = data.details;
 
       // Lưu vào database
-      // Khi cần thao tác với repository:
-      // const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
-      // const auditLogRepo = dataSource.getRepository(AuditLog);
-      // await auditLogRepo.save(auditLog);
-
-      this.logger.debug(
-        `Audit log saved successfully: ${auditLog.audit_log_id}`,
+      const dataSource = await this.tenantDataSourceService.getTenantDataSource(
+        data.storeId,
       );
+      const auditLogRepo = dataSource.getRepository(AuditLog);
+      const savedLog = await auditLogRepo.save(auditLog);
+
+      this.logger.debug(`Audit log saved successfully: ${savedLog.id}`);
 
       // Log metrics cho monitoring
       this.logMetrics(data.action, 'SUCCESS');

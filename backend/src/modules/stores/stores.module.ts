@@ -9,7 +9,7 @@ import { User } from 'src/entities/global/user.entity';
 import { Bank } from 'src/entities/global/bank.entity';
 import { Unit } from 'src/entities/global/unit.entity';
 import { PaymentMethod } from 'src/entities/global/payment_method.entity';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbglobal/global-database.module';
 import { TenantModule } from 'src/config/db/dbtenant/tenant.module';
 import { SecurityModule } from 'src/common/auth/security.module';
 import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';

@@ -1,63 +1,105 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString, IsEnum, IsNumber, Min, Max, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  Min,
+  Max,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class InventoryAnalyticsFilterDto {
-  @ApiProperty({ description: 'Ngày bắt đầu', required: false, example: '2024-01-01' })
+  @ApiProperty({
+    description: 'Ngày bắt đầu',
+    required: false,
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   dateFrom?: string;
 
-  @ApiProperty({ description: 'Ngày kết thúc', required: false, example: '2024-12-31' })
+  @ApiProperty({
+    description: 'Ngày kết thúc',
+    required: false,
+    example: '2024-12-31',
+  })
   @IsOptional()
   @IsDateString()
   dateTo?: string;
 
-  @ApiProperty({ description: 'ID danh mục', required: false, example: 'cat-001' })
+  @ApiProperty({
+    description: 'ID danh mục',
+    required: false,
+    example: 'cat-001',
+  })
   @IsOptional()
   @IsString()
   categoryId?: string;
 
-  @ApiProperty({ description: 'Danh sách ID danh mục', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID danh mục',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   categoryIds?: string[];
 
-  @ApiProperty({ description: 'ID nhà cung cấp', required: false, example: 'sup-001' })
+  @ApiProperty({
+    description: 'ID nhà cung cấp',
+    required: false,
+    example: 'sup-001',
+  })
   @IsOptional()
   @IsString()
   supplierId?: string;
 
-  @ApiProperty({ description: 'Thương hiệu', required: false, example: 'Brand A' })
+  @ApiProperty({
+    description: 'Thương hiệu',
+    required: false,
+    example: 'Brand A',
+  })
   @IsOptional()
   @IsString()
   brand?: string;
 
-  @ApiProperty({ 
-    description: 'Loại phân tích', 
+  @ApiProperty({
+    description: 'Loại phân tích',
     enum: ['overview', 'turnover', 'movement', 'transfers', 'trends'],
     required: false,
-    default: 'overview'
+    default: 'overview',
   })
   @IsOptional()
   @IsEnum(['overview', 'turnover', 'movement', 'transfers', 'trends'])
-  analysisType?: 'overview' | 'turnover' | 'movement' | 'transfers' | 'trends' = 'overview';
+  analysisType?: 'overview' | 'turnover' | 'movement' | 'transfers' | 'trends' =
+    'overview';
 
-  @ApiProperty({ 
-    description: 'Khoảng thời gian nhóm', 
+  @ApiProperty({
+    description: 'Khoảng thời gian nhóm',
     enum: ['day', 'week', 'month', 'quarter', 'year'],
     required: false,
-    default: 'month'
+    default: 'month',
   })
   @IsOptional()
   @IsEnum(['day', 'week', 'month', 'quarter', 'year'])
   groupBy?: 'day' | 'week' | 'month' | 'quarter' | 'year' = 'month';
 
-  @ApiProperty({ description: 'Chỉ sản phẩm active', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm active',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   isActive?: boolean = true;
 
-  @ApiProperty({ description: 'Bao gồm sản phẩm đã xóa', required: false, default: false })
+  @ApiProperty({
+    description: 'Bao gồm sản phẩm đã xóa',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   includeDeleted?: boolean = false;
 }
@@ -81,10 +123,16 @@ export class InventoryOverviewDto {
   @ApiProperty({ description: 'Sản phẩm tồn kho cao', example: 23 })
   overStockProducts!: number;
 
-  @ApiProperty({ description: 'Giá trị trung bình mỗi sản phẩm', example: 125000 })
+  @ApiProperty({
+    description: 'Giá trị trung bình mỗi sản phẩm',
+    example: 125000,
+  })
   averageProductValue!: number;
 
-  @ApiProperty({ description: 'Tỷ lệ luân chuyển tồn kho trung bình', example: 4.2 })
+  @ApiProperty({
+    description: 'Tỷ lệ luân chuyển tồn kho trung bình',
+    example: 4.2,
+  })
   averageTurnoverRatio!: number;
 
   @ApiProperty({ description: 'Số ngày tồn kho trung bình', example: 87 })
@@ -189,7 +237,10 @@ export class TransferAnalyticsDto {
   @ApiProperty({ description: 'Ngày tạo', example: '2024-01-15T10:30:00Z' })
   createdAt!: Date;
 
-  @ApiProperty({ description: 'Ngày hoàn thành', example: '2024-01-16T14:20:00Z' })
+  @ApiProperty({
+    description: 'Ngày hoàn thành',
+    example: '2024-01-16T14:20:00Z',
+  })
   completedAt?: Date;
 
   @ApiProperty({ description: 'Thời gian xử lý (giờ)', example: 27.8 })
@@ -197,7 +248,10 @@ export class TransferAnalyticsDto {
 }
 
 export class InventoryTrendsDto {
-  @ApiProperty({ description: 'Xu hướng tồn kho theo thời gian', type: [Object] })
+  @ApiProperty({
+    description: 'Xu hướng tồn kho theo thời gian',
+    type: [Object],
+  })
   stockTrends!: Array<{
     period: string;
     totalStock: number;
@@ -267,22 +321,37 @@ export class InventoryAnalyticsReportDto {
   @ApiProperty({ description: 'Tổng quan tồn kho', type: InventoryOverviewDto })
   overview!: InventoryOverviewDto;
 
-  @ApiProperty({ description: 'Phân tích luân chuyển', type: [ProductTurnoverDto] })
+  @ApiProperty({
+    description: 'Phân tích luân chuyển',
+    type: [ProductTurnoverDto],
+  })
   turnoverAnalysis!: ProductTurnoverDto[];
 
-  @ApiProperty({ description: 'Chuyển động tồn kho', type: [InventoryMovementDto] })
+  @ApiProperty({
+    description: 'Chuyển động tồn kho',
+    type: [InventoryMovementDto],
+  })
   movementAnalysis!: InventoryMovementDto[];
 
-  @ApiProperty({ description: 'Phân tích chuyển kho', type: [TransferAnalyticsDto] })
+  @ApiProperty({
+    description: 'Phân tích chuyển kho',
+    type: [TransferAnalyticsDto],
+  })
   transferAnalysis!: TransferAnalyticsDto[];
 
   @ApiProperty({ description: 'Xu hướng tồn kho', type: InventoryTrendsDto })
   trends!: InventoryTrendsDto;
 
-  @ApiProperty({ description: 'Phân tích theo danh mục', type: [CategoryInventoryDto] })
+  @ApiProperty({
+    description: 'Phân tích theo danh mục',
+    type: [CategoryInventoryDto],
+  })
   categoryAnalysis!: CategoryInventoryDto[];
 
-  @ApiProperty({ description: 'Thời gian tạo báo cáo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo báo cáo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 
   @ApiProperty({ description: 'Khoảng thời gian báo cáo' })
@@ -324,6 +393,9 @@ export class InventoryKPIDto {
   @ApiProperty({ description: 'Hiệu quả chuyển kho', example: 92.3 })
   transferEfficiency!: number;
 
-  @ApiProperty({ description: 'Thời gian xử lý chuyển kho trung bình (giờ)', example: 24.5 })
+  @ApiProperty({
+    description: 'Thời gian xử lý chuyển kho trung bình (giờ)',
+    example: 24.5,
+  })
   averageTransferTime!: number;
 }

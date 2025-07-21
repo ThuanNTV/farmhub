@@ -41,11 +41,21 @@ export class CreateProductSeoTable1700000000004 implements MigrationInterface {
     `);
 
     // Create indexes for product_seo
-    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_product_seo_product_id" ON "product_seo" ("product_id") WHERE "is_deleted" = false`);
-    await queryRunner.query(`CREATE UNIQUE INDEX "IDX_product_seo_slug" ON "product_seo" ("slug") WHERE "is_deleted" = false`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_seo_active" ON "product_seo" ("is_active")`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_seo_sitemap_include" ON "product_seo" ("sitemap_include")`);
-    await queryRunner.query(`CREATE INDEX "IDX_product_seo_updated_at" ON "product_seo" ("updated_at")`);
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "IDX_product_seo_product_id" ON "product_seo" ("product_id") WHERE "is_deleted" = false`,
+    );
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "IDX_product_seo_slug" ON "product_seo" ("slug") WHERE "is_deleted" = false`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_seo_active" ON "product_seo" ("is_active")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_seo_sitemap_include" ON "product_seo" ("sitemap_include")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_product_seo_updated_at" ON "product_seo" ("updated_at")`,
+    );
 
     // Create foreign key constraint
     await queryRunner.query(`
@@ -103,11 +113,17 @@ export class CreateProductSeoTable1700000000004 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop trigger and function
-    await queryRunner.query(`DROP TRIGGER IF EXISTS update_product_seo_updated_at ON "product_seo"`);
-    await queryRunner.query(`DROP FUNCTION IF EXISTS update_product_seo_updated_at()`);
+    await queryRunner.query(
+      `DROP TRIGGER IF EXISTS update_product_seo_updated_at ON "product_seo"`,
+    );
+    await queryRunner.query(
+      `DROP FUNCTION IF EXISTS update_product_seo_updated_at()`,
+    );
 
     // Drop foreign key constraint
-    await queryRunner.query(`ALTER TABLE "product_seo" DROP CONSTRAINT "FK_product_seo_product"`);
+    await queryRunner.query(
+      `ALTER TABLE "product_seo" DROP CONSTRAINT "FK_product_seo_product"`,
+    );
 
     // Drop indexes
     await queryRunner.query(`DROP INDEX "IDX_product_seo_fulltext"`);

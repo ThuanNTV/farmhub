@@ -102,7 +102,12 @@ export class ProductAttribute {
   @Column({ type: 'text', name: 'help_text', nullable: true })
   help_text?: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'default_value', nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    name: 'default_value',
+    nullable: true,
+  })
   default_value?: string;
 
   @Column({ type: 'boolean', name: 'is_active', default: true })
@@ -124,6 +129,9 @@ export class ProductAttribute {
   updated_by_user_id?: string;
 
   // Relations
-  @OneToMany(() => ProductVariantAttribute, (variantAttribute) => variantAttribute.attribute)
+  @OneToMany(
+    () => ProductVariantAttribute,
+    (variantAttribute) => variantAttribute.attribute,
+  )
   variant_attributes!: ProductVariantAttribute[];
 }

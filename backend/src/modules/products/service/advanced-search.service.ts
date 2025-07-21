@@ -13,7 +13,123 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 
 @Injectable()
 export class AdvancedSearchService extends TenantBaseService<Product> {
-  private readonly logger = new Logger(AdvancedSearchService.name);
+  // Khai báo khóa chính cho entity Product
+  protected primaryKey = 'product_id';
+
+  /**
+   * Sinh facets cho kết quả tìm kiếm (ví dụ: đếm theo category, brand, price range)
+   * @param storeId - Mã cửa hàng
+   * @param searchDto - Tham số tìm kiếm
+   * @returns Facet data (thống kê theo các trường)
+   */
+  async generateFacets(
+    storeId: string,
+    _searchDto: AdvancedSearchDto,
+  ): Promise<{
+    categories: Array<{ id: string; name: string; count: number }>;
+    brands: Array<{ name: string; count: number }>;
+    priceRanges: Array<{ range: string; count: number }>;
+    stockStatus: Array<{ status: string; count: number }>;
+  }> {
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
+    const productRepo = dataSource.getRepository(Product);
+
+    // Facet theo category với tên category
+    const categoryFacet = await productRepo
+      .createQueryBuilder('product')
+      .leftJoin('product.category', 'category')
+      .select('product.category_id', 'id')
+      .addSelect('category.name', 'name')
+      .addSelect('COUNT(*)', 'count')
+      .where('product.is_deleted = :isDeleted', { isDeleted: false })
+      .groupBy('product.category_id, category.name')
+      .getRawMany();
+
+    // Facet theo brand
+    const brandFacet = await productRepo
+      .createQueryBuilder('product')
+      .select('product.brand', 'name')
+      .addSelect('COUNT(*)', 'count')
+      .where('product.is_deleted = :isDeleted AND product.brand IS NOT NULL', {
+        isDeleted: false,
+      })
+      .groupBy('product.brand')
+      .getRawMany();
+
+    // Facet theo khoảng giá (ví dụ: <100k, 100k-500k, >500k)
+    const priceFacet = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        `CASE
+          WHEN product.price_retail < 100000 THEN '<100k'
+          WHEN product.price_retail BETWEEN 100000 AND 500000 THEN '100k-500k'
+          ELSE '>500k'
+        END AS range`,
+        'COUNT(*) AS count',
+      ])
+      .where('product.is_deleted = :isDeleted', { isDeleted: false })
+      .groupBy('range')
+      .getRawMany();
+
+    // Facet theo trạng thái tồn kho
+    const stockFacet = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        `CASE
+          WHEN product.stock > 0 THEN 'in_stock'
+          ELSE 'out_of_stock'
+        END AS status`,
+        'COUNT(*) AS count',
+      ])
+      .where('product.is_deleted = :isDeleted', { isDeleted: false })
+      .groupBy('status')
+      .getRawMany();
+
+    return {
+      categories: categoryFacet.map((item: any) => ({
+        id: String(item.id),
+        name: item.name ? String(item.name) : 'Unknown Category',
+        count: parseInt(String(item.count), 10),
+      })),
+      brands: brandFacet.map((item: any) => ({
+        name: String(item.name),
+        count: parseInt(String(item.count), 10),
+      })),
+      priceRanges: priceFacet.map((item: any) => ({
+        range: String(item.range),
+        count: parseInt(String(item.count), 10),
+      })),
+      stockStatus: stockFacet.map((item: any) => ({
+        status: String(item.status),
+        count: parseInt(String(item.count), 10),
+      })),
+    };
+  }
+
+  /**
+   * Sinh gợi ý tìm kiếm khi không có kết quả (ví dụ: sửa lỗi chính tả, đề xuất từ gần giống)
+   * @param storeId - Mã cửa hàng
+   * @param query - Chuỗi tìm kiếm
+   * @returns Mảng gợi ý
+   */
+  async generateSuggestions(storeId: string, query: string): Promise<string[]> {
+    // Đơn giản: lấy các tên sản phẩm gần giống (Levenshtein distance < 3)
+    const productRepo = await this.getRepo(storeId);
+
+    // PostgreSQL hỗ trợ hàm similarity nếu cài pg_trgm
+    const similarProducts = await productRepo
+      .createQueryBuilder('product')
+      .select('product.name', 'name')
+      .where('product.is_deleted = :isDeleted', { isDeleted: false })
+      .andWhere('similarity(product.name, :query) > 0.3', { query })
+      .orderBy('similarity(product.name, :query)', 'DESC')
+      .limit(5)
+      .getRawMany();
+
+    return similarProducts.map((item) => item.name);
+  }
+  protected readonly logger = new Logger(AdvancedSearchService.name);
 
   constructor(
     protected readonly tenantDataSourceService: TenantDataSourceService,
@@ -82,7 +198,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
       const results: SearchResultDto[] = [];
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const result = await this.transformToSearchResult(
+        const result = this.transformToSearchResult(
           product,
           searchDto,
           i + 1 + offset,
@@ -415,11 +531,11 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
    * @param rank - Search rank
    * @returns Search result DTO
    */
-  private async transformToSearchResult(
+  private transformToSearchResult(
     product: Product,
     searchDto: AdvancedSearchDto,
     rank: number,
-  ): Promise<SearchResultDto> {
+  ): SearchResultDto {
     // Calculate relevance score (simplified)
     let relevanceScore = 1.0;
     if (searchDto.query) {

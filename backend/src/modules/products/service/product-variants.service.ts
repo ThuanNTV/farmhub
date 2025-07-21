@@ -2,7 +2,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException,
   ConflictException,
 } from '@nestjs/common';
 import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
@@ -24,6 +23,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProductVariantsService {
+  getVariants(_storeId: string, _filterDto: VariantFilterDto) {
+    throw new Error('Method not implemented.');
+  }
   private readonly logger = new Logger(ProductVariantsService.name);
 
   constructor(
@@ -63,7 +65,7 @@ export class ProductVariantsService {
 
       // Create new attribute
       const attribute = new ProductAttribute();
-      attribute.attribute_id = uuidv4();
+      attribute.attribute_id = uuidv4() as string;
       attribute.name = createDto.name;
       attribute.display_name = createDto.displayName;
       attribute.description = createDto.description;
@@ -71,11 +73,11 @@ export class ProductVariantsService {
       attribute.input_type = createDto.inputType;
       attribute.options = createDto.options;
       attribute.unit = createDto.unit;
-      attribute.is_required = createDto.isRequired || false;
+      attribute.is_required = createDto.isRequired ?? false;
       attribute.is_variant_defining = createDto.isVariantDefining !== false;
       attribute.is_filterable = createDto.isFilterable !== false;
-      attribute.is_searchable = createDto.isSearchable || false;
-      attribute.sort_order = createDto.sortOrder || 0;
+      attribute.is_searchable = createDto.isSearchable ?? false;
+      attribute.sort_order = createDto.sortOrder ?? 0;
       attribute.group_name = createDto.groupName;
       attribute.help_text = createDto.helpText;
       attribute.default_value = createDto.defaultValue;
@@ -94,6 +96,7 @@ export class ProductVariantsService {
           resourceId: savedAttribute.attribute_id,
           changes: { created: savedAttribute },
         },
+        storeId,
       });
 
       return this.transformAttributeToDto(savedAttribute);
@@ -186,7 +189,7 @@ export class ProductVariantsService {
 
       // Create new variant
       const variant = new ProductVariant();
-      variant.variant_id = uuidv4();
+      variant.variant_id = uuidv4() as string;
       variant.product_id = createDto.productId;
       variant.sku = createDto.sku;
       variant.name = createDto.name;
@@ -201,8 +204,8 @@ export class ProductVariantsService {
       variant.weight_unit = createDto.weightUnit;
       variant.dimensions = createDto.dimensions;
       variant.images = createDto.images;
-      variant.sort_order = createDto.sortOrder || 0;
-      variant.is_default = createDto.isDefault || false;
+      variant.sort_order = createDto.sortOrder ?? 0;
+      variant.is_default = createDto.isDefault ?? false;
 
       const savedVariant = await variantRepo.save(variant);
 
@@ -219,25 +222,27 @@ export class ProductVariantsService {
         }
 
         const variantAttribute = new ProductVariantAttribute();
-        variantAttribute.variant_attribute_id = uuidv4();
+        variantAttribute.variant_attribute_id = uuidv4() as string;
         variantAttribute.variant_id = savedVariant.variant_id;
         variantAttribute.attribute_id = attrDto.attributeId;
         variantAttribute.value = attrDto.value;
         variantAttribute.display_value = attrDto.displayValue;
-        variantAttribute.sort_order = attrDto.sortOrder || 0;
+        variantAttribute.sort_order = attrDto.sortOrder ?? 0;
 
         await variantAttributeRepo.save(variantAttribute);
       }
 
       // If this is set as default, unset other defaults
       if (variant.is_default) {
-        await variantRepo.update(
-          {
-            product_id: createDto.productId,
-            variant_id: { $ne: savedVariant.variant_id } as any,
-          },
-          { is_default: false },
-        );
+        await variantRepo
+          .createQueryBuilder()
+          .update(ProductVariant)
+          .set({ is_default: false })
+          .where('product_id = :productId AND variant_id != :variantId', {
+            productId: createDto.productId,
+            variantId: savedVariant.variant_id,
+          })
+          .execute();
       }
 
       // Audit log
@@ -252,6 +257,7 @@ export class ProductVariantsService {
           resourceId: savedVariant.variant_id,
           changes: { created: savedVariant },
         },
+        storeId,
       });
 
       return this.getVariantById(storeId, savedVariant.variant_id);
@@ -436,7 +442,7 @@ export class ProductVariantsService {
       if (updateDto.isActive !== undefined)
         variant.is_active = updateDto.isActive;
 
-      const savedVariant = await variantRepo.save(variant);
+      const _savedVariant = await variantRepo.save(variant);
 
       // Update attributes if provided
       if (updateDto.attributes) {
@@ -446,12 +452,12 @@ export class ProductVariantsService {
         // Add new attributes
         for (const attrDto of updateDto.attributes) {
           const variantAttribute = new ProductVariantAttribute();
-          variantAttribute.variant_attribute_id = uuidv4();
+          variantAttribute.variant_attribute_id = uuidv4() as string;
           variantAttribute.variant_id = variantId;
           variantAttribute.attribute_id = attrDto.attributeId;
           variantAttribute.value = attrDto.value;
           variantAttribute.display_value = attrDto.displayValue;
-          variantAttribute.sort_order = attrDto.sortOrder || 0;
+          variantAttribute.sort_order = attrDto.sortOrder ?? 0;
 
           await variantAttributeRepo.save(variantAttribute);
         }
@@ -465,7 +471,7 @@ export class ProductVariantsService {
           .set({ is_default: false })
           .where('product_id = :productId AND variant_id != :variantId', {
             productId: variant.product_id,
-            variantId: variantId,
+            variantId,
           })
           .execute();
       }
@@ -476,11 +482,12 @@ export class ProductVariantsService {
         action: 'UPDATE_PRODUCT_VARIANT',
         targetTable: 'ProductVariant',
         targetId: variantId,
+        storeId,
         metadata: {
           action: 'UPDATE_PRODUCT_VARIANT',
           resource: 'ProductVariant',
           resourceId: variantId,
-          changes: updateDto,
+          changes: { ...updateDto },
         },
       });
 
@@ -532,6 +539,7 @@ export class ProductVariantsService {
           resource: 'ProductVariant',
           resourceId: variantId,
         },
+        storeId,
       });
     } catch (error) {
       const errorMessage =
@@ -573,15 +581,14 @@ export class ProductVariantsService {
       isActive: variant.is_active,
       createdAt: variant.created_at,
       updatedAt: variant.updated_at,
-      attributes:
-        variant.attributes?.map((attr) => ({
-          variantAttributeId: attr.variant_attribute_id,
-          attributeId: attr.attribute_id,
-          attribute: this.transformAttributeToDto(attr.attribute),
-          value: attr.value,
-          displayValue: attr.display_value,
-          sortOrder: attr.sort_order,
-        })) || [],
+      attributes: variant.attributes.map((attr) => ({
+        variantAttributeId: attr.variant_attribute_id,
+        attributeId: attr.attribute_id,
+        attribute: this.transformAttributeToDto(attr.attribute),
+        value: attr.value,
+        displayValue: attr.display_value,
+        sortOrder: attr.sort_order,
+      })),
     };
   }
 

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
 import { SecurityModule } from 'src/common/auth/security.module';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbglobal/global-database.module';
 import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity';
 import { User } from 'src/entities/global/user.entity';
 import { Store } from 'src/entities/global/store.entity';

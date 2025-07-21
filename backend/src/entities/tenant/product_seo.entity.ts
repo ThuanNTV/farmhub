@@ -37,10 +37,21 @@ export class ProductSeo {
   @Column({ type: 'json', name: 'seo_keywords', nullable: true })
   seo_keywords?: string[];
 
-  @Column({ type: 'varchar', length: 500, name: 'canonical_url', nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 500,
+    name: 'canonical_url',
+    nullable: true,
+  })
   canonical_url?: string;
 
-  @Column({ type: 'varchar', length: 100, name: 'meta_robots', nullable: true, default: 'index,follow' })
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'meta_robots',
+    nullable: true,
+    default: 'index,follow',
+  })
   meta_robots?: string;
 
   @Column({ type: 'json', name: 'hreflang_tags', nullable: true })
@@ -121,10 +132,23 @@ export class ProductSeo {
     analyzedAt: Date;
   };
 
-  @Column({ type: 'varchar', length: 50, name: 'sitemap_change_freq', nullable: true, default: 'weekly' })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    name: 'sitemap_change_freq',
+    nullable: true,
+    default: 'weekly',
+  })
   sitemap_change_freq?: string;
 
-  @Column({ type: 'decimal', precision: 3, scale: 2, name: 'sitemap_priority', nullable: true, default: 0.8 })
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    name: 'sitemap_priority',
+    nullable: true,
+    default: 0.8,
+  })
   sitemap_priority?: number;
 
   @Column({ type: 'boolean', name: 'sitemap_include', default: true })
@@ -143,7 +167,13 @@ export class ProductSeo {
   @Column({ type: 'int', name: 'click_count', default: 0 })
   click_count!: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 4, name: 'ctr', nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 4,
+    name: 'ctr',
+    nullable: true,
+  })
   ctr?: number;
 
   @Column({ type: 'json', name: 'search_console_data', nullable: true })

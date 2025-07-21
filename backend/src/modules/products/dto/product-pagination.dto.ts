@@ -22,21 +22,21 @@ export class PaginationMetaDto {
 }
 
 export class ProductPaginationDto {
-  @ApiProperty({ 
-    description: 'Danh sách sản phẩm', 
-    type: [ProductResponseDto] 
+  @ApiProperty({
+    description: 'Danh sách sản phẩm',
+    type: [ProductResponseDto],
   })
   data!: ProductResponseDto[];
 
-  @ApiProperty({ 
-    description: 'Thông tin phân trang', 
-    type: PaginationMetaDto 
+  @ApiProperty({
+    description: 'Thông tin phân trang',
+    type: PaginationMetaDto,
   })
   pagination!: PaginationMetaDto;
 
-  @ApiProperty({ 
-    description: 'Thông tin bổ sung', 
-    required: false 
+  @ApiProperty({
+    description: 'Thông tin bổ sung',
+    required: false,
   })
   meta?: {
     totalValue?: number; // Tổng giá trị sản phẩm

@@ -1,62 +1,103 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString, IsEnum, IsNumber, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ProductReportFilterDto {
-  @ApiProperty({ description: 'Ngày bắt đầu', required: false, example: '2024-01-01' })
+  @ApiProperty({
+    description: 'Ngày bắt đầu',
+    required: false,
+    example: '2024-01-01',
+  })
   @IsOptional()
   @IsDateString()
   dateFrom?: string;
 
-  @ApiProperty({ description: 'Ngày kết thúc', required: false, example: '2024-12-31' })
+  @ApiProperty({
+    description: 'Ngày kết thúc',
+    required: false,
+    example: '2024-12-31',
+  })
   @IsOptional()
   @IsDateString()
   dateTo?: string;
 
-  @ApiProperty({ description: 'ID danh mục', required: false, example: 'cat-001' })
+  @ApiProperty({
+    description: 'ID danh mục',
+    required: false,
+    example: 'cat-001',
+  })
   @IsOptional()
   @IsString()
   categoryId?: string;
 
-  @ApiProperty({ description: 'Danh sách ID danh mục', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID danh mục',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   categoryIds?: string[];
 
-  @ApiProperty({ description: 'ID nhà cung cấp', required: false, example: 'sup-001' })
+  @ApiProperty({
+    description: 'ID nhà cung cấp',
+    required: false,
+    example: 'sup-001',
+  })
   @IsOptional()
   @IsString()
   supplierId?: string;
 
-  @ApiProperty({ description: 'Thương hiệu', required: false, example: 'Brand A' })
+  @ApiProperty({
+    description: 'Thương hiệu',
+    required: false,
+    example: 'Brand A',
+  })
   @IsOptional()
   @IsString()
   brand?: string;
 
-  @ApiProperty({ 
-    description: 'Loại báo cáo', 
+  @ApiProperty({
+    description: 'Loại báo cáo',
     enum: ['overview', 'sales', 'inventory', 'performance', 'trends'],
     required: false,
-    default: 'overview'
+    default: 'overview',
   })
   @IsOptional()
   @IsEnum(['overview', 'sales', 'inventory', 'performance', 'trends'])
-  reportType?: 'overview' | 'sales' | 'inventory' | 'performance' | 'trends' = 'overview';
+  reportType?: 'overview' | 'sales' | 'inventory' | 'performance' | 'trends' =
+    'overview';
 
-  @ApiProperty({ 
-    description: 'Khoảng thời gian nhóm', 
+  @ApiProperty({
+    description: 'Khoảng thời gian nhóm',
     enum: ['day', 'week', 'month', 'quarter', 'year'],
     required: false,
-    default: 'month'
+    default: 'month',
   })
   @IsOptional()
   @IsEnum(['day', 'week', 'month', 'quarter', 'year'])
   groupBy?: 'day' | 'week' | 'month' | 'quarter' | 'year' = 'month';
 
-  @ApiProperty({ description: 'Chỉ sản phẩm active', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm active',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   isActive?: boolean = true;
 
-  @ApiProperty({ description: 'Bao gồm sản phẩm đã xóa', required: false, default: false })
+  @ApiProperty({
+    description: 'Bao gồm sản phẩm đã xóa',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   includeDeleted?: boolean = false;
 }
@@ -153,12 +194,18 @@ export class InventoryReportDto {
     percentage: number;
   }>;
 
-  @ApiProperty({ description: 'Phân bố theo danh mục', type: [CategoryPerformanceDto] })
+  @ApiProperty({
+    description: 'Phân bố theo danh mục',
+    type: [CategoryPerformanceDto],
+  })
   categoryDistribution!: CategoryPerformanceDto[];
 }
 
 export class ProductTrendsDto {
-  @ApiProperty({ description: 'Xu hướng tạo sản phẩm theo thời gian', type: [Object] })
+  @ApiProperty({
+    description: 'Xu hướng tạo sản phẩm theo thời gian',
+    type: [Object],
+  })
   creationTrends!: Array<{
     period: string;
     count: number;
@@ -202,7 +249,10 @@ export class ProductTrendsDto {
 }
 
 export class ProductPerformanceReportDto {
-  @ApiProperty({ description: 'Báo cáo tổng quan', type: ProductOverviewReportDto })
+  @ApiProperty({
+    description: 'Báo cáo tổng quan',
+    type: ProductOverviewReportDto,
+  })
   overview!: ProductOverviewReportDto;
 
   @ApiProperty({ description: 'Báo cáo tồn kho', type: InventoryReportDto })
@@ -211,10 +261,16 @@ export class ProductPerformanceReportDto {
   @ApiProperty({ description: 'Xu hướng sản phẩm', type: ProductTrendsDto })
   trends!: ProductTrendsDto;
 
-  @ApiProperty({ description: 'Hiệu suất theo danh mục', type: [CategoryPerformanceDto] })
+  @ApiProperty({
+    description: 'Hiệu suất theo danh mục',
+    type: [CategoryPerformanceDto],
+  })
   categoryPerformance!: CategoryPerformanceDto[];
 
-  @ApiProperty({ description: 'Thời gian tạo báo cáo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo báo cáo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 
   @ApiProperty({ description: 'Khoảng thời gian báo cáo' })
@@ -235,19 +291,27 @@ export class ProductPerformanceReportDto {
 }
 
 export class ExportReportDto {
-  @ApiProperty({ 
-    description: 'Định dạng xuất', 
+  @ApiProperty({
+    description: 'Định dạng xuất',
     enum: ['excel', 'csv', 'pdf'],
-    example: 'excel'
+    example: 'excel',
   })
   @IsEnum(['excel', 'csv', 'pdf'])
   format!: 'excel' | 'csv' | 'pdf';
 
-  @ApiProperty({ description: 'Bao gồm biểu đồ', required: false, default: true })
+  @ApiProperty({
+    description: 'Bao gồm biểu đồ',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   includeCharts?: boolean = true;
 
-  @ApiProperty({ description: 'Bao gồm chi tiết', required: false, default: false })
+  @ApiProperty({
+    description: 'Bao gồm chi tiết',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   includeDetails?: boolean = false;
 

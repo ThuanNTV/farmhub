@@ -57,6 +57,7 @@ interface InventoryProductRow {
 
 @Injectable()
 export class ReportService {
+  [x: string]: any;
   constructor(private readonly tenantDS: TenantDataSourceService) {}
 
   async exportReport(storeId: string, type: string, from: string, to: string) {

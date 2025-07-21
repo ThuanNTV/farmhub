@@ -1,53 +1,87 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber, IsEnum, IsArray, IsBoolean, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsArray,
+  IsBoolean,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class AdvancedSearchDto {
-  @ApiProperty({ description: 'Từ khóa tìm kiếm', required: false, example: 'phân bón NPK' })
+  @ApiProperty({
+    description: 'Từ khóa tìm kiếm',
+    required: false,
+    example: 'phân bón NPK',
+  })
   @IsOptional()
   @IsString()
   query?: string;
 
-  @ApiProperty({ 
-    description: 'Loại tìm kiếm', 
+  @ApiProperty({
+    description: 'Loại tìm kiếm',
     enum: ['simple', 'phrase', 'boolean', 'fuzzy', 'wildcard'],
     required: false,
-    default: 'simple'
+    default: 'simple',
   })
   @IsOptional()
   @IsEnum(['simple', 'phrase', 'boolean', 'fuzzy', 'wildcard'])
-  searchType?: 'simple' | 'phrase' | 'boolean' | 'fuzzy' | 'wildcard' = 'simple';
+  searchType?: 'simple' | 'phrase' | 'boolean' | 'fuzzy' | 'wildcard' =
+    'simple';
 
-  @ApiProperty({ 
-    description: 'Trường tìm kiếm', 
+  @ApiProperty({
+    description: 'Trường tìm kiếm',
     enum: ['all', 'name', 'description', 'barcode', 'brand', 'specs'],
     required: false,
     isArray: true,
-    default: ['all']
+    default: ['all'],
   })
   @IsOptional()
   @IsArray()
-  @IsEnum(['all', 'name', 'description', 'barcode', 'brand', 'specs'], { each: true })
-  searchFields?: ('all' | 'name' | 'description' | 'barcode' | 'brand' | 'specs')[] = ['all'];
+  @IsEnum(['all', 'name', 'description', 'barcode', 'brand', 'specs'], {
+    each: true,
+  })
+  searchFields?: (
+    | 'all'
+    | 'name'
+    | 'description'
+    | 'barcode'
+    | 'brand'
+    | 'specs'
+  )[] = ['all'];
 
-  @ApiProperty({ 
-    description: 'Ngôn ngữ tìm kiếm', 
+  @ApiProperty({
+    description: 'Ngôn ngữ tìm kiếm',
     enum: ['vietnamese', 'english', 'simple'],
     required: false,
-    default: 'vietnamese'
+    default: 'vietnamese',
   })
   @IsOptional()
   @IsEnum(['vietnamese', 'english', 'simple'])
   language?: 'vietnamese' | 'english' | 'simple' = 'vietnamese';
 
-  @ApiProperty({ description: 'Trang hiện tại', required: false, minimum: 1, default: 1 })
+  @ApiProperty({
+    description: 'Trang hiện tại',
+    required: false,
+    minimum: 1,
+    default: 1,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
   page?: number = 1;
 
-  @ApiProperty({ description: 'Số lượng mỗi trang', required: false, minimum: 1, maximum: 100, default: 10 })
+  @ApiProperty({
+    description: 'Số lượng mỗi trang',
+    required: false,
+    minimum: 1,
+    maximum: 100,
+    default: 10,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -55,39 +89,70 @@ export class AdvancedSearchDto {
   @Max(100)
   limit?: number = 10;
 
-  @ApiProperty({ description: 'Sắp xếp theo', enum: ['relevance', 'name', 'price', 'created_at', 'stock'], required: false, default: 'relevance' })
+  @ApiProperty({
+    description: 'Sắp xếp theo',
+    enum: ['relevance', 'name', 'price', 'created_at', 'stock'],
+    required: false,
+    default: 'relevance',
+  })
   @IsOptional()
   @IsEnum(['relevance', 'name', 'price', 'created_at', 'stock'])
-  sortBy?: 'relevance' | 'name' | 'price' | 'created_at' | 'stock' = 'relevance';
+  sortBy?: 'relevance' | 'name' | 'price' | 'created_at' | 'stock' =
+    'relevance';
 
-  @ApiProperty({ description: 'Thứ tự sắp xếp', enum: ['ASC', 'DESC'], required: false, default: 'DESC' })
+  @ApiProperty({
+    description: 'Thứ tự sắp xếp',
+    enum: ['ASC', 'DESC'],
+    required: false,
+    default: 'DESC',
+  })
   @IsOptional()
   @IsEnum(['ASC', 'DESC'])
   sortOrder?: 'ASC' | 'DESC' = 'DESC';
 
-  @ApiProperty({ description: 'Highlight kết quả', required: false, default: true })
+  @ApiProperty({
+    description: 'Highlight kết quả',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   highlight?: boolean = true;
 
-  @ApiProperty({ description: 'Chỉ sản phẩm đang hoạt động', required: false, default: true })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm đang hoạt động',
+    required: false,
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   activeOnly?: boolean = true;
 
-  @ApiProperty({ description: 'Chỉ sản phẩm có tồn kho', required: false, default: false })
+  @ApiProperty({
+    description: 'Chỉ sản phẩm có tồn kho',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   inStockOnly?: boolean = false;
 
   // Filters
-  @ApiProperty({ description: 'Danh sách ID danh mục', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID danh mục',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   categoryIds?: string[];
 
-  @ApiProperty({ description: 'Danh sách thương hiệu', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách thương hiệu',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -107,14 +172,22 @@ export class AdvancedSearchDto {
   @Min(0)
   maxPrice?: number;
 
-  @ApiProperty({ description: 'Tồn kho tối thiểu', required: false, minimum: 0 })
+  @ApiProperty({
+    description: 'Tồn kho tối thiểu',
+    required: false,
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
   minStock?: number;
 
-  @ApiProperty({ description: 'Danh sách ID nhà cung cấp', required: false, type: [String] })
+  @ApiProperty({
+    description: 'Danh sách ID nhà cung cấp',
+    required: false,
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -131,10 +204,16 @@ export class SearchResultDto {
   @ApiProperty({ description: 'Tên sản phẩm', example: 'Phân bón NPK 16-16-8' })
   name!: string;
 
-  @ApiProperty({ description: 'Slug sản phẩm', example: 'phan-bon-npk-16-16-8' })
+  @ApiProperty({
+    description: 'Slug sản phẩm',
+    example: 'phan-bon-npk-16-16-8',
+  })
   slug!: string;
 
-  @ApiProperty({ description: 'Mô tả sản phẩm', example: 'Phân bón NPK chất lượng cao' })
+  @ApiProperty({
+    description: 'Mô tả sản phẩm',
+    example: 'Phân bón NPK chất lượng cao',
+  })
   description!: string;
 
   @ApiProperty({ description: 'ID danh mục', example: 'cat-001' })
@@ -177,7 +256,10 @@ export class SearchResultDto {
 }
 
 export class AdvancedSearchResponseDto {
-  @ApiProperty({ description: 'Danh sách kết quả tìm kiếm', type: [SearchResultDto] })
+  @ApiProperty({
+    description: 'Danh sách kết quả tìm kiếm',
+    type: [SearchResultDto],
+  })
   results!: SearchResultDto[];
 
   @ApiProperty({ description: 'Thông tin phân trang' })
@@ -209,7 +291,10 @@ export class AdvancedSearchResponseDto {
     stockStatus: Array<{ status: string; count: number }>;
   };
 
-  @ApiProperty({ description: 'Thời gian tạo kết quả', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo kết quả',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 
@@ -234,7 +319,10 @@ export class SearchSuggestionsResponseDto {
   @ApiProperty({ description: 'Danh sách gợi ý', type: [SearchSuggestionDto] })
   suggestions!: SearchSuggestionDto[];
 
-  @ApiProperty({ description: 'Thời gian tạo gợi ý', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo gợi ý',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 
@@ -255,17 +343,23 @@ export class SearchAnalyticsDto {
   }>;
 
   @ApiProperty({ description: 'Thống kê theo loại tìm kiếm' })
-  searchTypeStats!: Record<string, {
-    count: number;
-    avgResultCount: number;
-    avgSearchTime: number;
-  }>;
+  searchTypeStats!: Record<
+    string,
+    {
+      count: number;
+      avgResultCount: number;
+      avgSearchTime: number;
+    }
+  >;
 
   @ApiProperty({ description: 'Thống kê theo trường tìm kiếm' })
-  searchFieldStats!: Record<string, {
-    count: number;
-    avgResultCount: number;
-  }>;
+  searchFieldStats!: Record<
+    string,
+    {
+      count: number;
+      avgResultCount: number;
+    }
+  >;
 
   @ApiProperty({ description: 'Hiệu suất tìm kiếm' })
   performance!: {
@@ -275,7 +369,10 @@ export class SearchAnalyticsDto {
     successRate: number;
   };
 
-  @ApiProperty({ description: 'Thời gian tạo báo cáo', example: '2024-01-15T10:30:00Z' })
+  @ApiProperty({
+    description: 'Thời gian tạo báo cáo',
+    example: '2024-01-15T10:30:00Z',
+  })
   generatedAt!: Date;
 }
 

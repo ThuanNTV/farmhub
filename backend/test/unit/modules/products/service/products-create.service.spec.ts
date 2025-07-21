@@ -7,6 +7,7 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 import { Product } from 'src/entities/tenant/product.entity';
 import { Category } from 'src/entities/tenant/category.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service';
+import { PriceHistoriesService } from 'src/modules/price-histories/service/price-histories.service';
 
 describe('ProductsService - createProduct (Detailed)', () => {
   let service: ProductsService;
@@ -14,6 +15,7 @@ describe('ProductsService - createProduct (Detailed)', () => {
   let mockProductRepository: jest.Mocked<any>;
   let mockCategoryRepository: jest.Mocked<any>;
   let mockAuditLogsService: jest.Mocked<AuditLogsService>;
+  let mockPriceHistoriesService: jest.Mocked<PriceHistoriesService>;
   let loggerSpy: jest.SpyInstance;
 
   const storeId = 'store-123';
@@ -102,6 +104,10 @@ describe('ProductsService - createProduct (Detailed)', () => {
       create: jest.fn(),
     } as any;
 
+    mockPriceHistoriesService = {
+      createPriceHistories: jest.fn(),
+    } as any;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
@@ -112,6 +118,10 @@ describe('ProductsService - createProduct (Detailed)', () => {
         {
           provide: AuditLogsService,
           useValue: mockAuditLogsService,
+        },
+        {
+          provide: PriceHistoriesService,
+          useValue: mockPriceHistoriesService,
         },
       ],
     }).compile();

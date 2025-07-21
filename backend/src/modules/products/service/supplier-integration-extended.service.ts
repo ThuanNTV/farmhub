@@ -1,20 +1,30 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { TenantBaseService } from 'src/core/tenant/tenant-base.service';
-import { TenantDataSourceService } from 'src/core/tenant/tenant-datasource.service';
-import { Product } from '../entity/product.entity';
 import { Supplier } from 'src/entities/tenant/supplier.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service/audit-logs.service';
-import { 
+import {
   SupplierProductDto,
   SupplierSummaryDto,
   AssignSupplierDto,
   UnassignSupplierDto,
-  SupplierOperationResultDto
+  SupplierOperationResultDto,
 } from '../dto/supplier-integration.dto';
+import { TenantBaseService } from 'src/service/tenant/tenant-base.service';
+import { Product } from 'src/entities/tenant/product.entity';
+import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasource.service';
 
 @Injectable()
 export class SupplierIntegrationExtendedService extends TenantBaseService<Product> {
-  private readonly logger = new Logger(SupplierIntegrationExtendedService.name);
+  // Định nghĩa khoá chính cho entity Product
+  protected primaryKey = 'product_id';
+
+  protected async getRepo(storeId: string) {
+    const dataSource =
+      await this.tenantDataSourceService.getTenantDataSource(storeId);
+    return dataSource.getRepository(Product);
+  }
+  protected readonly logger = new Logger(
+    SupplierIntegrationExtendedService.name,
+  );
 
   constructor(
     protected readonly tenantDataSourceService: TenantDataSourceService,
@@ -29,11 +39,17 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
    * @param assignDto - Assignment data
    * @returns Operation result
    */
-  async assignSupplierToProducts(storeId: string, assignDto: AssignSupplierDto): Promise<SupplierOperationResultDto> {
+  async assignSupplierToProducts(
+    storeId: string,
+    assignDto: AssignSupplierDto,
+  ): Promise<SupplierOperationResultDto> {
     try {
-      this.logger.log(`Assigning supplier ${assignDto.supplierId} to ${assignDto.productIds.length} products in store: ${storeId}`);
+      this.logger.log(
+        `Assigning supplier ${assignDto.supplierId} to ${assignDto.productIds.length} products in store: ${storeId}`,
+      );
 
-      const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+      const dataSource =
+        await this.tenantDataSourceService.getTenantDataSource(storeId);
       const productRepo = dataSource.getRepository(Product);
       const supplierRepo = dataSource.getRepository(Supplier);
 
@@ -43,7 +59,9 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
       });
 
       if (!supplier) {
-        throw new NotFoundException(`Supplier with ID ${assignDto.supplierId} not found`);
+        throw new NotFoundException(
+          `Supplier with ID ${assignDto.supplierId} not found`,
+        );
       }
 
       const result: SupplierOperationResultDto = {
@@ -92,25 +110,36 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
               resource: 'Product',
               resourceId: productId,
               changes: {
-                supplier_id: { before: oldSupplierId, after: assignDto.supplierId },
+                supplier_id: {
+                  before: oldSupplierId,
+                  after: assignDto.supplierId,
+                },
                 supplier_name: supplier.name,
                 note: assignDto.note,
               },
             },
+            storeId,
           });
-
         } catch (error) {
           result.failureCount++;
           result.failureIds.push(productId);
-          result.errors.push(`Product ${productId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Product ${productId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          );
         }
       }
 
-      this.logger.log(`Supplier assignment completed: ${result.successCount} success, ${result.failureCount} failures`);
+      this.logger.log(
+        `Supplier assignment completed: ${result.successCount} success, ${result.failureCount} failures`,
+      );
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to assign supplier: ${errorMessage}`, error instanceof Error ? error.stack : undefined);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Failed to assign supplier: ${errorMessage}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -121,9 +150,14 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
    * @param unassignDto - Unassignment data
    * @returns Operation result
    */
-  async unassignSupplierFromProducts(storeId: string, unassignDto: UnassignSupplierDto): Promise<SupplierOperationResultDto> {
+  async unassignSupplierFromProducts(
+    storeId: string,
+    unassignDto: UnassignSupplierDto,
+  ): Promise<SupplierOperationResultDto> {
     try {
-      this.logger.log(`Unassigning supplier from ${unassignDto.productIds.length} products in store: ${storeId}`);
+      this.logger.log(
+        `Unassigning supplier from ${unassignDto.productIds.length} products in store: ${storeId}`,
+      );
 
       const productRepo = await this.getRepo(storeId);
 
@@ -173,20 +207,28 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
                 note: unassignDto.note,
               },
             },
+            storeId,
           });
-
         } catch (error) {
           result.failureCount++;
           result.failureIds.push(productId);
-          result.errors.push(`Product ${productId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Product ${productId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          );
         }
       }
 
-      this.logger.log(`Supplier unassignment completed: ${result.successCount} success, ${result.failureCount} failures`);
+      this.logger.log(
+        `Supplier unassignment completed: ${result.successCount} success, ${result.failureCount} failures`,
+      );
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to unassign supplier: ${errorMessage}`, error instanceof Error ? error.stack : undefined);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Failed to unassign supplier: ${errorMessage}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -198,26 +240,33 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
    * @param limit - Items per page
    * @returns Products without supplier
    */
-  async getProductsWithoutSupplier(storeId: string, page: number = 1, limit: number = 10): Promise<any> {
+  async getProductsWithoutSupplier(
+    storeId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<any> {
     try {
-      this.logger.debug(`Getting products without supplier in store: ${storeId}`);
+      this.logger.debug(
+        `Getting products without supplier in store: ${storeId}`,
+      );
 
       const productRepo = await this.getRepo(storeId);
       const offset = (page - 1) * limit;
 
-      const queryBuilder = productRepo.createQueryBuilder('product')
+      const queryBuilder = productRepo
+        .createQueryBuilder('product')
         .where('product.is_deleted = :isDeleted', { isDeleted: false })
-        .andWhere('(product.supplier_id IS NULL OR product.supplier_id = \'\')')
+        .andWhere("(product.supplier_id IS NULL OR product.supplier_id = '')")
         .orderBy('product.created_at', 'DESC')
         .skip(offset)
         .take(limit);
 
       const [products, total] = await queryBuilder.getManyAndCount();
 
-      const productDtos: SupplierProductDto[] = products.map(product => ({
+      const productDtos: SupplierProductDto[] = products.map((product) => ({
         productId: product.product_id,
         productName: product.name,
-        sku: product.sku,
+        // sku: product.sku,
         barcode: product.barcode,
         category: product.category_id,
         priceRetail: product.price_retail,
@@ -242,8 +291,12 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
         },
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to get products without supplier: ${errorMessage}`, error instanceof Error ? error.stack : undefined);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Failed to get products without supplier: ${errorMessage}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -253,11 +306,16 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
    * @param storeId - Store ID
    * @returns Suppliers with product counts
    */
-  async getSuppliersWithProductCounts(storeId: string): Promise<SupplierSummaryDto[]> {
+  async getSuppliersWithProductCounts(
+    storeId: string,
+  ): Promise<SupplierSummaryDto[]> {
     try {
-      this.logger.debug(`Getting suppliers with product counts for store: ${storeId}`);
+      this.logger.debug(
+        `Getting suppliers with product counts for store: ${storeId}`,
+      );
 
-      const dataSource = await this.tenantDataSourceService.getTenantDataSource(storeId);
+      const dataSource =
+        await this.tenantDataSourceService.getTenantDataSource(storeId);
       const supplierRepo = dataSource.getRepository(Supplier);
       const productRepo = dataSource.getRepository(Product);
 
@@ -273,10 +331,19 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
           where: { supplier_id: supplier.id, is_deleted: false },
         });
 
-        const activeProducts = products.filter(p => p.is_active);
-        const totalInventoryValue = products.reduce((sum, p) => sum + (p.price_retail * p.stock), 0);
-        const lowStockProducts = products.filter(p => p.stock <= p.min_stock_level);
-        const averagePrice = products.length > 0 ? products.reduce((sum, p) => sum + p.price_retail, 0) / products.length : 0;
+        const activeProducts = products.filter((p) => p.is_active);
+        const totalInventoryValue = products.reduce(
+          (sum, p) => sum + p.price_retail * p.stock,
+          0,
+        );
+        const lowStockProducts = products.filter(
+          (p) => p.stock <= p.min_stock_level,
+        );
+        const averagePrice =
+          products.length > 0
+            ? products.reduce((sum, p) => sum + p.price_retail, 0) /
+              products.length
+            : 0;
 
         supplierSummaries.push({
           supplierId: supplier.id,
@@ -295,10 +362,16 @@ export class SupplierIntegrationExtendedService extends TenantBaseService<Produc
         });
       }
 
-      return supplierSummaries.sort((a, b) => b.totalInventoryValue - a.totalInventoryValue);
+      return supplierSummaries.sort(
+        (a, b) => b.totalInventoryValue - a.totalInventoryValue,
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to get suppliers with product counts: ${errorMessage}`, error instanceof Error ? error.stack : undefined);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(
+        `Failed to get suppliers with product counts: ${errorMessage}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }

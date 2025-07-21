@@ -5,7 +5,7 @@ import { AuditLogsModule } from 'src/modules/audit-logs/audit-logs.module';
 import { PaymentMethodsService } from 'src/modules/payment-methods/service/payment-methods.service';
 import { PaymentMethod } from 'src/entities/global/payment_method.entity';
 import { SecurityModule } from 'src/common/auth/security.module';
-import { GlobalDatabaseModule } from 'src/config/db/dbtenant/global-database.module';
+import { GlobalDatabaseModule } from 'src/config/db/dbglobal/global-database.module';
 import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
 
 @Module({

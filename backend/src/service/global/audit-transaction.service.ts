@@ -104,7 +104,7 @@ export class AuditTransactionService {
         orderId,
         orderData,
         storeId,
-        { details: { operation: 'order_creation' } },
+        { details: JSON.stringify({ operation: 'order_creation' }) },
       );
     }
   }

@@ -228,7 +228,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('response.status throw error không làm crash filter', () => {
-    mockResponse.status = jest.fn(() => {
+    mockResponse.status.mockImplementation(() => {
       throw new Error('status fail');
     });
     const ex = new Error('fail');
@@ -236,7 +236,7 @@ describe('AllExceptionsFilter bổ sung coverage', () => {
   });
 
   it('response.json throw error không làm crash filter', () => {
-    mockResponse.json = jest.fn(() => {
+    mockResponse.json.mockImplementation(() => {
       throw new Error('json fail');
     });
     const ex = new Error('fail');

@@ -92,6 +92,22 @@ describe('CategoriesController', () => {
       name: 'Test Category',
       slug: 'test-category',
     } as any;
+    // Thêm mockResolvedValue cho tất cả các phương thức được sử dụng
+    mockService.createCategory.mockResolvedValue({
+      message: 'ok',
+      data: mockCategory,
+    });
+    mockService.findAll.mockResolvedValue([mockCategory]);
+    mockService.findOne.mockResolvedValue(mockCategory);
+    mockService.update.mockResolvedValue({ message: 'ok', data: mockCategory });
+    mockService.remove.mockResolvedValue({ message: 'ok' });
+    mockService.restore.mockResolvedValue({
+      message: 'ok',
+      data: mockCategory,
+    });
+    mockService.findByParent.mockResolvedValue([mockCategory]);
+    mockService.getCategoryTree.mockResolvedValue([]);
+
     const result = await controller.create(storeId, dto);
     expect(mockService.createCategory).toHaveBeenCalledWith(storeId, dto);
     expect(result).toBeDefined();
@@ -143,6 +159,7 @@ describe('CategoriesController', () => {
   });
 
   it('getCategoryTree gọi service và trả về tree', async () => {
+    mockService.getCategoryTree.mockResolvedValue([]);
     const result = await controller.getCategoryTree(storeId);
     expect(mockService.getCategoryTree).toHaveBeenCalledWith(storeId);
     expect(result).toBeDefined();

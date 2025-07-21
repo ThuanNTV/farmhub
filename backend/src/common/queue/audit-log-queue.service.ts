@@ -1,21 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { AuditMetadata } from 'src/common/types/common.types';
 
 export interface AuditLogJobData {
   userId: string;
-  userName: string;
+  userName?: string;
   action: string;
-  resource: string;
-  resourceId?: string;
-  oldValue?: any;
-  newValue?: any;
+  targetTable: string;
+  targetId: string;
+  storeId: string;
+  oldValue?: Record<string, any>;
+  newValue?: Record<string, any>;
+  metadata?: AuditMetadata;
   ipAddress?: string;
   userAgent?: string;
-  timestamp: Date;
-  storeId?: string;
   sessionId?: string;
-  details?: any;
+  details?: string;
 }
 
 @Injectable()

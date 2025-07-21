@@ -11,7 +11,6 @@ import {
   mockSecurityService,
   mockAuditLogAsyncService,
   mockReflector,
-  mockInstallmentsService,
   mockEnhancedAuthGuard,
   mockPermissionGuard,
   mockAuditInterceptor,
@@ -22,6 +21,11 @@ describe('InstallmentsController', () => {
   let installmentsService: jest.Mocked<InstallmentsService>;
 
   beforeEach(async () => {
+    const mockInstallmentsService = {
+      createInstallment: jest.fn(),
+      findAllInstallments: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [InstallmentsController],
       providers: [

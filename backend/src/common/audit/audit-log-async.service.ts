@@ -20,20 +20,19 @@ export class AuditLogAsyncService {
   async logCreate(
     userId: string,
     userName: string,
-    resource: string,
-    resourceId: string,
+    targetTable: string,
+    targetId: string,
     newData: any,
-    storeId?: string,
+    storeId: string,
     additionalData?: Partial<AuditLogJobData>,
   ): Promise<void> {
     const auditData: AuditLogJobData = {
       userId,
       userName,
       action: 'CREATE',
-      resource,
-      resourceId,
+      targetTable,
+      targetId,
       newValue: newData,
-      timestamp: new Date(),
       storeId,
       ...additionalData,
     };
@@ -47,22 +46,21 @@ export class AuditLogAsyncService {
   async logUpdate(
     userId: string,
     userName: string,
-    resource: string,
-    resourceId: string,
+    targetTable: string,
+    targetId: string,
     oldData: any,
     newData: any,
-    storeId?: string,
+    storeId: string,
     additionalData?: Partial<AuditLogJobData>,
   ): Promise<void> {
     const auditData: AuditLogJobData = {
       userId,
       userName,
       action: 'UPDATE',
-      resource,
-      resourceId,
+      targetTable,
+      targetId,
       oldValue: oldData,
       newValue: newData,
-      timestamp: new Date(),
       storeId,
       ...additionalData,
     };
@@ -76,20 +74,19 @@ export class AuditLogAsyncService {
   async logDelete(
     userId: string,
     userName: string,
-    resource: string,
-    resourceId: string,
+    targetTable: string,
+    targetId: string,
     deletedData: any,
-    storeId?: string,
+    storeId: string,
     additionalData?: Partial<AuditLogJobData>,
   ): Promise<void> {
     const auditData: AuditLogJobData = {
       userId,
       userName,
       action: 'DELETE',
-      resource,
-      resourceId,
+      targetTable,
+      targetId,
       oldValue: deletedData,
-      timestamp: new Date(),
       storeId,
       ...additionalData,
     };
@@ -103,6 +100,7 @@ export class AuditLogAsyncService {
   async logLogin(
     userId: string,
     userName: string,
+    storeId: string,
     ipAddress?: string,
     userAgent?: string,
     additionalData?: Partial<AuditLogJobData>,
@@ -111,8 +109,9 @@ export class AuditLogAsyncService {
       userId,
       userName,
       action: 'LOGIN',
-      resource: 'authentication',
-      timestamp: new Date(),
+      targetTable: 'authentication',
+      targetId: userId,
+      storeId,
       ipAddress,
       userAgent,
       ...additionalData,
@@ -127,6 +126,7 @@ export class AuditLogAsyncService {
   async logLogout(
     userId: string,
     userName: string,
+    storeId: string,
     ipAddress?: string,
     userAgent?: string,
     additionalData?: Partial<AuditLogJobData>,
@@ -135,8 +135,9 @@ export class AuditLogAsyncService {
       userId,
       userName,
       action: 'LOGOUT',
-      resource: 'authentication',
-      timestamp: new Date(),
+      targetTable: 'authentication',
+      targetId: userId,
+      storeId,
       ipAddress,
       userAgent,
       ...additionalData,
@@ -152,20 +153,19 @@ export class AuditLogAsyncService {
     userId: string,
     userName: string,
     action: string,
-    resource: string,
-    resourceId?: string,
-    data?: any,
-    storeId?: string,
+    targetTable: string,
+    targetId: string,
+    data: any,
+    storeId: string,
     additionalData?: Partial<AuditLogJobData>,
   ): Promise<void> {
     const auditData: AuditLogJobData = {
       userId,
       userName,
       action,
-      resource,
-      resourceId,
+      targetTable,
+      targetId,
       details: data,
-      timestamp: new Date(),
       storeId,
       ...additionalData,
     };
@@ -177,13 +177,7 @@ export class AuditLogAsyncService {
    * Ghi audit log bulk cho nhiều hành động cùng lúc
    */
   async logBulkActions(auditDataArray: AuditLogJobData[]): Promise<void> {
-    // Thêm timestamp cho tất cả nếu chưa có
-    const dataWithTimestamp = auditDataArray.map((data) => ({
-      ...data,
-      timestamp: data.timestamp || new Date(),
-    }));
-
-    await this.auditLogQueue.addBulkAuditLogs(dataWithTimestamp);
+    await this.auditLogQueue.addBulkAuditLogs(auditDataArray);
   }
 
   /**
