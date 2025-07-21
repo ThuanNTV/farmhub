@@ -9,14 +9,19 @@ import {
   UseGuards,
   UseInterceptors,
   NotFoundException,
+  Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UserStoreMappingsService } from 'src/modules/user-store-mappings/service/user-store-mappings.service';
+import { UserStoreMappingsAdvancedService } from 'src/modules/user-store-mappings/service/user-store-mappings-advanced.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { Roles } from 'src/core/rbac/role/roles.decorator';
@@ -27,6 +32,17 @@ import { UserRole } from 'src/modules/users/dto/create-user.dto';
 import { UserStoreMappingResponseDto } from 'src/modules/user-store-mappings/dto/userStoreMapping-response.dto';
 import { CreateUserStoreMappingDto } from 'src/modules/user-store-mappings/dto/create-userStoreMapping.dto';
 import { UpdateUserStoreMappingDto } from 'src/modules/user-store-mappings/dto/update-userStoreMapping.dto';
+import {
+  UserStoreMappingFilterDto,
+  PaginatedUserStoreMappingResponseDto,
+  UserStoreMappingStatsDto,
+} from '../dto/user-store-mapping-filter.dto';
+import {
+  BulkCreateUserStoreMappingDto,
+  BulkUpdateUserStoreMappingDto,
+  BulkDeleteUserStoreMappingDto,
+  BulkOperationResultDto,
+} from '../dto/bulk-operations.dto';
 
 @ApiTags('user-store-mappings')
 @ApiBearerAuth('access-token')
@@ -36,6 +52,7 @@ import { UpdateUserStoreMappingDto } from 'src/modules/user-store-mappings/dto/u
 export class UserStoreMappingsController {
   constructor(
     private readonly userStoreMappingsService: UserStoreMappingsService,
+    private readonly advancedService: UserStoreMappingsAdvancedService,
   ) {}
 
   @Post()
@@ -99,13 +116,10 @@ export class UserStoreMappingsController {
     @Param('userId') userId: string,
     @Param('storeId') storeId: string,
   ): Promise<UserStoreMappingResponseDto> {
-    const mapping = await this.userStoreMappingsService.findByUserAndStore(
+    const mapping = await this.userStoreMappingsService.findOne(
       userId,
       storeId,
     );
-    if (!mapping) {
-      throw new NotFoundException('User store mapping not found');
-    }
     return this.userStoreMappingsService.mapToResponseDto(mapping);
   }
 
@@ -175,5 +189,142 @@ export class UserStoreMappingsController {
   ): Promise<UserStoreMappingResponseDto> {
     const entity = await this.userStoreMappingsService.restore(userId, storeId);
     return this.userStoreMappingsService.mapToResponseDto(entity);
+  }
+
+  // ==================== ADVANCED ENDPOINTS ====================
+
+  @Get('search')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({
+    summary: 'Search user store mappings with advanced filters and pagination',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User store mappings retrieved successfully',
+    type: PaginatedUserStoreMappingResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async searchMappings(
+    @Query() filters: UserStoreMappingFilterDto,
+  ): Promise<PaginatedUserStoreMappingResponseDto> {
+    return await this.userStoreMappingsService.findWithFilters(filters);
+  }
+
+  @Get('user/:userId/stores')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Get all stores for a specific user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User stores retrieved successfully',
+    type: [UserStoreMappingResponseDto],
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getUserStores(
+    @Param('userId') userId: string,
+  ): Promise<UserStoreMappingResponseDto[]> {
+    const mappings = await this.userStoreMappingsService.findByUserId(userId);
+    return mappings.map((mapping) =>
+      this.userStoreMappingsService.mapToResponseDto(mapping),
+    );
+  }
+
+  @Get('store/:storeId/users')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Get all users for a specific store' })
+  @ApiResponse({
+    status: 200,
+    description: 'Store users retrieved successfully',
+    type: [UserStoreMappingResponseDto],
+  })
+  @ApiResponse({ status: 404, description: 'Store not found' })
+  async getStoreUsers(
+    @Param('storeId') storeId: string,
+  ): Promise<UserStoreMappingResponseDto[]> {
+    const mappings = await this.userStoreMappingsService.findByStoreId(storeId);
+    return mappings.map((mapping) =>
+      this.userStoreMappingsService.mapToResponseDto(mapping),
+    );
+  }
+
+  @Get('statistics')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({
+    summary: 'Get comprehensive statistics about user store mappings',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+    type: UserStoreMappingStatsDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getStatistics(): Promise<UserStoreMappingStatsDto> {
+    return await this.advancedService.getStatistics();
+  }
+
+  // ==================== BULK OPERATIONS ====================
+
+  @Post('bulk/create')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RequireUserPermission('create')
+  @RateLimitAPI()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Bulk create user store mappings' })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk create operation completed',
+    type: BulkOperationResultDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async bulkCreate(
+    @Body() dto: BulkCreateUserStoreMappingDto,
+  ): Promise<BulkOperationResultDto> {
+    return await this.advancedService.bulkCreate(dto);
+  }
+
+  @Patch('bulk/update')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RequireUserPermission('update')
+  @RateLimitAPI()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Bulk update user store mappings' })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk update operation completed',
+    type: BulkOperationResultDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async bulkUpdate(
+    @Body() dto: BulkUpdateUserStoreMappingDto,
+  ): Promise<BulkOperationResultDto> {
+    return await this.advancedService.bulkUpdate(dto);
+  }
+
+  @Delete('bulk/delete')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RequireUserPermission('delete')
+  @RateLimitAPI()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Bulk delete user store mappings' })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk delete operation completed',
+    type: BulkOperationResultDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async bulkDelete(
+    @Body() dto: BulkDeleteUserStoreMappingDto,
+  ): Promise<BulkOperationResultDto> {
+    return await this.advancedService.bulkDelete(dto);
   }
 }

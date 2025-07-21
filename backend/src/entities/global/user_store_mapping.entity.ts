@@ -15,6 +15,11 @@ import { Store } from './store.entity';
 @Entity('user_store_mapping')
 @Index('IDX_user_id', ['user_id'])
 @Index('IDX_store_id', ['store_id'])
+@Index('IDX_role', ['role'])
+@Index('IDX_created_at', ['created_at'])
+@Index('IDX_is_deleted', ['is_deleted'])
+@Index('IDX_user_store_active', ['user_id', 'store_id', 'is_deleted'])
+@Index('IDX_role_active', ['role', 'is_deleted'])
 export class UserStoreMapping {
   @PrimaryColumn({ type: 'uuid', name: 'userId' })
   user_id!: string;

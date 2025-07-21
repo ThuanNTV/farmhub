@@ -1,27 +1,45 @@
 # User Store Mappings Module
 
-## Chức năng
+## Overview
 
-- Quản lý mối quan hệ giữa người dùng và cửa hàng.
-- Các chức năng chính:
-  - Tạo mối quan hệ mới.
-  - Lấy danh sách mối quan hệ.
-  - Lấy chi tiết mối quan hệ.
-  - Cập nhật mối quan hệ.
-  - Xóa mềm mối quan hệ.
-  - Khôi phục mối quan hệ đã xóa.
+The User Store Mappings module manages the relationships between users and stores in the FarmHub system. It provides comprehensive functionality for creating, managing, and querying user-store associations with role-based access control.
 
-## Kiến trúc
+## Features
 
-- **Controller**: `UserStoreMappingsController`
-- **Service**: `UserStoreMappingsService`
-- **DTOs**:
-  - `CreateUserStoreMappingDto`
-  - `UpdateUserStoreMappingDto`
-  - `UserStoreMappingResponseDto`
-- **Entity**: `UserStoreMapping`
-- **Guard**: `EnhancedAuthGuard`, `PermissionGuard`
-- **Interceptor**: `AuditInterceptor`
+### ✅ Core Functionality
+
+- **CRUD Operations**: Create, read, update, delete user-store mappings
+- **Role Management**: Assign and manage user roles within stores
+- **Soft Delete**: Safe deletion with restore capability
+- **Audit Trail**: Complete audit logging for all operations
+
+### ✅ Advanced Features
+
+- **Advanced Search**: Filter mappings with multiple criteria
+- **Pagination**: Efficient pagination for large datasets
+- **Bulk Operations**: Batch create, update, and delete operations
+- **Statistics**: Comprehensive analytics and reporting
+- **Performance Optimization**: Optimized queries with proper indexing
+
+### ✅ Business Rules
+
+- **Duplicate Prevention**: Prevents duplicate user-store mappings
+- **Role Validation**: Enforces role-specific business rules
+- **Manager Limits**: Maximum 3 managers per store
+- **Global Admin Restrictions**: Global admins limited to one store
+
+## Architecture
+
+### Core Components
+
+- **Controller**: `UserStoreMappingsController` - API endpoints
+- **Services**:
+  - `UserStoreMappingsService` - Core business logic
+  - `UserStoreMappingsAdvancedService` - Advanced operations
+- **DTOs**: Comprehensive data transfer objects
+- **Entity**: `UserStoreMapping` - Database entity with optimized indexes
+- **Guards**: `EnhancedAuthGuard`, `PermissionGuard` - Security
+- **Interceptors**: `AuditInterceptor` - Audit logging
 
 ## API
 

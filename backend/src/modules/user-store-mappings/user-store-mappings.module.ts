@@ -7,6 +7,7 @@ import { UserStoreMapping } from 'src/entities/global/user_store_mapping.entity'
 import { User } from 'src/entities/global/user.entity';
 import { Store } from 'src/entities/global/store.entity';
 import { UserStoreMappingsService } from 'src/modules/user-store-mappings/service/user-store-mappings.service';
+import { UserStoreMappingsAdvancedService } from 'src/modules/user-store-mappings/service/user-store-mappings-advanced.service';
 import { UserStoreMappingsController } from 'src/modules/user-store-mappings/controller/user-store-mappings.controller';
 import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
 
@@ -21,8 +22,8 @@ import { AuditLogAsyncModule } from 'src/common/audit/audit-log-async.module';
     ),
     AuditLogAsyncModule,
   ],
-  providers: [UserStoreMappingsService],
+  providers: [UserStoreMappingsService, UserStoreMappingsAdvancedService],
   controllers: [UserStoreMappingsController],
-  exports: [UserStoreMappingsService],
+  exports: [UserStoreMappingsService, UserStoreMappingsAdvancedService],
 })
 export class UserStoreMappingsModule {}
