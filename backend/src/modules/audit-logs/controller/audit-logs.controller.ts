@@ -57,6 +57,48 @@ export class AuditLogsController {
     return this.service.mapToResponseDto(entity);
   }
 
+  @Get('search')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Tìm kiếm audit logs với bộ lọc nâng cao' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  async searchLogs(
+    @Param('storeId') storeId: string,
+    @Query() filters: AuditLogFilterDto,
+  ): Promise<PaginatedAuditLogResponseDto> {
+    return this.service.findWithFilters(storeId, filters);
+  }
+
+  @Get('statistics')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Lấy thống kê audit logs' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  async getStatistics(
+    @Param('storeId') storeId: string,
+    @Query() dateRange?: DateRangeDto,
+  ): Promise<AuditLogStatsDto> {
+    return this.service.getStatistics(storeId, dateRange);
+  }
+
+  @Get('history/:targetTable/:targetId')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Lấy lịch sử thay đổi của một record' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  @ApiParam({ name: 'targetTable', description: 'Tên bảng' })
+  @ApiParam({ name: 'targetId', description: 'ID của record' })
+  async getChangeHistory(
+    @Param('storeId') storeId: string,
+    @Param('targetTable') targetTable: string,
+    @Param('targetId') targetId: string,
+  ): Promise<AuditLogResponseDto[]> {
+    return this.service.getChangeHistory(storeId, targetTable, targetId);
+  }
+
   @Get()
   @Roles(
     UserRole.ADMIN_GLOBAL,
@@ -118,47 +160,5 @@ export class AuditLogsController {
     @Param('id') id: string,
   ): Promise<{ message: string }> {
     return this.service.remove(storeId, id);
-  }
-
-  @Get('search')
-  @RequireUserPermission('read')
-  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
-  @RateLimitAPI()
-  @ApiOperation({ summary: 'Tìm kiếm audit logs với bộ lọc nâng cao' })
-  @ApiParam({ name: 'storeId', description: 'ID của store' })
-  async searchLogs(
-    @Param('storeId') storeId: string,
-    @Query() filters: AuditLogFilterDto,
-  ): Promise<PaginatedAuditLogResponseDto> {
-    return this.service.findWithFilters(storeId, filters);
-  }
-
-  @Get('statistics')
-  @RequireUserPermission('read')
-  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
-  @RateLimitAPI()
-  @ApiOperation({ summary: 'Lấy thống kê audit logs' })
-  @ApiParam({ name: 'storeId', description: 'ID của store' })
-  async getStatistics(
-    @Param('storeId') storeId: string,
-    @Query() dateRange?: DateRangeDto,
-  ): Promise<AuditLogStatsDto> {
-    return this.service.getStatistics(storeId, dateRange);
-  }
-
-  @Get('history/:targetTable/:targetId')
-  @RequireUserPermission('read')
-  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
-  @RateLimitAPI()
-  @ApiOperation({ summary: 'Lấy lịch sử thay đổi của một record' })
-  @ApiParam({ name: 'storeId', description: 'ID của store' })
-  @ApiParam({ name: 'targetTable', description: 'Tên bảng' })
-  @ApiParam({ name: 'targetId', description: 'ID của record' })
-  async getChangeHistory(
-    @Param('storeId') storeId: string,
-    @Param('targetTable') targetTable: string,
-    @Param('targetId') targetId: string,
-  ): Promise<AuditLogResponseDto[]> {
-    return this.service.getChangeHistory(storeId, targetTable, targetId);
   }
 }

@@ -47,6 +47,7 @@ describe('AuditLogsService', () => {
       merge: jest.fn(),
       save: jest.fn(),
       remove: jest.fn(),
+      createQueryBuilder: jest.fn(),
     };
     mockTenantDataSourceService = {
       getTenantDataSource: jest.fn().mockResolvedValue({
@@ -104,17 +105,23 @@ describe('AuditLogsService', () => {
 
   describe('findOne', () => {
     it('should return audit log if found', async () => {
-      mockRepository.findOneBy.mockResolvedValue(mockAuditLog);
+      // Mock repository findOne method that super.findById uses
+      mockRepository.findOne.mockResolvedValue(mockAuditLog);
       const result = await service.findOne('store1', '1');
       expect(result).toBe(mockAuditLog);
-      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: '1' });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
     it('should throw NotFoundException if not found', async () => {
-      mockRepository.findOneBy.mockResolvedValue(null);
+      // Mock repository to return null, which should trigger NotFoundException
+      mockRepository.findOne.mockResolvedValue(null);
       await expect(service.findOne('store1', '2')).rejects.toThrow(
         NotFoundException,
       );
-      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: '2' });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '2' },
+      });
     });
   });
 
@@ -172,6 +179,129 @@ describe('AuditLogsService', () => {
       await expect(service.remove('store1', '1')).rejects.toThrow(
         'fail-remove',
       );
+    });
+  });
+
+  describe('findWithFilters', () => {
+    it('should find audit logs with filters', async () => {
+      const filters = {
+        userId: 'user1',
+        action: 'CREATE',
+        page: 1,
+        limit: 10,
+      };
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([[mockAuditLog], 1]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      const result = await service.findWithFilters('store1', filters as any);
+
+      expect(result.data).toHaveLength(1);
+      expect(result.pagination.total).toBe(1);
+      expect(result.pagination.page).toBe(1);
+      expect(result.pagination.limit).toBe(10);
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'audit_log',
+      );
+    });
+
+    it('should handle empty results', async () => {
+      const filters = { page: 1, limit: 10 };
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      const result = await service.findWithFilters('store1', filters as any);
+
+      expect(result.data).toHaveLength(0);
+      expect(result.pagination.total).toBe(0);
+    });
+  });
+
+  describe('getStatistics', () => {
+    it('should get audit log statistics', async () => {
+      const dateRange = {
+        startDate: new Date('2023-01-01'),
+        endDate: new Date('2023-12-31'),
+      };
+
+      const mockQueryBuilder = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(100),
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([
+          { action: 'CREATE', count: '50' },
+          { action: 'UPDATE', count: '30' },
+          { action: 'DELETE', count: '20' },
+        ]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      const result = await service.getStatistics('store1', dateRange as any);
+
+      expect(result.totalLogs).toBe(100);
+      expect(result.logsByAction).toEqual({
+        CREATE: 50,
+        UPDATE: 30,
+        DELETE: 20,
+      });
+    });
+  });
+
+  describe('getChangeHistory', () => {
+    it('should get change history for a record', async () => {
+      mockRepository.find.mockResolvedValue([mockAuditLog]);
+
+      const result = await service.getChangeHistory(
+        'store1',
+        'products',
+        'prod1',
+      );
+
+      expect(result).toHaveLength(1);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: {
+          store_id: 'store1',
+          target_table: 'products',
+          target_id: 'prod1',
+          is_deleted: false,
+        },
+        order: { created_at: 'DESC' },
+      });
+    });
+
+    it('should return empty array if no history found', async () => {
+      mockRepository.find.mockResolvedValue([]);
+
+      const result = await service.getChangeHistory(
+        'store1',
+        'products',
+        'prod1',
+      );
+
+      expect(result).toHaveLength(0);
     });
   });
 

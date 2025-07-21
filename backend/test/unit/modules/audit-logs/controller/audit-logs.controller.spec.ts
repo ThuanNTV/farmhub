@@ -79,6 +79,9 @@ describe('AuditLogsController', () => {
       update: jest.fn(),
       remove: jest.fn(),
       mapToResponseDto: jest.fn(),
+      findWithFilters: jest.fn(),
+      getStatistics: jest.fn(),
+      getChangeHistory: jest.fn(),
     };
 
     // Create controller instance directly to avoid guard/interceptor issues
@@ -264,6 +267,128 @@ describe('AuditLogsController', () => {
 
       expect(service.mapToResponseDto).toHaveBeenCalledTimes(2);
       expect(result).toEqual(mockResponses);
+    });
+  });
+
+  describe('searchLogs', () => {
+    it('should search audit logs with filters', async () => {
+      const filters = {
+        userId: 'user1',
+        action: 'CREATE',
+        page: 1,
+        limit: 10,
+      };
+      const paginatedResult = {
+        data: [mockAuditLogResponse],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 1,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+        appliedFilters: {
+          userId: 'user1',
+          action: 'CREATE',
+        },
+        generatedAt: new Date(),
+      };
+
+      service.findWithFilters.mockResolvedValue(paginatedResult);
+
+      const result = await controller.searchLogs('store1', filters as any);
+
+      expect(result).toEqual(paginatedResult);
+      expect(service.findWithFilters).toHaveBeenCalledWith('store1', filters);
+    });
+
+    it('should handle service errors during search', async () => {
+      const filters = { page: 1, limit: 10 };
+      service.findWithFilters.mockRejectedValue(new Error('Search failed'));
+
+      await expect(
+        controller.searchLogs('store1', filters as any),
+      ).rejects.toThrow('Search failed');
+    });
+  });
+
+  describe('getStatistics', () => {
+    it('should get audit log statistics', async () => {
+      const dateRange = {
+        startDate: new Date('2023-01-01'),
+        endDate: new Date('2023-12-31'),
+      };
+      const stats = {
+        totalLogs: 100,
+        logsByAction: { CREATE: 50, UPDATE: 30, DELETE: 20 },
+        logsByUser: { user1: 60, user2: 40 },
+        logsByTable: { products: 70, users: 30 },
+        logsByDevice: { desktop: 80, mobile: 20 },
+        logsByBrowser: { chrome: 60, firefox: 40 },
+        recentActivity: [
+          {
+            action: 'CREATE',
+            targetTable: 'products',
+            userName: 'John Doe',
+            createdAt: new Date('2023-01-01'),
+            count: 5,
+          },
+        ],
+        dailyStats: [{ date: '2023-01-01', count: 10 }],
+        topActiveUsers: [
+          {
+            userId: 'user-1',
+            userName: 'John Doe',
+            actionCount: 50,
+            lastActivity: new Date('2023-01-01'),
+          },
+        ],
+        generatedAt: new Date('2023-01-01'),
+      };
+
+      service.getStatistics.mockResolvedValue(stats);
+
+      const result = await controller.getStatistics('store1', dateRange as any);
+
+      expect(result).toEqual(stats);
+      expect(service.getStatistics).toHaveBeenCalledWith('store1', dateRange);
+    });
+
+    it('should handle service errors during statistics', async () => {
+      service.getStatistics.mockRejectedValue(new Error('Stats failed'));
+
+      await expect(controller.getStatistics('store1')).rejects.toThrow(
+        'Stats failed',
+      );
+    });
+  });
+
+  describe('getChangeHistory', () => {
+    it('should get change history for a record', async () => {
+      const history = [mockAuditLogResponse];
+      service.getChangeHistory.mockResolvedValue(history);
+
+      const result = await controller.getChangeHistory(
+        'store1',
+        'products',
+        'prod1',
+      );
+
+      expect(result).toEqual(history);
+      expect(service.getChangeHistory).toHaveBeenCalledWith(
+        'store1',
+        'products',
+        'prod1',
+      );
+    });
+
+    it('should handle service errors during change history', async () => {
+      service.getChangeHistory.mockRejectedValue(new Error('History failed'));
+
+      await expect(
+        controller.getChangeHistory('store1', 'products', 'prod1'),
+      ).rejects.toThrow('History failed');
     });
   });
 });
