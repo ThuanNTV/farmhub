@@ -15,13 +15,6 @@ import { dbConfig } from 'src/config/db/dbglobal/dbConfig';
       ...dbConfig,
       name: 'globalConnection',
       entities: [Store, User, Bank, UserStoreMapping, Unit, PaymentMethod],
-      extra: {
-        max: 20,
-        min: 5,
-        acquireTimeoutMillis: 2000,
-        idleTimeoutMillis: 10000,
-        reapIntervalMillis: 3000,
-      },
     }),
   ],
   exports: [TypeOrmModule],

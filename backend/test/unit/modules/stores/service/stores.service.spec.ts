@@ -203,8 +203,7 @@ describe('StoresService', () => {
       storesRepo.findOneBy.mockResolvedValue(null);
       storesRepo.create.mockReturnValue(mockStore);
       storesRepo.save.mockResolvedValue(mockStore);
-      (storesRepo.manager.query as jest.Mock).mockResolvedValue(undefined);
-      tenantDataSourceService.dropObsoleteIndexesWithGlobalConnection.mockRejectedValue(
+      tenantDataSourceService.getTenantDataSource.mockRejectedValue(
         new Error('Datasource creation failed'),
       );
 
@@ -335,28 +334,6 @@ describe('StoresService', () => {
 
       await expect(service.restore('invalid-store')).rejects.toThrow(
         InternalServerErrorException,
-      );
-    });
-  });
-
-  describe('createTenantDatabase', () => {
-    it('should create database successfully', async () => {
-      (storesRepo.manager.query as jest.Mock).mockResolvedValue(undefined);
-
-      await service.createTenantDatabase('test-db');
-
-      expect(storesRepo.manager.query).toHaveBeenCalledWith(
-        'CREATE DATABASE "test-db"',
-      );
-    });
-
-    it('should handle database creation error', async () => {
-      (storesRepo.manager.query as jest.Mock).mockRejectedValue(
-        new Error('Database creation failed'),
-      );
-
-      await expect(service.createTenantDatabase('test-db')).rejects.toThrow(
-        Error,
       );
     });
   });

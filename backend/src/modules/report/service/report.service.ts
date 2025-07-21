@@ -88,6 +88,34 @@ export class ReportService {
         reportData = await this.generateInventoryReport(storeId, from, to);
         fileName = `inventory_report_${from}_${to}`;
         break;
+      case 'product-performance':
+        reportData = await this.generateProductPerformanceReport(
+          storeId,
+          from,
+          to,
+        );
+        fileName = `product_performance_report_${from}_${to}`;
+        break;
+      case 'product-analytics':
+        reportData = await this.generateProductAnalyticsReport(
+          storeId,
+          from,
+          to,
+        );
+        fileName = `product_analytics_report_${from}_${to}`;
+        break;
+      case 'inventory-analysis':
+        reportData = await this.generateInventoryAnalysisReport(
+          storeId,
+          from,
+          to,
+        );
+        fileName = `inventory_analysis_report_${from}_${to}`;
+        break;
+      case 'price-trends':
+        reportData = await this.generatePriceTrendsReport(storeId, from, to);
+        fileName = `price_trends_report_${from}_${to}`;
+        break;
       default:
         throw new BadRequestException(`Unsupported report type: ${type}`);
     }
@@ -136,6 +164,26 @@ export class ReportService {
         name: 'Báo cáo tồn kho',
         description: 'Tình trạng tồn kho hiện tại',
       },
+      {
+        key: 'product-performance',
+        name: 'Báo cáo hiệu suất sản phẩm',
+        description: 'Phân tích hiệu suất và xu hướng sản phẩm',
+      },
+      {
+        key: 'product-analytics',
+        name: 'Báo cáo phân tích sản phẩm',
+        description: 'Thống kê chi tiết về sản phẩm và danh mục',
+      },
+      {
+        key: 'inventory-analysis',
+        name: 'Báo cáo phân tích tồn kho',
+        description: 'Phân tích sâu về tình trạng tồn kho và luân chuyển',
+      },
+      {
+        key: 'price-trends',
+        name: 'Báo cáo xu hướng giá',
+        description: 'Theo dõi và phân tích xu hướng thay đổi giá',
+      },
     ];
   }
 
@@ -161,6 +209,30 @@ export class ReportService {
         break;
       case 'inventory':
         previewData = await this.generateInventoryReport(storeId, from, to);
+        break;
+      case 'product-performance':
+        previewData = await this.generateProductPerformanceReport(
+          storeId,
+          from,
+          to,
+        );
+        break;
+      case 'product-analytics':
+        previewData = await this.generateProductAnalyticsReport(
+          storeId,
+          from,
+          to,
+        );
+        break;
+      case 'inventory-analysis':
+        previewData = await this.generateInventoryAnalysisReport(
+          storeId,
+          from,
+          to,
+        );
+        break;
+      case 'price-trends':
+        previewData = await this.generatePriceTrendsReport(storeId, from, to);
         break;
       default:
         throw new BadRequestException(`Unsupported report type: ${type}`);
@@ -479,11 +551,458 @@ export class ReportService {
       'customers',
       'products',
       'inventory',
+      'product-performance',
+      'product-analytics',
+      'inventory-analysis',
+      'price-trends',
     ];
     if (!validTypes.includes(type)) {
       throw new BadRequestException(
         `Invalid report type. Supported types: ${validTypes.join(', ')}`,
       );
     }
+  }
+
+  // Advanced Product Reports
+  private async generateProductPerformanceReport(
+    storeId: string,
+    from: string,
+    to: string,
+  ) {
+    const ds = await this.tenantDS.getTenantDataSource(storeId);
+    const productRepo = ds.getRepository('product');
+    const orderItemRepo = ds.getRepository('orderItem');
+
+    // Get product performance metrics
+    const productPerformance = await orderItemRepo
+      .createQueryBuilder('item')
+      .leftJoin('item.order', 'order')
+      .leftJoin('item.product', 'product')
+      .select([
+        'product.productId as product_id',
+        'product.name',
+        'product.sku',
+        'product.category_id',
+        'product.brand',
+        'SUM(item.quantity) as total_sold',
+        'SUM(item.totalPrice) as total_revenue',
+        'AVG(item.unitPrice) as avg_price',
+        'COUNT(DISTINCT order.orderId) as order_count',
+      ])
+      .where('order.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('order.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('order.status = :status', { status: 'completed' })
+      .groupBy(
+        'product.productId, product.name, product.sku, product.category_id, product.brand',
+      )
+      .orderBy('total_revenue', 'DESC')
+      .getRawMany();
+
+    // Get current inventory status
+    const inventoryStatus = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        'COUNT(*) as total_products',
+        'SUM(CASE WHEN stock_quantity <= min_stock_level THEN 1 ELSE 0 END) as low_stock_count',
+        'SUM(CASE WHEN stock_quantity = 0 THEN 1 ELSE 0 END) as out_of_stock_count',
+        'SUM(stock_quantity * price_retail) as total_inventory_value',
+        'AVG(price_retail) as avg_price',
+      ])
+      .where('product.isDeleted = :isDeleted', { isDeleted: false })
+      .getRawOne();
+
+    // Calculate performance metrics
+    const totalRevenue = productPerformance.reduce(
+      (sum, p) => sum + parseFloat(p.total_revenue || 0),
+      0,
+    );
+    const totalQuantitySold = productPerformance.reduce(
+      (sum, p) => sum + parseInt(p.total_sold || 0),
+      0,
+    );
+
+    return {
+      summary: {
+        total_products_sold: productPerformance.length,
+        total_revenue: totalRevenue,
+        total_quantity_sold: totalQuantitySold,
+        average_order_value:
+          totalRevenue /
+          (productPerformance.reduce(
+            (sum, p) => sum + parseInt(p.order_count || 0),
+            0,
+          ) || 1),
+        inventory_status: {
+          total_products: parseInt(inventoryStatus?.total_products || 0),
+          low_stock_count: parseInt(inventoryStatus?.low_stock_count || 0),
+          out_of_stock_count: parseInt(
+            inventoryStatus?.out_of_stock_count || 0,
+          ),
+          total_inventory_value: parseFloat(
+            inventoryStatus?.total_inventory_value || 0,
+          ),
+          avg_price: parseFloat(inventoryStatus?.avg_price || 0),
+        },
+      },
+      top_performers: productPerformance.slice(0, 20).map((p) => ({
+        product_id: p.product_id,
+        name: p.name,
+        sku: p.sku,
+        category_id: p.category_id,
+        brand: p.brand,
+        total_sold: parseInt(p.total_sold || 0),
+        total_revenue: parseFloat(p.total_revenue || 0),
+        avg_price: parseFloat(p.avg_price || 0),
+        order_count: parseInt(p.order_count || 0),
+        revenue_per_order:
+          parseFloat(p.total_revenue || 0) / parseInt(p.order_count || 1),
+      })),
+      category_performance: await this.getCategoryPerformance(ds, from, to),
+      brand_performance: await this.getBrandPerformance(ds, from, to),
+    };
+  }
+
+  private async generateProductAnalyticsReport(
+    storeId: string,
+    from: string,
+    to: string,
+  ) {
+    const ds = await this.tenantDS.getTenantDataSource(storeId);
+    const productRepo = ds.getRepository('product');
+
+    // Product creation trends
+    const creationTrends = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        'DATE(product.createdAt) as date',
+        'COUNT(*) as products_created',
+        'AVG(product.price_retail) as avg_price',
+        'SUM(product.price_retail * product.stock_quantity) as total_value',
+      ])
+      .where('product.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('product.isDeleted = :isDeleted', { isDeleted: false })
+      .groupBy('DATE(product.createdAt)')
+      .orderBy('DATE(product.createdAt)')
+      .getRawMany();
+
+    // Price distribution analysis
+    const priceDistribution = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        'CASE ' +
+          'WHEN price_retail < 50000 THEN "Under 50K" ' +
+          'WHEN price_retail < 100000 THEN "50K-100K" ' +
+          'WHEN price_retail < 500000 THEN "100K-500K" ' +
+          'WHEN price_retail < 1000000 THEN "500K-1M" ' +
+          'ELSE "Over 1M" END as price_range',
+        'COUNT(*) as product_count',
+        'SUM(stock_quantity) as total_stock',
+        'SUM(price_retail * stock_quantity) as total_value',
+      ])
+      .where('product.isDeleted = :isDeleted', { isDeleted: false })
+      .groupBy('price_range')
+      .getRawMany();
+
+    // Stock level analysis
+    const stockAnalysis = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        'CASE ' +
+          'WHEN stock_quantity = 0 THEN "Out of Stock" ' +
+          'WHEN stock_quantity <= min_stock_level THEN "Low Stock" ' +
+          'WHEN stock_quantity <= min_stock_level * 2 THEN "Normal Stock" ' +
+          'ELSE "High Stock" END as stock_level',
+        'COUNT(*) as product_count',
+        'SUM(price_retail * stock_quantity) as total_value',
+      ])
+      .where('product.isDeleted = :isDeleted', { isDeleted: false })
+      .groupBy('stock_level')
+      .getRawMany();
+
+    return {
+      creation_trends: creationTrends.map((trend) => ({
+        date: trend.date,
+        products_created: parseInt(trend.products_created),
+        avg_price: parseFloat(trend.avg_price || 0),
+        total_value: parseFloat(trend.total_value || 0),
+      })),
+      price_distribution: priceDistribution.map((dist) => ({
+        price_range: dist.price_range,
+        product_count: parseInt(dist.product_count),
+        total_stock: parseInt(dist.total_stock || 0),
+        total_value: parseFloat(dist.total_value || 0),
+      })),
+      stock_analysis: stockAnalysis.map((analysis) => ({
+        stock_level: analysis.stock_level,
+        product_count: parseInt(analysis.product_count),
+        total_value: parseFloat(analysis.total_value || 0),
+      })),
+    };
+  }
+
+  private async generateInventoryAnalysisReport(
+    storeId: string,
+    from: string,
+    to: string,
+  ) {
+    const ds = await this.tenantDS.getTenantDataSource(storeId);
+    const productRepo = ds.getRepository('product');
+    const orderItemRepo = ds.getRepository('orderItem');
+
+    // Inventory turnover analysis
+    const turnoverAnalysis = await orderItemRepo
+      .createQueryBuilder('item')
+      .leftJoin('item.order', 'order')
+      .leftJoin('item.product', 'product')
+      .select([
+        'product.productId as product_id',
+        'product.name',
+        'product.stock_quantity as current_stock',
+        'SUM(item.quantity) as total_sold',
+        'AVG(product.stock_quantity) as avg_stock',
+        'SUM(item.quantity) / NULLIF(AVG(product.stock_quantity), 0) as turnover_ratio',
+      ])
+      .where('order.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('order.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('order.status = :status', { status: 'completed' })
+      .groupBy('product.productId, product.name, product.stock_quantity')
+      .having('SUM(item.quantity) > 0')
+      .orderBy('turnover_ratio', 'DESC')
+      .getRawMany();
+
+    // ABC Analysis (based on revenue contribution)
+    const abcAnalysis = await orderItemRepo
+      .createQueryBuilder('item')
+      .leftJoin('item.order', 'order')
+      .leftJoin('item.product', 'product')
+      .select([
+        'product.productId as product_id',
+        'product.name',
+        'SUM(item.totalPrice) as total_revenue',
+      ])
+      .where('order.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('order.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('order.status = :status', { status: 'completed' })
+      .groupBy('product.productId, product.name')
+      .orderBy('total_revenue', 'DESC')
+      .getRawMany();
+
+    // Calculate ABC categories
+    const totalRevenue = abcAnalysis.reduce(
+      (sum, item) => sum + parseFloat(item.total_revenue),
+      0,
+    );
+    let cumulativeRevenue = 0;
+    const abcCategorized = abcAnalysis.map((item) => {
+      cumulativeRevenue += parseFloat(item.total_revenue);
+      const percentage = (cumulativeRevenue / totalRevenue) * 100;
+      let category = 'C';
+      if (percentage <= 80) category = 'A';
+      else if (percentage <= 95) category = 'B';
+
+      return {
+        ...item,
+        total_revenue: parseFloat(item.total_revenue),
+        cumulative_percentage: percentage,
+        abc_category: category,
+      };
+    });
+
+    return {
+      turnover_analysis: turnoverAnalysis.slice(0, 50).map((item) => ({
+        product_id: item.product_id,
+        name: item.name,
+        current_stock: parseInt(item.current_stock || 0),
+        total_sold: parseInt(item.total_sold || 0),
+        avg_stock: parseFloat(item.avg_stock || 0),
+        turnover_ratio: parseFloat(item.turnover_ratio || 0),
+        turnover_days:
+          item.turnover_ratio > 0
+            ? Math.round(365 / parseFloat(item.turnover_ratio))
+            : 0,
+      })),
+      abc_analysis: {
+        category_a: abcCategorized.filter((item) => item.abc_category === 'A'),
+        category_b: abcCategorized.filter((item) => item.abc_category === 'B'),
+        category_c: abcCategorized.filter((item) => item.abc_category === 'C'),
+        summary: {
+          total_products: abcCategorized.length,
+          category_a_count: abcCategorized.filter(
+            (item) => item.abc_category === 'A',
+          ).length,
+          category_b_count: abcCategorized.filter(
+            (item) => item.abc_category === 'B',
+          ).length,
+          category_c_count: abcCategorized.filter(
+            (item) => item.abc_category === 'C',
+          ).length,
+        },
+      },
+    };
+  }
+
+  private async generatePriceTrendsReport(
+    storeId: string,
+    from: string,
+    to: string,
+  ) {
+    const ds = await this.tenantDS.getTenantDataSource(storeId);
+    const priceHistoryRepo = ds.getRepository('priceHistory');
+    const productRepo = ds.getRepository('product');
+
+    // Price change trends over time
+    const priceTrends = await priceHistoryRepo
+      .createQueryBuilder('ph')
+      .select([
+        'DATE(ph.changedAt) as date',
+        'COUNT(*) as total_changes',
+        'SUM(CASE WHEN ph.newPrice > ph.oldPrice THEN 1 ELSE 0 END) as price_increases',
+        'SUM(CASE WHEN ph.newPrice < ph.oldPrice THEN 1 ELSE 0 END) as price_decreases',
+        'AVG(((ph.newPrice - ph.oldPrice) / ph.oldPrice) * 100) as avg_percentage_change',
+        'MAX(((ph.newPrice - ph.oldPrice) / ph.oldPrice) * 100) as max_increase',
+        'MIN(((ph.newPrice - ph.oldPrice) / ph.oldPrice) * 100) as max_decrease',
+      ])
+      .where('ph.changedAt BETWEEN :from AND :to', { from, to })
+      .groupBy('DATE(ph.changedAt)')
+      .orderBy('DATE(ph.changedAt)')
+      .getRawMany();
+
+    // Most volatile products (frequent price changes)
+    const volatileProducts = await priceHistoryRepo
+      .createQueryBuilder('ph')
+      .leftJoin('ph.product', 'product')
+      .select([
+        'ph.productId as product_id',
+        'product.name',
+        'product.sku',
+        'COUNT(*) as change_count',
+        'AVG(ABS((ph.newPrice - ph.oldPrice) / ph.oldPrice) * 100) as avg_volatility',
+        'MAX(ph.newPrice) as max_price',
+        'MIN(ph.newPrice) as min_price',
+        'MAX(ph.newPrice) - MIN(ph.newPrice) as price_range',
+      ])
+      .where('ph.changedAt BETWEEN :from AND :to', { from, to })
+      .groupBy('ph.productId, product.name, product.sku')
+      .having('COUNT(*) > 1')
+      .orderBy('change_count', 'DESC')
+      .addOrderBy('avg_volatility', 'DESC')
+      .limit(20)
+      .getRawMany();
+
+    // Price distribution by category
+    const categoryPriceAnalysis = await productRepo
+      .createQueryBuilder('product')
+      .select([
+        'product.category_id',
+        'COUNT(*) as product_count',
+        'AVG(product.price_retail) as avg_price',
+        'MIN(product.price_retail) as min_price',
+        'MAX(product.price_retail) as max_price',
+        'STDDEV(product.price_retail) as price_stddev',
+      ])
+      .where('product.isDeleted = :isDeleted', { isDeleted: false })
+      .groupBy('product.category_id')
+      .orderBy('avg_price', 'DESC')
+      .getRawMany();
+
+    return {
+      price_trends: priceTrends.map((trend) => ({
+        date: trend.date,
+        total_changes: parseInt(trend.total_changes),
+        price_increases: parseInt(trend.price_increases || 0),
+        price_decreases: parseInt(trend.price_decreases || 0),
+        avg_percentage_change: parseFloat(trend.avg_percentage_change || 0),
+        max_increase: parseFloat(trend.max_increase || 0),
+        max_decrease: parseFloat(trend.max_decrease || 0),
+      })),
+      volatile_products: volatileProducts.map((product) => ({
+        product_id: product.product_id,
+        name: product.name,
+        sku: product.sku,
+        change_count: parseInt(product.change_count),
+        avg_volatility: parseFloat(product.avg_volatility || 0),
+        max_price: parseFloat(product.max_price || 0),
+        min_price: parseFloat(product.min_price || 0),
+        price_range: parseFloat(product.price_range || 0),
+        volatility_score:
+          parseFloat(product.avg_volatility || 0) *
+          parseInt(product.change_count),
+      })),
+      category_price_analysis: categoryPriceAnalysis.map((category) => ({
+        category_id: category.category_id,
+        product_count: parseInt(category.product_count),
+        avg_price: parseFloat(category.avg_price || 0),
+        min_price: parseFloat(category.min_price || 0),
+        max_price: parseFloat(category.max_price || 0),
+        price_stddev: parseFloat(category.price_stddev || 0),
+        price_coefficient_variation:
+          parseFloat(category.price_stddev || 0) /
+          parseFloat(category.avg_price || 1),
+      })),
+    };
+  }
+
+  // Helper methods for advanced reports
+  private async getCategoryPerformance(ds: any, from: string, to: string) {
+    const orderItemRepo = ds.getRepository('orderItem');
+
+    return await orderItemRepo
+      .createQueryBuilder('item')
+      .leftJoin('item.order', 'order')
+      .leftJoin('item.product', 'product')
+      .select([
+        'product.category_id',
+        'COUNT(DISTINCT product.productId) as product_count',
+        'SUM(item.quantity) as total_sold',
+        'SUM(item.totalPrice) as total_revenue',
+        'AVG(item.unitPrice) as avg_price',
+      ])
+      .where('order.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('order.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('order.status = :status', { status: 'completed' })
+      .groupBy('product.category_id')
+      .orderBy('total_revenue', 'DESC')
+      .getRawMany()
+      .then((results) =>
+        results.map((result) => ({
+          category_id: result.category_id,
+          product_count: parseInt(result.product_count),
+          total_sold: parseInt(result.total_sold || 0),
+          total_revenue: parseFloat(result.total_revenue || 0),
+          avg_price: parseFloat(result.avg_price || 0),
+        })),
+      );
+  }
+
+  private async getBrandPerformance(ds: any, from: string, to: string) {
+    const orderItemRepo = ds.getRepository('orderItem');
+
+    return await orderItemRepo
+      .createQueryBuilder('item')
+      .leftJoin('item.order', 'order')
+      .leftJoin('item.product', 'product')
+      .select([
+        'product.brand',
+        'COUNT(DISTINCT product.productId) as product_count',
+        'SUM(item.quantity) as total_sold',
+        'SUM(item.totalPrice) as total_revenue',
+        'AVG(item.unitPrice) as avg_price',
+      ])
+      .where('order.createdAt BETWEEN :from AND :to', { from, to })
+      .andWhere('order.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('order.status = :status', { status: 'completed' })
+      .andWhere('product.brand IS NOT NULL')
+      .groupBy('product.brand')
+      .orderBy('total_revenue', 'DESC')
+      .getRawMany()
+      .then((results) =>
+        results.map((result) => ({
+          brand: result.brand,
+          product_count: parseInt(result.product_count),
+          total_sold: parseInt(result.total_sold || 0),
+          total_revenue: parseFloat(result.total_revenue || 0),
+          avg_price: parseFloat(result.avg_price || 0),
+        })),
+      );
   }
 }

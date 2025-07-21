@@ -29,10 +29,10 @@ export abstract class TenantBaseService<T extends ObjectLiteral> {
     private readonly entity: new () => T, // Entity class
   ) {
     // Validate dependencies
-    if (!tenantDataSourceService) {
+    if (!this.tenantDataSourceService) {
       throw new Error('TenantDataSourceService is required');
     }
-    if (!entity) {
+    if (!this.entity) {
       throw new Error('Entity class is required');
     }
   }
@@ -44,29 +44,9 @@ export abstract class TenantBaseService<T extends ObjectLiteral> {
       throw new BadRequestException('Store ID không được để trống');
     }
 
-    // Validate dependencies
-    if (!this.tenantDataSourceService) {
-      throw new InternalServerErrorException(
-        'TenantDataSourceService không được khởi tạo',
-      );
-    }
-
-    // Validate entity
-    if (!this.entity) {
-      throw new InternalServerErrorException(
-        'Entity class không được định nghĩa',
-      );
-    }
-
     try {
       const dataSource =
         await this.tenantDataSourceService.getTenantDataSource(storeId);
-
-      if (!dataSource) {
-        throw new InternalServerErrorException(
-          `Không thể lấy data source cho store "${storeId}"`,
-        );
-      }
 
       if (!dataSource.isInitialized) {
         throw new InternalServerErrorException(

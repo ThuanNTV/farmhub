@@ -51,13 +51,6 @@ export class StoresService {
       dto as unknown as Record<string, unknown>,
     );
     const store = this.storesRepo.create(entityData);
-    try {
-      await this.createTenantDatabase(store.schema_name);
-    } catch (err) {
-      throw new InternalServerErrorException(
-        `❌ Không thể tạo database cho tenant: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
     let saved: Store;
     try {
       saved = await this.storesRepo.save(store);
@@ -174,19 +167,6 @@ export class StoresService {
     };
   }
 
-  async createTenantDatabase(dbName: string) {
-    const query = `CREATE DATABASE "${dbName}"`;
-    try {
-      // Sử dụng manager thay vì DataSource
-      await this.storesRepo.manager.query(query);
-
-      this.logger.log(`🎉 Database ${dbName} created.`);
-    } catch (error) {
-      this.logger.error(`❌ Failed to create database ${dbName}`, error);
-      throw error;
-    }
-  }
-
   async updateStore(id: string, updateStoreDto: UpdateStoreDto) {
     return this.update(id, updateStoreDto);
   }
@@ -207,12 +187,12 @@ export class StoresService {
 
   // Thêm hàm dropTenantDatabase để xóa schema vật lý khi rollback
   async dropTenantDatabase(dbName: string) {
-    const query = `DROP DATABASE IF EXISTS "${dbName}"`;
+    const query = `DROP SCHEMA IF EXISTS "${dbName}" CASCADE`;
     try {
       await this.storesRepo.manager.query(query);
-      this.logger.log(`🗑️ Database ${dbName} dropped.`);
+      this.logger.log(`🗑️ Schema ${dbName} dropped.`);
     } catch (error) {
-      this.logger.error(`❌ Failed to drop database ${dbName}`, error);
+      this.logger.error(`❌ Failed to drop schema ${dbName}`, error);
       // Không throw lại để tránh che lỗi gốc
     }
   }

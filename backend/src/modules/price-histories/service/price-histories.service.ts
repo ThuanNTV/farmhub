@@ -34,11 +34,28 @@ export class PriceHistoriesService extends TenantBaseService<PriceHistory> {
         throw new BadRequestException('Price cannot be negative');
       }
 
-      const entityData = DtoMapper.mapToEntity<PriceHistory>(
-        dto as unknown as Record<string, unknown>,
-      );
+      const repo = await this.getRepo(storeId);
 
-      const created = await super.create(storeId, entityData);
+      // Calculate price difference and percentage change
+      const priceDifference = dto.newPrice - dto.oldPrice;
+      const percentageChange =
+        dto.oldPrice > 0 ? (priceDifference / dto.oldPrice) * 100 : 0;
+
+      const priceHistory = repo.create({
+        product_id: dto.productId,
+        price_type: dto.priceType || 'retail',
+        old_price: dto.oldPrice,
+        new_price: dto.newPrice,
+        price_difference: priceDifference,
+        percentage_change: percentageChange,
+        reason: dto.reason,
+        metadata: dto.metadata,
+        changed_by_user_id: dto.changedByUserId,
+        created_by_user_id: dto.createdByUserId,
+        updated_by_user_id: dto.updatedByUserId,
+      });
+
+      const created = await repo.save(priceHistory);
 
       this.logger.log(`Price history created successfully: ${created.id}`);
 
@@ -250,10 +267,20 @@ export class PriceHistoriesService extends TenantBaseService<PriceHistory> {
     return {
       id: entity.id,
       productId: entity.product_id,
+      productName: entity.product?.name,
+      priceType: entity.price_type,
       oldPrice: entity.old_price,
       newPrice: entity.new_price,
+      priceDifference: entity.price_difference || 0,
+      percentageChange: entity.percentage_change || 0,
+      reason: entity.reason,
+      metadata: entity.metadata,
       changedByUserId: entity.changed_by_user_id,
       changedAt: entity.changed_at,
+      isIncrease: entity.isIncrease,
+      isDecrease: entity.isDecrease,
+      absoluteChange: entity.absoluteChange,
+      formattedPercentageChange: entity.formattedPercentageChange,
       createdByUserId: entity.created_by_user_id,
       updatedByUserId: entity.updated_by_user_id,
     };

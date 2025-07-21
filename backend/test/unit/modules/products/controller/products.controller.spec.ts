@@ -215,7 +215,13 @@ describe('ProductsController', () => {
     };
 
     it('should update a product successfully', async () => {
-      const updatedProduct = { ...mockProduct, ...updateProductDto };
+      const updatedProduct = {
+        ...mockProduct,
+        ...updateProductDto,
+        getUnit: async () => null,
+        getCreatedByUser: async () => null,
+        getUpdatedByUser: async () => null,
+      };
       mockProductsService.update.mockResolvedValue(updatedProduct);
 
       const result = await controller.update(

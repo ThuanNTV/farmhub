@@ -4,35 +4,79 @@ import { AuditMetadata } from 'src/common/types/common.types';
 
 export class AuditLogResponseDto {
   @ApiProperty({ description: 'ID log' })
-  @Expose({ name: 'id' })
+  @Expose()
   id!: string;
 
   @ApiProperty({ description: 'ID người dùng' })
-  @Expose({ name: 'userId' })
+  @Expose()
   userId!: string;
 
   @ApiProperty({ description: 'Hành động' })
-  @Expose({ name: 'action' })
+  @Expose()
   action!: string;
 
   @ApiProperty({ description: 'Bảng tác động' })
-  @Expose({ name: 'targetTable' })
+  @Expose()
   targetTable!: string;
 
   @ApiProperty({ description: 'ID bản ghi tác động' })
-  @Expose({ name: 'targetId' })
+  @Expose()
   targetId!: string;
 
+  @ApiProperty({ description: 'ID store/tenant' })
+  @Expose()
+  storeId!: string;
+
+  @ApiProperty({ description: 'Địa chỉ IP', required: false })
+  @Expose()
+  ipAddress?: string;
+
+  @ApiProperty({ description: 'User Agent', required: false })
+  @Expose()
+  userAgent?: string;
+
+  @ApiProperty({ description: 'Session ID', required: false })
+  @Expose()
+  sessionId?: string;
+
+  @ApiProperty({ description: 'Thiết bị', required: false })
+  @Expose()
+  device?: string;
+
+  @ApiProperty({ description: 'Trình duyệt', required: false })
+  @Expose()
+  browser?: string;
+
+  @ApiProperty({ description: 'Hệ điều hành', required: false })
+  @Expose()
+  os?: string;
+
+  @ApiProperty({ description: 'Tên người dùng', required: false })
+  @Expose()
+  userName?: string;
+
+  @ApiProperty({ description: 'Giá trị cũ', required: false, type: Object })
+  @Expose()
+  oldValue?: Record<string, any>;
+
+  @ApiProperty({ description: 'Giá trị mới', required: false, type: Object })
+  @Expose()
+  newValue?: Record<string, any>;
+
   @ApiProperty({ description: 'Metadata', required: false })
-  @Expose({ name: 'metadata' })
+  @Expose()
   metadata?: AuditMetadata;
+
+  @ApiProperty({ description: 'Chi tiết', required: false })
+  @Expose()
+  details?: string;
 
   @ApiProperty({
     description: 'Thời gian tạo',
     type: String,
     format: 'date-time',
   })
-  @Expose({ name: 'createdAt' })
+  @Expose()
   createdAt!: Date;
 
   @ApiProperty({
@@ -40,11 +84,11 @@ export class AuditLogResponseDto {
     type: String,
     format: 'date-time',
   })
-  @Expose({ name: 'updatedAt' })
+  @Expose()
   updatedAt!: Date;
 
   @ApiProperty({ description: 'Đã xóa mềm' })
-  @Expose({ name: 'isDeleted' })
+  @Expose()
   isDeleted!: boolean;
 
   @ApiProperty({
@@ -53,6 +97,6 @@ export class AuditLogResponseDto {
     format: 'date-time',
     required: false,
   })
-  @Expose({ name: 'deletedAt' })
+  @Expose()
   deletedAt?: Date;
 }

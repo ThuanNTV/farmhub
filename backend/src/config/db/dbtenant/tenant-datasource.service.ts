@@ -161,53 +161,6 @@ export class TenantDataSourceService implements OnModuleDestroy {
     }
   }
 
-  /**
-   * Tạo Promise để khởi tạo DataSource
-   */
-  // private async createDataSourceInitPromise(
-  //   storeId: string,
-  //   dbName: string,
-  // ): Promise<DataSource> {
-  //   this.logger.log(
-  //     `Initializing new DataSource for store: ${storeId} (db: ${dbName})`,
-  //   );
-
-  //   const tenantConfig = getTenantDbConfig(dbName);
-  //   const newDataSource = new DataSource(tenantConfig);
-
-  //   try {
-  //     await newDataSource.initialize();
-
-  //     // Test connection
-  //     const shouldSync = await this.shouldSynchronize(newDataSource);
-  //     if (shouldSync) {
-  //       this.logger.warn(`Synchronizing schema for db: ${dbName}`);
-  //       await newDataSource.synchronize();
-  //     }
-
-  //     return newDataSource;
-  //   } catch (error) {
-  //     this.logger.error(
-  //       `Failed to initialize DataSource for store: ${storeId} (db: ${dbName})`,
-  //       error instanceof Error ? error.message : String(error),
-  //     );
-
-  //     // Cleanup nếu initialization thất bại
-  //     if (newDataSource.isInitialized) {
-  //       try {
-  //         await newDataSource.destroy();
-  //       } catch (destroyError) {
-  //         this.logger.error(
-  //           'Failed to cleanup failed DataSource',
-  //           destroyError,
-  //         );
-  //       }
-  //     }
-
-  //     throw error;
-  //   }
-  // }
-
   private async createDataSourceInitPromise(
     storeId: string,
     schemaName: string,

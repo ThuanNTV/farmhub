@@ -8,6 +8,7 @@ import {
   Patch,
   UseGuards,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -27,6 +28,12 @@ import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { CreateAuditLogDto } from 'src/modules/audit-logs/dto/create-auditLog.dto';
 import { AuditLogResponseDto } from 'src/modules/audit-logs/dto/audit-log-response.dto';
 import { UpdateAuditLogDto } from 'src/modules/audit-logs/dto/update-auditLog.dto';
+import {
+  AuditLogFilterDto,
+  AuditLogStatsDto,
+  PaginatedAuditLogResponseDto,
+  DateRangeDto,
+} from '../dto/audit-log-filter.dto';
 
 @ApiTags('Audit Logs')
 @ApiBearerAuth('access-token')
@@ -37,7 +44,7 @@ export class AuditLogsController {
   constructor(private readonly service: AuditLogsService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.ADMIN_STORE, UserRole.STORE_MANAGER)
   @RequireUserPermission('create')
   @RateLimitAPI()
   @ApiOperation({ summary: 'Create a new audit log' })
@@ -111,5 +118,47 @@ export class AuditLogsController {
     @Param('id') id: string,
   ): Promise<{ message: string }> {
     return this.service.remove(storeId, id);
+  }
+
+  @Get(':storeId/search')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Tìm kiếm audit logs với bộ lọc nâng cao' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  async searchLogs(
+    @Param('storeId') storeId: string,
+    @Query() filters: AuditLogFilterDto,
+  ): Promise<PaginatedAuditLogResponseDto> {
+    return this.service.findWithFilters(storeId, filters);
+  }
+
+  @Get(':storeId/statistics')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Lấy thống kê audit logs' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  async getStatistics(
+    @Param('storeId') storeId: string,
+    @Query() dateRange?: DateRangeDto,
+  ): Promise<AuditLogStatsDto> {
+    return this.service.getStatistics(storeId, dateRange);
+  }
+
+  @Get(':storeId/history/:targetTable/:targetId')
+  @RequireUserPermission('read')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Lấy lịch sử thay đổi của một record' })
+  @ApiParam({ name: 'storeId', description: 'ID của store' })
+  @ApiParam({ name: 'targetTable', description: 'Tên bảng' })
+  @ApiParam({ name: 'targetId', description: 'ID của record' })
+  async getChangeHistory(
+    @Param('storeId') storeId: string,
+    @Param('targetTable') targetTable: string,
+    @Param('targetId') targetId: string,
+  ): Promise<AuditLogResponseDto[]> {
+    return this.service.getChangeHistory(storeId, targetTable, targetId);
   }
 }

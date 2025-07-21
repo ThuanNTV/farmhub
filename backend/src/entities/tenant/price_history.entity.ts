@@ -31,6 +31,46 @@ export class PriceHistory {
   @Column({ type: 'decimal', precision: 18, scale: 2, name: 'newPrice' })
   new_price!: number;
 
+  @Column({
+    type: 'enum',
+    enum: ['retail', 'wholesale', 'credit', 'cost'],
+    name: 'priceType',
+    default: 'retail',
+  })
+  price_type!: 'retail' | 'wholesale' | 'credit' | 'cost';
+
+  @Column({
+    type: 'decimal',
+    precision: 18,
+    scale: 2,
+    name: 'priceDifference',
+    nullable: true,
+  })
+  price_difference?: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    name: 'percentageChange',
+    nullable: true,
+  })
+  percentage_change?: number;
+
+  @Column({ type: 'varchar', length: 500, name: 'reason', nullable: true })
+  reason?: string;
+
+  @Column({ type: 'json', name: 'metadata', nullable: true })
+  metadata?: {
+    source?: string; // 'manual', 'bulk_update', 'api', 'import'
+    batch_id?: string; // For bulk operations
+    supplier_price_change?: boolean;
+    market_adjustment?: boolean;
+    promotion?: boolean;
+    cost_increase?: boolean;
+    [key: string]: any;
+  };
+
   @Column({ type: 'uuid', name: 'changedByUserId', nullable: true })
   changed_by_user_id?: string;
 
@@ -51,4 +91,23 @@ export class PriceHistory {
 
   @Column({ type: 'uuid', name: 'updatedByUserId', nullable: true })
   updated_by_user_id?: string;
+
+  // Computed properties
+  get isIncrease(): boolean {
+    return this.new_price > this.old_price;
+  }
+
+  get isDecrease(): boolean {
+    return this.new_price < this.old_price;
+  }
+
+  get absoluteChange(): number {
+    return Math.abs(this.price_difference || 0);
+  }
+
+  get formattedPercentageChange(): string {
+    if (!this.percentage_change) return '0%';
+    const sign = this.percentage_change > 0 ? '+' : '';
+    return `${sign}${this.percentage_change.toFixed(2)}%`;
+  }
 }
