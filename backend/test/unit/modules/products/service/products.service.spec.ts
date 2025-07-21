@@ -133,11 +133,31 @@ describe('ProductsService', () => {
     it('should create a product successfully', async () => {
       const storeId = 'store-123';
 
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
       // Mock findById to return null (product doesn't exist)
       jest.spyOn(service, 'findById').mockResolvedValue(null);
 
       // Mock findByproductCode to return null (product code doesn't exist)
       jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category repository for validation
+      const mockCategoryRepo = {
+        findOne: jest
+          .fn()
+          .mockResolvedValue({ category_id: createProductDto.categoryId }),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockImplementation((entity) => {
+          if (entity.name === 'Category') return mockCategoryRepo;
+          return mockRepository;
+        }),
+        isInitialized: true,
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
 
       // Mock repository methods
       mockRepository.create.mockReturnValue(mockProduct);
@@ -173,28 +193,74 @@ describe('ProductsService', () => {
 
     it('should log and throw if repo.save throws', async () => {
       const storeId = 'store-123';
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
+
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
+      // Mock findById and findByproductCode to return null
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category validation to pass
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue({ category_id: 'cat1' }),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockImplementation((entity) => {
+          if (entity.name === 'Category') return mockCategoryRepo;
+          return mockRepository;
+        }),
+        isInitialized: true,
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
       mockRepository.create.mockReturnValue({ product_id: 'p1' });
       mockRepository.save.mockRejectedValue(new Error('fail-save'));
+
       await expect(
         service.createProduct(storeId, {
           productId: 'p1',
           productCode: 'C1',
+          categoryId: 'cat1',
         } as any),
       ).rejects.toThrow('fail-save');
     });
     it('should log and throw if auditLogsService.create throws', async () => {
       const storeId = 'store-123';
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
+
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
+      // Mock findById and findByproductCode to return null
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category validation to pass
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue({ category_id: 'cat1' }),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockImplementation((entity) => {
+          if (entity.name === 'Category') return mockCategoryRepo;
+          return mockRepository;
+        }),
+        isInitialized: true,
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
       mockRepository.create.mockReturnValue({ product_id: 'p1' });
       mockRepository.save.mockResolvedValue({ product_id: 'p1' });
       mockAuditLogsService.create.mockRejectedValue(new Error('fail-audit'));
+
       await expect(
         service.createProduct(storeId, {
           productId: 'p1',
           productCode: 'C1',
+          categoryId: 'cat1',
         } as any),
       ).rejects.toThrow('fail-audit');
     });
@@ -212,15 +278,38 @@ describe('ProductsService', () => {
     });
     it('should log and throw if unknown error', async () => {
       const storeId = 'store-123';
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
-      mockRepository.findOneBy.mockResolvedValueOnce(null);
+
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
+      // Mock findById and findByproductCode to return null
+      jest.spyOn(service, 'findById').mockResolvedValue(null);
+      jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
+
+      // Mock category validation to pass
+      const mockCategoryRepo = {
+        findOne: jest.fn().mockResolvedValue({ category_id: 'cat1' }),
+      };
+      const mockDataSource = {
+        getRepository: jest.fn().mockImplementation((entity) => {
+          if (entity.name === 'Category') return mockCategoryRepo;
+          return mockRepository;
+        }),
+        isInitialized: true,
+      };
+      mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
+        mockDataSource as any,
+      );
+
       mockRepository.create.mockImplementation(() => {
         throw new Error('fail-unknown');
       });
+
       await expect(
         service.createProduct(storeId, {
           productId: 'p1',
           productCode: 'C1',
+          categoryId: 'cat1',
         } as any),
       ).rejects.toThrow('fail-unknown');
     });
@@ -613,6 +702,9 @@ describe('ProductsService', () => {
         isDeleted: false,
       };
 
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
       // Mock no existing product/code conflicts
       jest.spyOn(service, 'findById').mockResolvedValue(null);
       jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
@@ -623,6 +715,7 @@ describe('ProductsService', () => {
       };
       const mockDataSource = {
         getRepository: jest.fn().mockReturnValue(mockCategoryRepo),
+        isInitialized: true,
       };
       mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
         mockDataSource as any,
@@ -686,6 +779,9 @@ describe('ProductsService', () => {
         isDeleted: false,
       };
 
+      // Mock getRepo to return mockRepository directly
+      jest.spyOn(service as any, 'getRepo').mockResolvedValue(mockRepository);
+
       // Mock no existing product/code conflicts
       jest.spyOn(service, 'findById').mockResolvedValue(null);
       jest.spyOn(service, 'findByproductCode').mockResolvedValue(null);
@@ -703,6 +799,7 @@ describe('ProductsService', () => {
           if (entity.name === 'Category') return mockCategoryRepo;
           return mockRepository;
         }),
+        isInitialized: true,
       };
       mockTenantDataSourceService.getTenantDataSource.mockResolvedValue(
         mockDataSource as any,

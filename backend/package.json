@@ -1,8 +1,8 @@
 {
   "name": "backend",
   "version": "1.0.1",
-  "description": "FarmHub - Quản lý vật tư nông nghiệp",
-  "author": "",
+  "description": "FarmHub - Quản lý đa cửa hàng",
+  "author": "ThuanNguyen",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
