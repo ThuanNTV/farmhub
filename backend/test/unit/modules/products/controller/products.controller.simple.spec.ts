@@ -7,6 +7,10 @@ import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
 import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import { PriceHistoriesService } from 'src/modules/price-histories/service/price-histories.service';
+import { ReportService } from 'src/modules/report/service/report.service';
+import { InventoryAnalyticsService } from 'src/modules/products/service/inventory-analytics.service';
+import { SupplierIntegrationService } from 'src/modules/products/service/supplier-integration.service';
 import {
   BadRequestException,
   NotFoundException,
@@ -20,6 +24,9 @@ import {
   mockPermissionGuard,
   mockAuditInterceptor,
 } from '../../../../utils/mock-dependencies';
+import { SupplierIntegrationExtendedService } from 'src/modules/products/service/supplier-integration-extended.service';
+import { ProductRecommendationsService } from 'src/modules/products/service/product-recommendations.service';
+import { AdvancedSearchService } from 'src/modules/products/service/advanced-search.service';
 // Simple mock data without helpers
 const createMockProduct = () => ({
   productId: '123e4567-e89b-12d3-a456-426614174000',
@@ -75,6 +82,43 @@ describe('ProductsController', () => {
         {
           provide: ProductsService,
           useValue: mockService,
+        },
+        {
+          provide: PriceHistoriesService,
+          useValue: { createPriceHistories: jest.fn() },
+        },
+        {
+          provide: ReportService,
+          useValue: { exportReport: jest.fn(), previewReport: jest.fn() },
+        },
+        {
+          provide: InventoryAnalyticsService,
+          useValue: {
+            getInventoryAnalytics: jest.fn(),
+            getInventoryOverview: jest.fn(),
+          },
+        },
+        {
+          provide: SupplierIntegrationService,
+          useValue: {
+            // mock các method nếu test có gọi, ví dụ:
+            syncSuppliers: jest.fn(),
+          },
+        },
+        {
+          provide: SupplierIntegrationExtendedService,
+          useValue: {
+            // mock các method nếu test có gọi, ví dụ:
+            syncSuppliers: jest.fn(),
+          },
+        },
+        {
+          provide: ProductRecommendationsService,
+          useValue: {},
+        },
+        {
+          provide: AdvancedSearchService,
+          useValue: {},
         },
         { provide: SecurityService, useValue: mockSecurityService },
         { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },

@@ -3,12 +3,33 @@ import { ProductsController } from '@modules/products/controller/products.contro
 import { ProductsService } from '@modules/products/service/products.service';
 import { CreateProductDto } from '@modules/products/dto/create-product.dto';
 import { UpdateProductDto } from '@modules/products/dto/update-product.dto';
+import { Reflector } from '@nestjs/core';
 import {
   InternalServerErrorException,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { Product } from 'src/entities/tenant/product.entity';
+import { SecurityService } from 'src/service/global/security.service';
+import {
+  mockAuditInterceptor,
+  mockAuditLogAsyncService,
+  mockEnhancedAuthGuard,
+  mockPermissionGuard,
+  mockReflector,
+  mockSecurityService,
+} from '../../../../utils/mock-dependencies';
+import { EnhancedAuthGuard } from 'src/common/auth/enhanced-auth.guard';
+import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
+import { PriceHistoriesService } from 'src/modules/price-histories/service/price-histories.service';
+import { ReportService } from 'src/modules/report/service/report.service';
+import { InventoryAnalyticsService } from 'src/modules/products/service/inventory-analytics.service';
+import { SupplierIntegrationService } from 'src/modules/products/service/supplier-integration.service';
+import { SupplierIntegrationExtendedService } from 'src/modules/products/service/supplier-integration-extended.service';
+import { ProductRecommendationsService } from 'src/modules/products/service/product-recommendations.service';
+import { AdvancedSearchService } from 'src/modules/products/service/advanced-search.service';
+import { AuditLogAsyncService } from 'src/common/audit/audit-log-async.service';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -49,6 +70,15 @@ describe('ProductsController', () => {
   const storeId = 'store-123';
 
   beforeEach(async () => {
+    const mockService = {
+      createProduct: jest.fn(),
+      findAll: jest.fn(),
+      findOne: jest.fn(),
+      update: jest.fn(),
+      remove: jest.fn(),
+      restore: jest.fn(),
+    };
+
     mockProductsService = {
       createProduct: jest.fn(),
       findAll: jest.fn(),
@@ -67,10 +97,60 @@ describe('ProductsController', () => {
       providers: [
         {
           provide: ProductsService,
-          useValue: mockProductsService,
+          useValue: mockService,
         },
+        {
+          provide: PriceHistoriesService,
+          useValue: { createPriceHistories: jest.fn() },
+        },
+        {
+          provide: ReportService,
+          useValue: { exportReport: jest.fn(), previewReport: jest.fn() },
+        },
+        {
+          provide: InventoryAnalyticsService,
+          useValue: {
+            getInventoryAnalytics: jest.fn(),
+            getInventoryOverview: jest.fn(),
+          },
+        },
+        {
+          provide: SupplierIntegrationService,
+          useValue: {
+            // mock các method nếu test có gọi, ví dụ:
+            syncSuppliers: jest.fn(),
+          },
+        },
+        {
+          provide: SupplierIntegrationExtendedService,
+          useValue: {
+            // mock các method nếu test có gọi, ví dụ:
+            syncSuppliers: jest.fn(),
+          },
+        },
+        {
+          provide: ProductRecommendationsService,
+          useValue: {},
+        },
+        {
+          provide: AdvancedSearchService,
+          useValue: {},
+        },
+        { provide: SecurityService, useValue: mockSecurityService },
+        { provide: AuditLogAsyncService, useValue: mockAuditLogAsyncService },
+        { provide: Reflector, useValue: mockReflector },
+        { provide: EnhancedAuthGuard, useValue: mockEnhancedAuthGuard },
+        { provide: PermissionGuard, useValue: mockPermissionGuard },
+        { provide: AuditInterceptor, useValue: mockAuditInterceptor },
       ],
-    }).compile();
+    })
+      .overrideGuard(EnhancedAuthGuard)
+      .useValue(mockEnhancedAuthGuard)
+      .overrideGuard(PermissionGuard)
+      .useValue(mockPermissionGuard)
+      .overrideInterceptor(AuditInterceptor)
+      .useValue(mockAuditInterceptor)
+      .compile();
 
     controller = module.get<ProductsController>(ProductsController);
   });

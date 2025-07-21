@@ -6,6 +6,7 @@ import { TenantDataSourceService } from 'src/config/db/dbtenant/tenant-datasourc
 import { Product } from 'src/entities/tenant/product.entity';
 import { Category } from 'src/entities/tenant/category.entity';
 import { AuditLogsService } from 'src/modules/audit-logs/service';
+import { PriceHistoriesService } from 'src/modules/price-histories/service/price-histories.service';
 
 describe('ProductsService - createProduct Coverage Test', () => {
   let service: ProductsService;
@@ -97,6 +98,10 @@ describe('ProductsService - createProduct Coverage Test', () => {
         {
           provide: AuditLogsService,
           useValue: mockAuditLogsService,
+        },
+        {
+          provide: PriceHistoriesService,
+          useValue: { createPriceHistories: jest.fn() },
         },
       ],
     }).compile();
