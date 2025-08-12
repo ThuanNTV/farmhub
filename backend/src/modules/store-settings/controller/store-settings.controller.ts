@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   Request,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,6 +26,9 @@ import { AuditInterceptor } from 'src/common/auth/audit.interceptor';
 import { RateLimitAPI } from 'src/common/decorator/rate-limit.decorator';
 import { RequestWithUser } from 'src/common/types/common.types';
 import { PermissionGuard } from 'src/core/rbac/permission/permission.guard';
+import { StoreSettingFilterDto } from '../dto/storeSetting-filter.dto';
+import { Roles } from 'src/core/rbac/role/roles.decorator';
+import { UserRole } from 'src/modules/users/dto/create-user.dto';
 
 @ApiTags('Store Settings')
 @Controller('tenant/:storeId/store-settings')
@@ -35,6 +39,7 @@ export class StoreSettingsController {
   constructor(private readonly service: StoreSettingsService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Create a new store setting' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -60,8 +65,11 @@ export class StoreSettingsController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
-  @ApiOperation({ summary: 'Get all store settings' })
+  @ApiOperation({
+    summary: 'Get all store settings (with filter & pagination)',
+  })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
   @ApiResponse({
     status: 200,
@@ -71,11 +79,15 @@ export class StoreSettingsController {
     status: 403,
     description: 'Forbidden - insufficient permissions',
   })
-  findAll(@Param('storeId') storeId: string) {
-    return this.service.findAll(storeId);
+  findAll(
+    @Param('storeId') storeId: string,
+    @Query() query: StoreSettingFilterDto,
+  ) {
+    return this.service.findAllWithFilter(storeId, query);
   }
 
   @Get('key/:key')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Get store setting by key' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -91,6 +103,7 @@ export class StoreSettingsController {
   }
 
   @Get('value/:key')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Get store setting value by key' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -108,6 +121,7 @@ export class StoreSettingsController {
   }
 
   @Get('category/:category')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Get store settings by category' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -131,6 +145,7 @@ export class StoreSettingsController {
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER, UserRole.STORE_STAFF)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Get store setting by ID' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -146,6 +161,7 @@ export class StoreSettingsController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Update store setting' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -174,6 +190,7 @@ export class StoreSettingsController {
   }
 
   @Patch('key/:key')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Update store setting by key' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -197,6 +214,7 @@ export class StoreSettingsController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN_GLOBAL)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Soft delete store setting' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -215,6 +233,7 @@ export class StoreSettingsController {
   }
 
   @Delete('key/:key')
+  @Roles(UserRole.ADMIN_GLOBAL)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Delete store setting by key' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })
@@ -233,6 +252,7 @@ export class StoreSettingsController {
   }
 
   @Patch(':id/restore')
+  @Roles(UserRole.ADMIN_GLOBAL, UserRole.STORE_MANAGER)
   @RateLimitAPI()
   @ApiOperation({ summary: 'Restore soft deleted store setting' })
   @ApiParam({ name: 'storeId', description: 'Store ID' })

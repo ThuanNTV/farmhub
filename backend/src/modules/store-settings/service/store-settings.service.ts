@@ -10,6 +10,8 @@ import { StoreSetting } from 'src/entities/tenant/store_setting.entity';
 import { CreateStoreSettingDto } from 'src/modules/store-settings/dto/create-storeSetting.dto';
 import { UpdateStoreSettingDto } from 'src/modules/store-settings/dto/update-storeSetting.dto';
 import { Like } from 'typeorm';
+import { StoreSettingFilterDto } from '../dto/storeSetting-filter.dto';
+import { FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class StoreSettingsService extends TenantBaseService<StoreSetting> {
@@ -224,6 +226,26 @@ export class StoreSettingsService extends TenantBaseService<StoreSetting> {
     }
 
     return await this.remove(storeId, setting.id);
+  }
+
+  async findAllWithFilter(storeId: string, filter: StoreSettingFilterDto) {
+    const repo = await this.getRepo(storeId);
+    const page = filter.page || 1;
+    const limit = filter.limit || 20;
+    const where: FindOptionsWhere<StoreSetting> = { is_deleted: false };
+    if (filter.key) {
+      where.setting_key = Like(`%${filter.key}%`);
+    }
+    if (filter.value) {
+      where.setting_value = Like(`%${filter.value}%`);
+    }
+    const [data, total] = await repo.findAndCount({
+      where,
+      order: { setting_key: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { data, total, page, limit };
   }
 
   private validateSettingKey(key: string): void {

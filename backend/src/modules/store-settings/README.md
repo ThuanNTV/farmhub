@@ -1,5 +1,77 @@
 # Store Settings Module
 
+Quản lý cài đặt cửa hàng theo từng tenant (multi-tenant).
+
+## Kiến trúc & Thành phần
+
+- Controller: `StoreSettingsController`
+- Service: `StoreSettingsService` (kế thừa `TenantBaseService`)
+- DTOs: `CreateStoreSettingDto`, `UpdateStoreSettingDto`, `StoreSettingFilterDto`, `StoreSettingResponseDto`
+
+- Entity: `StoreSetting`
+- Guard: `EnhancedAuthGuard`, `PermissionGuard`
+- Interceptor: `AuditInterceptor`
+- RBAC: `@Roles(...)` theo endpoint
+
+## API & Phân quyền
+
+Các endpoint (tenant route: `/tenant/:storeId/store-settings`):
+
+- POST `/` — Tạo cài đặt mới. Quyền: ADMIN_GLOBAL, STORE_MANAGER
+- GET `/` — Danh sách + filter/pagination (query: `key`, `value`, `page`=1, `limit`=20). Quyền: ADMIN_GLOBAL, STORE_MANAGER, STORE_STAFF
+- GET `/key/:key` — Lấy theo key. Quyền: ADMIN_GLOBAL, STORE_MANAGER, STORE_STAFF
+- GET `/value/:key` — Lấy chỉ giá trị theo key. Quyền: ADMIN_GLOBAL, STORE_MANAGER, STORE_STAFF
+- GET `/category/:category` — Danh sách theo tiền tố category (match `setting_key` bắt đầu với `category.`). Quyền: ADMIN_GLOBAL, STORE_MANAGER, STORE_STAFF
+- GET `/:id` — Lấy theo ID. Quyền: ADMIN_GLOBAL, STORE_MANAGER, STORE_STAFF
+- PATCH `/:id` — Cập nhật theo ID. Quyền: ADMIN_GLOBAL, STORE_MANAGER
+- PATCH `/key/:key` — Cập nhật theo key (upsert khi chưa tồn tại). Quyền: ADMIN_GLOBAL, STORE_MANAGER
+- DELETE `/:id` — Xóa mềm. Quyền: ADMIN_GLOBAL
+- DELETE `/key/:key` — Xóa mềm theo key. Quyền: ADMIN_GLOBAL
+- PATCH `/:id/restore` — Khôi phục bản ghi đã xóa mềm. Quyền: ADMIN_GLOBAL, STORE_MANAGER
+
+## Filter & Pagination
+
+- `GET /` hỗ trợ: `key` (LIKE), `value` (LIKE), `page` (>=1), `limit` (>=1)
+- Mặc định: `page=1`, `limit=20`
+- Sắp xếp: `setting_key` ASC
+
+## Validation chính
+
+- `settingKey`: chỉ cho phép `[a-zA-Z0-9._-]`, độ dài `1..255`
+- `settingValue`: nếu bắt đầu bằng `{` hoặc `[` thì phải là JSON hợp lệ; tối đa `65535` ký tự
+- Không cho phép trùng `settingKey` (is_deleted=false) khi tạo/cập nhật đổi key
+
+## Ghi chú Entity
+
+- Trường chính: `setting_key`, `setting_value`, `store_id`, `is_deleted`, timestamps, `created_by_user_id`, `updated_by_user_id`
+- Có index trên `store_id`
+- Không có cột `category` riêng; phân loại theo tiền tố của `setting_key` (ví dụ: `email.smtp_host` ⇒ category `email`)
+
+## Testing & Coverage
+
+- Unit tests: controller và service (mock repo thông qua mock `getRepo`)
+- E2E: smoke test cho route list với guard override
+- Chạy test module-scoped với coverage (khuyến nghị):
+
+```powershell
+npx jest --config test/jest.config.ts test/unit/modules/store-settings --coverage --collectCoverageFrom="src/modules/store-settings/**/*.{ts,js}"
+```
+
+- Mục tiêu: coverage module ≥ 80% (controller ~100%, service >90% hiện tại). Global threshold có thể không áp dụng khi chạy toàn repo; nên dùng lệnh scoped trên khi cần kiểm tra module này.
+
+## Bảo mật
+
+- JWT + guards (`EnhancedAuthGuard`, `PermissionGuard`), RBAC bằng `@Roles`
+- Rate limiting theo decorator (nếu bật ở controller)
+
+## Checklist nhanh
+
+- [ ] Thêm test case cho nhánh lỗi mới (nếu mở rộng validation)
+- [ ] Đảm bảo không hardcode config; dùng `TenantDataSourceService`
+- [ ] Review index/hiệu năng với bảng lớn; xem xét cache nếu cần
+
+# Store Settings Module
+
 ## Chức năng
 
 - Quản lý cài đặt cửa hàng.
