@@ -40,6 +40,7 @@ describe('BankService', () => {
       merge: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      createQueryBuilder: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -123,6 +124,58 @@ describe('BankService', () => {
       const result = await service.findAll();
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('findAllWithFilter', () => {
+    const makeQB = (rows: any[], count = rows.length) => {
+      const qb: any = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([rows, count]),
+      };
+      return qb;
+    };
+
+    it('should return paginated banks without search', async () => {
+      const rows = [mockBank];
+      const qb = makeQB(rows, 1);
+      mockBankRepository.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findAllWithFilter({ page: 2, limit: 5 });
+
+      expect(mockBankRepository.createQueryBuilder).toHaveBeenCalledWith('b');
+      expect(qb.where).toHaveBeenCalledWith('b.is_deleted = :isDeleted', {
+        isDeleted: false,
+      });
+      expect(qb.orderBy).toHaveBeenCalledWith('b.created_at', 'DESC');
+      expect(qb.skip).toHaveBeenCalledWith((2 - 1) * 5);
+      expect(qb.take).toHaveBeenCalledWith(5);
+      expect(result.total).toBe(1);
+      expect(result.page).toBe(2);
+      expect(result.limit).toBe(5);
+      expect(result.data[0].id).toBe(mockBank.id);
+    });
+
+    it('should apply search filter (LIKE on name)', async () => {
+      const rows = [mockBank];
+      const qb = makeQB(rows, 1);
+      mockBankRepository.createQueryBuilder.mockReturnValue(qb);
+
+      const result = await service.findAllWithFilter({
+        search: 'test',
+        page: 1,
+        limit: 10,
+      });
+
+      expect(qb.andWhere).toHaveBeenCalledWith('LOWER(b.name) LIKE :search', {
+        search: '%test%',
+      });
+      expect(result.data.length).toBe(1);
+      expect(result.total).toBe(1);
     });
   });
 

@@ -26,4 +26,4 @@ export class StoreSettingFilterDto {
   @IsOptional()
   @IsString()
   value?: string;
-} 
+}

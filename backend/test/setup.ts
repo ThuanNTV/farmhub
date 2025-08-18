@@ -56,6 +56,14 @@ jest.mock('@nestjs/typeorm', () => ({
     }),
   },
   getRepositoryToken: jest.fn().mockReturnValue('MockRepositoryToken'),
+  // Provide a no-op decorator for InjectRepository to prevent runtime errors
+  InjectRepository:
+    () =>
+    (
+      _target?: any,
+      _propertyKey?: string | symbol,
+      _parameterIndex?: number,
+    ) => {},
 }));
 
 // Mock TenantDataSourceService

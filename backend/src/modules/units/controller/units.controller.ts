@@ -28,6 +28,7 @@ import { RequestWithUser } from 'src/common/types/common.types';
 import { CreateUnitDto } from 'src/modules/units/dto/create-unit.dto';
 import { UpdateUnitDto } from 'src/modules/units/dto/update-unit.dto';
 import { UnitResponseDto } from 'src/modules/units/dto/unit-response.dto';
+import { UnitFilterDto } from 'src/modules/units/dto/unit-filter.dto';
 
 @ApiTags('units')
 @ApiBearerAuth('access-token')
@@ -76,6 +77,34 @@ export class UnitsController {
   async findAll(): Promise<UnitResponseDto[]> {
     const entities = await this.unitsService.findAll();
     return entities.map((e) => this.unitsService.mapToResponseDto(e));
+  }
+
+  @Get('search')
+  @Roles(
+    UserRole.ADMIN_GLOBAL,
+    UserRole.STORE_MANAGER,
+    UserRole.STORE_STAFF,
+    UserRole.VIEWER,
+  )
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Search units with pagination' })
+  @ApiResponse({ status: 200, description: 'Return paginated units' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async findAllWithFilter(@Request() req: Request): Promise<{
+    data: UnitResponseDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const query = (req as any).query as UnitFilterDto;
+    const result = await this.unitsService.findAllWithFilter(query);
+    return {
+      data: result.data.map((e) => this.unitsService.mapToResponseDto(e)),
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+    };
   }
 
   @Get(':id')

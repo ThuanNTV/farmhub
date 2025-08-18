@@ -38,6 +38,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@core/(.*)$': '<rootDir>/../../src/core/$1',
     '^@modules/(.*)$': '<rootDir>/../../src/modules/$1',
+    '^@common/(.*)$': '<rootDir>/../../src/common/$1',
     '^src/(.*)$': '<rootDir>/../../src/$1',
     '^@/(.*)$': '<rootDir>/../../src/$1',
   },

@@ -178,7 +178,7 @@ export class ProductSeoService {
         throw new NotFoundException(`Product with ID ${productId} not found`);
       }
 
-      let seoRecord = await seoRepo.findOne({
+      const seoRecord = await seoRepo.findOne({
         where: { product_id: productId, is_deleted: false },
       });
 

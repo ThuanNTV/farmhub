@@ -25,6 +25,7 @@
     "test:security": "jest --config test/config/jest-unit.config.ts --testPathPattern=test/unit/(auth|guards)/.*\\.spec\\.ts$",
     "test:coverage": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:coverage2": "jest --config test/jest.config.ts --coverage --coverageReporters=html",
+    "test:bank": "jest --config test/jest.config.ts --coverage --collectCoverageFrom=\"src/modules/bank/**/*.{ts,js}\" --testPathPattern=\"test/unit/modules/bank/.*\\.spec\\.ts$\"",
     "create-test-user": "ts-node -r tsconfig-paths/register scripts/create-test-user.ts",
     "check-users": "ts-node -r tsconfig-paths/register scripts/check-users.ts",
     "verify-password": "ts-node -r tsconfig-paths/register scripts/verify-password.ts",

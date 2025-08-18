@@ -27,6 +27,7 @@ import { CreateBankDto } from 'src/modules/bank/dto/create-bank.dto';
 import { UpdateBankDto } from 'src/modules/bank/dto/update-bank.dto';
 import { BankService } from 'src/modules/bank/service/bank.service';
 import { UserRole } from 'src/modules/users/dto/create-user.dto';
+import { BankFilterDto } from 'src/modules/bank/dto/bank-filter.dto';
 
 @ApiTags('Banks')
 @Controller('banks')
@@ -62,6 +63,22 @@ export class BankController {
   @ApiResponse({ status: 200, type: [BankResponseDto] })
   findAll() {
     return this.bankService.findAll();
+  }
+
+  @Get('search')
+  @Roles(
+    UserRole.ADMIN_GLOBAL,
+    UserRole.STORE_MANAGER,
+    UserRole.STORE_STAFF,
+    UserRole.VIEWER,
+  )
+  @RequireUserPermission('read')
+  @RateLimitAPI()
+  @ApiOperation({ summary: 'Tìm kiếm + phân trang ngân hàng' })
+  @ApiResponse({ status: 200, description: 'Danh sách có phân trang' })
+  findAllWithFilter(@Request() req: Request) {
+    const query = (req as any).query as BankFilterDto;
+    return this.bankService.findAllWithFilter(query);
   }
 
   @Get(':id')

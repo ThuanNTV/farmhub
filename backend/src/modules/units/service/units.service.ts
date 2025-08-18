@@ -3,12 +3,13 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { Repository, FindOptionsWhere, Not } from 'typeorm';
+import { Repository, FindOptionsWhere, Not, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Unit } from 'src/entities/global/unit.entity';
 import { CreateUnitDto } from 'src/modules/units/dto/create-unit.dto';
 import { UpdateUnitDto } from 'src/modules/units/dto/update-unit.dto';
 import { UnitResponseDto } from 'src/modules/units/dto/unit-response.dto';
+import { UnitFilterDto } from 'src/modules/units/dto/unit-filter.dto';
 
 @Injectable()
 export class UnitsService {
@@ -35,6 +36,30 @@ export class UnitsService {
       where: { is_deleted: false },
       order: { created_at: 'DESC' },
     });
+  }
+
+  async findAllWithFilter(filter: UnitFilterDto): Promise<{
+    data: Unit[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filter.page ?? 1;
+    const limit = filter.limit ?? 20;
+    const where: FindOptionsWhere<Unit> = { is_deleted: false };
+
+    if (filter.search) {
+      where.name = Like(`%${filter.search}%`);
+    }
+
+    const [data, total] = await this.unitsRepo.findAndCount({
+      where,
+      order: { created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<Unit> {

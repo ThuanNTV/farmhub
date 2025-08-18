@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Bank } from 'src/entities/global/bank.entity';
 import { CreateBankDto } from 'src/modules/bank/dto/create-bank.dto';
 import { UpdateBankDto } from 'src/modules/bank/dto/update-bank.dto';
+import { BankFilterDto } from 'src/modules/bank/dto/bank-filter.dto';
 
 @Injectable()
 export class BankService {
@@ -26,6 +27,32 @@ export class BankService {
       where: { is_deleted: false },
       order: { created_at: 'DESC' },
     });
+  }
+
+  async findAllWithFilter(query: BankFilterDto): Promise<{
+    data: Bank[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const qb = this.banksRepo
+      .createQueryBuilder('b')
+      .where('b.is_deleted = :isDeleted', { isDeleted: false });
+
+    if (query.search) {
+      qb.andWhere('LOWER(b.name) LIKE :search', {
+        search: `%${query.search.toLowerCase()}%`,
+      });
+    }
+
+    qb.orderBy('b.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<Bank> {

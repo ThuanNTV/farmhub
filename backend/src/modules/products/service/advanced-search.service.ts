@@ -592,7 +592,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
     }
 
     // Brand match
-    if (product.brand && product.brand.toLowerCase().includes(queryLower)) {
+    if (product.brand?.toLowerCase().includes(queryLower)) {
       score += 0.15;
     }
 
@@ -602,7 +602,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
     }
 
     // Specs match
-    if (product.specs && product.specs.toLowerCase().includes(queryLower)) {
+    if (product.specs?.toLowerCase().includes(queryLower)) {
       score += 0.1;
     }
 
@@ -643,7 +643,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
     }
 
     // Highlight brand
-    if (product.brand && product.brand.toLowerCase().includes(queryLower)) {
+    if (product.brand?.toLowerCase().includes(queryLower)) {
       highlights.brand = this.highlightText(
         product.brand,
         query,
@@ -653,7 +653,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
     }
 
     // Highlight specs
-    if (product.specs && product.specs.toLowerCase().includes(queryLower)) {
+    if (product.specs?.toLowerCase().includes(queryLower)) {
       highlights.specs = this.highlightText(
         product.specs,
         query,
@@ -696,7 +696,7 @@ export class AdvancedSearchService extends TenantBaseService<Product> {
           highlighted.substring(start, end) +
           (end < highlighted.length ? '...' : '');
       } else {
-        highlighted = highlighted.substring(0, maxLength) + '...';
+        highlighted = `${highlighted.substring(0, maxLength)}...`;
       }
     }
 

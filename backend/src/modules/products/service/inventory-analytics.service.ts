@@ -266,7 +266,7 @@ export class InventoryAnalyticsService extends TenantBaseService<Product> {
       );
       const endDate = new Date(filterDto.dateTo ?? new Date());
 
-      let currentDate = new Date(startDate);
+      const currentDate = new Date(startDate);
       let runningStock = 2000;
 
       while (currentDate <= endDate) {
