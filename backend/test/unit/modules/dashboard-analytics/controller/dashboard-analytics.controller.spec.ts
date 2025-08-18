@@ -5,7 +5,9 @@ import { DashboardAnalyticsService } from '@modules/dashboard-analytics/service/
 describe('DashboardAnalyticsController', () => {
   let controller: DashboardAnalyticsController;
 
-  const mockService: Partial<Record<keyof DashboardAnalyticsService, jest.Mock>> = {
+  const mockService: Partial<
+    Record<keyof DashboardAnalyticsService, jest.Mock>
+  > = {
     getHeatmap: jest.fn(),
     getChart: jest.fn(),
     getIndustryAnalytics: jest.fn(),
